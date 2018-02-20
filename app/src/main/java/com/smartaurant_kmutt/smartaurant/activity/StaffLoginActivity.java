@@ -26,7 +26,7 @@ public class StaffLoginActivity extends AppCompatActivity implements StaffLoginF
     @Override
     public void onSubmitClicked(Intent intent) {
         startActivity(intent);
-
+        finish();
     }
 
 

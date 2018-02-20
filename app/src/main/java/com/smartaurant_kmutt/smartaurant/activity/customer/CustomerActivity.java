@@ -69,7 +69,9 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     public void onSubmitClicked(String email, String password) {
         writUserOut(false);
         Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
+
     }
 
 

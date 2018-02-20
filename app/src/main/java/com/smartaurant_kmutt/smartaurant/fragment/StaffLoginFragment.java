@@ -15,6 +15,7 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.StaffLoginActivity;
 import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierActivity;
 import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.activity.owner.OwnerActivity;
 
 
 /**
@@ -105,9 +106,13 @@ public class StaffLoginFragment extends Fragment {
         public void onClick(View v) {
             FragmentListener fragmentListener = (FragmentListener)getActivity();
             Intent intent;
-            if(etEmail.getText().toString().equals(cashierEmail)){
+            if(etEmail.getText().toString().equals("cashier")){
                 tvWrongPassord.setVisibility(View.INVISIBLE);
                 intent = new Intent(getActivity(), CashierTableActivity.class);
+                fragmentListener.onSubmitClicked(intent);
+            }else if(etEmail.getText().toString().equals("owner")){
+                tvWrongPassord.setVisibility(View.INVISIBLE);
+                intent = new Intent(getActivity(), OwnerActivity.class);
                 fragmentListener.onSubmitClicked(intent);
             }else{
                 tvWrongPassord.setVisibility(View.VISIBLE);

@@ -30,9 +30,14 @@
             android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".activity.cashier.CashierTableActivity"
-            android:theme="@style/AppThemeNoActionBar"></activity>
-        <activity android:name=".activity.cashier.CashierActivity"
-            android:theme="@style/AppThemeNoActionBar"></activity>
+            android:theme="@style/AppThemeNoActionBar" />
+        <activity
+            android:name=".activity.cashier.CashierActivity"
+            android:theme="@style/AppThemeNoActionBar" />
+        <activity android:name=".activity.owner.OwnerActivity"
+            android:theme="@style/AppThemeNoActionBar">
+
+        </activity>
     </application>
 
 </manifest>
