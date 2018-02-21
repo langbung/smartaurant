@@ -24,7 +24,8 @@
             android:theme="@style/AppThemeNoActionBar" />
         <activity
             android:name=".activity.StaffLoginActivity"
-            android:theme="@style/AppThemeNoActionBar" />
+            android:theme="@style/AppThemeNoActionBar"
+            android:windowSoftInputMode="stateVisible|adjustPan" />
         <activity
             android:name=".activity.customer.CustomerTableActivity"
             android:theme="@style/AppThemeNoActionBar" />
