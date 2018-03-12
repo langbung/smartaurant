@@ -106,11 +106,11 @@ public class StaffLoginFragment extends Fragment {
         public void onClick(View v) {
             FragmentListener fragmentListener = (FragmentListener)getActivity();
             Intent intent;
-            if(etEmail.getText().toString().equals("cashier")){
+            if(etEmail.getText().toString().trim().equals("cashier")){
                 tvWrongPassord.setVisibility(View.INVISIBLE);
                 intent = new Intent(getActivity(), CashierTableActivity.class);
                 fragmentListener.onSubmitClicked(intent);
-            }else if(etEmail.getText().toString().equals("owner")){
+            }else if(etEmail.getText().toString().trim().equals("owner")){
                 tvWrongPassord.setVisibility(View.INVISIBLE);
                 intent = new Intent(getActivity(), OwnerActivity.class);
                 fragmentListener.onSubmitClicked(intent);

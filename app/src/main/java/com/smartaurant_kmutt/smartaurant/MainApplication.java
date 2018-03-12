@@ -3,6 +3,8 @@ package com.smartaurant_kmutt.smartaurant;
 import android.app.Application;
 import android.content.Intent;
 
+import com.google.firebase.FirebaseApp;
+import com.google.firebase.database.FirebaseDatabase;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 
 /**
@@ -15,6 +17,9 @@ public class MainApplication extends Application{
     public void onCreate() {
         super.onCreate();
         Contextor.getInstance().init(getApplicationContext());
+//        if(!FirebaseApp.getApps(this).isEmpty()) {
+//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
+//        }
     }
 
     @Override

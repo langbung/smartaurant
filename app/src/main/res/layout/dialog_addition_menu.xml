@@ -11,7 +11,7 @@
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"
-        android:text="Logout"
+        android:text="Add menu"
         android:textSize="20sp"
         android:textStyle="bold" />
 
@@ -22,27 +22,47 @@
         android:padding="20dp">
 
         <EditText
-            android:id="@+id/etEmail"
+            android:id="@+id/etName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Email"
+            android:hint="Name"
             android:inputType="textEmailAddress" />
 
         <EditText
-            android:id="@+id/etPassword"
+            android:id="@+id/etPrice"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Password"
+            android:hint="Price"
             android:inputType="numberPassword" />
 
-        <Button
-            android:layout_marginTop="16dp"
-            android:id="@+id/btSubmit"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:background="@color/colorPrimary"
-            android:text="Logout" />
-    </LinearLayout>
+            android:layout_marginTop="16dp"
+            android:gravity="center_horizontal"
+            android:orientation="horizontal">
 
+            <Button
+
+                android:id="@+id/btAddMenu"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+
+                android:background="@drawable/selector_button"
+                android:text="Add" />
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="0dp"
+                android:background="@color/transparent" />
+
+            <Button
+                android:id="@+id/btClose"
+                android:layout_width="80dp"
+                android:layout_height="wrap_content"
+                android:background="@drawable/selector_button"
+                android:text="close" />
+
+        </LinearLayout>
+    </LinearLayout>
 </LinearLayout>

@@ -13,7 +13,7 @@ import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerFragment;
 import com.smartaurant_kmutt.smartaurant.util.PopupLogout;
 
-public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnSubmitClickListener {
+public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked {
     String table;
     Button btLogOut;
 
@@ -65,15 +65,12 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
         }
     };
 
+
     @Override
-    public void onSubmitClicked(String email, String password) {
+    public void onPopupLogoutClick(String email, String password) {
         writUserOut(false);
         Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-
     }
-
-
-
 }

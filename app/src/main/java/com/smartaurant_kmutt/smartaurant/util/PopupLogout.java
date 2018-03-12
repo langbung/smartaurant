@@ -1,10 +1,7 @@
 package com.smartaurant_kmutt.smartaurant.util;
 
 import android.app.Dialog;
-import android.app.DialogFragment;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -28,7 +25,7 @@ public class PopupLogout extends android.support.v4.app.DialogFragment{
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.logout_dialog,null);
+        View view = inflater.inflate(R.layout.dialog_logout,null);
         builder.setView(view);
         initInstance(view);
         return builder.create();
@@ -44,12 +41,12 @@ public class PopupLogout extends android.support.v4.app.DialogFragment{
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            OnSubmitClickListener dialogListener =(OnSubmitClickListener) getActivity();
-            dialogListener.onSubmitClicked(etEmail.getText().toString(),etPassword.getText().toString());
+            OnPopupLogoutClicked dialogListener =(OnPopupLogoutClicked) getActivity();
+            dialogListener.onPopupLogoutClick(etEmail.getText().toString(),etPassword.getText().toString());
         }
     };
 
-    public interface OnSubmitClickListener{
-        void onSubmitClicked(String email,String password);
+    public interface OnPopupLogoutClicked {
+        void onPopupLogoutClick(String email, String password);
     }
 }

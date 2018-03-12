@@ -12,7 +12,7 @@ import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerFragment;
 import com.smartaurant_kmutt.smartaurant.util.PopupLogout;
 
-public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnSubmitClickListener {
+public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked  {
     DrawerLayout drawerLayout;
     Button btRevenue;
     Button btMenusetting;
@@ -64,7 +64,7 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnSu
     };
 
     @Override
-    public void onSubmitClicked(String email, String password) {
+    public void onPopupLogoutClick(String email, String password) {
         Intent intent = new Intent(OwnerActivity.this, MenuActivity.class);
         startActivity(intent);
         finish();
