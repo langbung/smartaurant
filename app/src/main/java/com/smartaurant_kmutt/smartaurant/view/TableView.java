@@ -50,7 +50,7 @@ public class TableView extends BaseCustomViewGroup {
     }
 
     private void initInflate() {
-        inflate(getContext(), R.layout.table_item, this);
+        inflate(getContext(), R.layout.custom_table_item, this);
     }
 
     private void initInstances() {

@@ -96,7 +96,6 @@ public class CustomerFragment extends Fragment {
     }
 
     private void setSlidingTab(SlidingTabLayout slidingTab,View rootView){
-
         slidingTab.setSelectedIndicatorColors(Color.parseColor("#ffffffff"));
         slidingTab.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         slidingTab.setDistributeEvenly(true);

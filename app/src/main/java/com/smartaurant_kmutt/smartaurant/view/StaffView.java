@@ -15,24 +15,26 @@ import com.smartaurant_kmutt.smartaurant.R;
 /**
  * Created by nuuneoi on 11/16/2014.
  */
-public class MenuViewList extends BaseCustomViewGroup {
-    TextView tvMenuID;
-    TextView tvMenuName;
+public class StaffView extends BaseCustomViewGroup {
+    TextView tvName;
+    TextView tvEmail;
+    TextView tvPassword;
 
-    public MenuViewList(Context context) {
+
+    public StaffView(Context context) {
         super(context);
         initInflate();
         initInstances();
     }
 
-    public MenuViewList(Context context, AttributeSet attrs) {
+    public StaffView(Context context, AttributeSet attrs) {
         super(context, attrs);
         initInflate();
         initInstances();
         initWithAttrs(attrs, 0, 0);
     }
 
-    public MenuViewList(Context context, AttributeSet attrs, int defStyleAttr) {
+    public StaffView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initInflate();
         initInstances();
@@ -40,7 +42,7 @@ public class MenuViewList extends BaseCustomViewGroup {
     }
 
     @TargetApi(21)
-    public MenuViewList(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public StaffView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initInflate();
         initInstances();
@@ -48,13 +50,14 @@ public class MenuViewList extends BaseCustomViewGroup {
     }
 
     private void initInflate() {
-        inflate(getContext(), R.layout.custom_menu_item, this);
+        inflate(getContext(), R.layout.custom_staff_item, this);
     }
 
     private void initInstances() {
         // findViewById here
-        tvMenuID = (TextView)findViewById(R.id.tvMenuID);
-        tvMenuName = (TextView)findViewById(R.id.tvMenuName);
+        tvName = findViewById(R.id.tvName);
+        tvEmail = findViewById(R.id.tvEmail);
+        tvPassword = findViewById(R.id.tvPassword);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -71,12 +74,7 @@ public class MenuViewList extends BaseCustomViewGroup {
         }
         */
     }
-    public void setId(String id){
-        tvMenuID.setText(id);
-    }
-    public void setName(String name){
-        tvMenuName.setText(name);
-    }
+
     @Override
     protected Parcelable onSaveInstanceState() {
         Parcelable superState = super.onSaveInstanceState();
@@ -96,6 +94,18 @@ public class MenuViewList extends BaseCustomViewGroup {
 
         Bundle bundle = ss.getBundle();
         // Restore State from bundle here
+    }
+
+    public void setName(String name){
+        tvName.setText(name);
+    }
+
+    public void setEmail(String email){
+        tvEmail.setText(email);
+    }
+
+    public void setPassword(String password){
+        tvPassword.setText(password);
     }
 
 }

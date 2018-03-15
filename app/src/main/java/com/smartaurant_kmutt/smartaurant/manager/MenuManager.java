@@ -1,5 +1,7 @@
 package com.smartaurant_kmutt.smartaurant.manager;
 
+import android.os.Bundle;
+
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
 
@@ -10,16 +12,16 @@ import java.util.ArrayList;
  */
 
 public class MenuManager {
-    ArrayList<MenuItemDao> menuList= new ArrayList<>();
+    MenuListDao menuDao;
 
     public MenuManager() {
     }
 
-    public ArrayList<MenuItemDao> getMenuList() {
-        return menuList;
+    public MenuListDao getMenuDao() {
+        return menuDao;
     }
 
-    public void setMenuList(ArrayList<MenuItemDao> menuList) {
-        this.menuList = menuList;
+    public void setMenuDao(MenuListDao menuList) {
+        this.menuDao = menuList;
     }
 }

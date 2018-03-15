@@ -49,6 +49,7 @@ public class OwnerRevenueFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
+        getActivity().setTitle("Revenue");
     }
 
     @Override

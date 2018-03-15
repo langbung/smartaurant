@@ -1,5 +1,8 @@
 package com.smartaurant_kmutt.smartaurant.dao;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 import com.smartaurant_kmutt.smartaurant.adapter.MenuAdapter;
 
 import java.util.ArrayList;
@@ -9,23 +12,44 @@ import java.util.List;
  * Created by LB on 4/3/2561.
  */
 
-public class MenuListDao {
-    List<MenuIdDao> menuList;
-    String name;
+public class MenuListDao implements Parcelable{
+    ArrayList<MenuItemDao> menuList = new ArrayList<>();
 
-    public String getName() {
-        return name;
+    public MenuListDao() {
+
     }
 
-    public void setName(String name) {
-        this.name = name;
+    protected MenuListDao(Parcel in) {
+        menuList = in.createTypedArrayList(MenuItemDao.CREATOR);
     }
 
-    public List<MenuIdDao> getMenuList() {
+    public static final Creator<MenuListDao> CREATOR = new Creator<MenuListDao>() {
+        @Override
+        public MenuListDao createFromParcel(Parcel in) {
+            return new MenuListDao(in);
+        }
+
+        @Override
+        public MenuListDao[] newArray(int size) {
+            return new MenuListDao[size];
+        }
+    };
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeTypedList(menuList);
+    }
+
+    public ArrayList<MenuItemDao> getMenuList() {
         return menuList;
     }
 
-    public void setMenuList(List<MenuIdDao> menuList) {
+    public void setMenuList(ArrayList<MenuItemDao> menuList) {
         this.menuList = menuList;
     }
 }

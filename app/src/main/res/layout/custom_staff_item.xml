@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:orientation="horizontal"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:paddingLeft="20dp"
+        android:gravity="center_vertical|left"
+        android:layout_weight="1"
+        android:id="@+id/tvName"
+        android:textSize="@dimen/listview_text_size"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_listView_one_row" />
+    <TextView
+        android:gravity="center_vertical|left"
+        android:layout_weight="1"
+        android:textSize="@dimen/listview_text_size"
+        android:id="@+id/tvEmail"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_listView_one_row" />
+    <TextView
+        android:gravity="center_vertical|left"
+        android:layout_weight="1"
+        android:textSize="@dimen/listview_text_size"
+        android:id="@+id/tvPassword"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_listView_one_row" />
+</LinearLayout>

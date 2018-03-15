@@ -2,4 +2,6 @@
 <resources>
     <dimen name="h1TextSize">50sp</dimen>
     <dimen name="drawer_menu_width">250dp</dimen>
+    <dimen name="listview_text_size">22sp</dimen>
+    <dimen name="height_listView_one_row">50dp</dimen>
 </resources>

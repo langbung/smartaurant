@@ -11,7 +11,7 @@ import android.widget.Button;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerFragment;
-import com.smartaurant_kmutt.smartaurant.util.PopupLogout;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 
 public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked {
     String table;

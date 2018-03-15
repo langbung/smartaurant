@@ -17,23 +17,16 @@ import java.util.ArrayList;
  */
 
 public class MenuAdapter extends BaseAdapter {
-    ArrayList<MenuItemDao> menuList = new ArrayList<>();
+    MenuListDao menuDao;
 
-    public ArrayList<MenuItemDao> getMenuList() {
-        return menuList;
-    }
-
-    public void setMenuList(ArrayList<MenuItemDao> menuList) {
-        this.menuList = menuList;
-    }
 
     @Override
     public int getCount() {
-        if(menuList==null)
+        if(menuDao==null)
             return 0;
-        if(menuList.size()<=0)
+        if(menuDao.getMenuList().size()<=0)
             return 0;
-        return menuList.size();
+        return menuDao.getMenuList().size();
     }
 
     @Override
@@ -54,8 +47,16 @@ public class MenuAdapter extends BaseAdapter {
         else
             item = (MenuViewList) convertView;
 //        MenuItemDao menuItemDao =(MenuItemDao) getItem(position);
-        item.setId(getMenuList().get(position).getName());
-        item.setName(String.valueOf(getMenuList().get(position).getPrice()));
+        item.setId(menuDao.getMenuList().get(position).getName());
+        item.setName(String.valueOf(getMenuDao().getMenuList().get(position).getPrice()));
         return item;
+    }
+
+    public MenuListDao getMenuDao() {
+        return menuDao;
+    }
+
+    public void setMenuDao(MenuListDao menuList) {
+        this.menuDao = menuList;
     }
 }

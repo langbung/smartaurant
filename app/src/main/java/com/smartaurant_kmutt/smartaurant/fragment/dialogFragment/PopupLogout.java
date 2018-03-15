@@ -1,4 +1,4 @@
-package com.smartaurant_kmutt.smartaurant.util;
+package com.smartaurant_kmutt.smartaurant.fragment.dialogFragment;
 
 import android.app.Dialog;
 import android.os.Bundle;
