@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -17,6 +18,7 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.StaffAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.StaffDao;
 import com.smartaurant_kmutt.smartaurant.dao.StaffListDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.manager.StaffManager;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -66,7 +68,7 @@ public class OwnerStaffManagementFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        getActivity().setTitle("staff");
+        getActivity().setTitle("Staff management");
         btAddStaff = rootView.findViewById(R.id.btAddStaffFloat);
         listViewStaff = rootView.findViewById(R.id.listViewStaff);
         staffManager = new StaffManager();
@@ -74,6 +76,17 @@ public class OwnerStaffManagementFragment extends Fragment {
         setRealTime();
         btAddStaff.setOnClickListener(onButtonOnClickListener);
         listViewStaff.setAdapter(staffAdapter);
+        AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Bundle bundle = new Bundle();
+                StaffDao staffDao = staffManager.getStaffDao().getStaffList().get(position);
+                bundle.putParcelable("staffDao",staffDao);
+                OptionsStaffDialog optionsStaffDialog = OptionsStaffDialog.newInstance(bundle);
+                optionsStaffDialog.show(getFragmentManager(),"optionsStaffDialog");
+            }
+        };
+        listViewStaff.setOnItemClickListener(onItemClickListener);
     }
 
     @Override

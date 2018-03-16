@@ -2,6 +2,7 @@ package com.smartaurant_kmutt.smartaurant.fragment.owner;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -11,6 +12,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -35,6 +38,7 @@ public class OwnerEditStaffFragment extends Fragment {
     String staffPassword;
     FrameLayout frameLayout;
     Activity activity;
+    StaffDao staffDao;
 
     public OwnerEditStaffFragment() {
         super();
@@ -44,8 +48,7 @@ public class OwnerEditStaffFragment extends Fragment {
     public static OwnerEditStaffFragment newInstance(Bundle bundle) {
         OwnerEditStaffFragment fragment = new OwnerEditStaffFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
-
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,6 +59,7 @@ public class OwnerEditStaffFragment extends Fragment {
         init(savedInstanceState);
         Bundle bundle = getArguments().getBundle("bundle");
         title = bundle.getString("title");
+        staffDao = bundle.getParcelable("staffDao");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -81,7 +85,11 @@ public class OwnerEditStaffFragment extends Fragment {
         etEmail = rootView.findViewById(R.id.etEmail);
         etPassword = rootView.findViewById(R.id.etPassword);
         frameLayout = rootView.findViewById(R.id.frameLayout);
-
+        if (staffDao != null) {
+            etName.setText(staffDao.getName());
+            etEmail.setText(staffDao.getEmail());
+            etPassword.setText(staffDao.getPassword());
+        }
         activity = getActivity();
         btSave.setOnClickListener(onClickListener);
     }
@@ -116,15 +124,28 @@ public class OwnerEditStaffFragment extends Fragment {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-
             staffName = etName.getText().toString().trim();
             staffEmail = etEmail.getText().toString().trim();
             staffPassword = etPassword.getText().toString().trim();
-            if(MyUtil.checkText(staffName)&&MyUtil.checkText(staffEmail)&&MyUtil.checkText(staffPassword)){
-                frameLayout.setVisibility(View.VISIBLE);
-                DatabaseReference utilDatabase = UtilDatabase.getUtilDatabase();
-                DatabaseReference maxStaffIdDatabase = utilDatabase.child("maxStaffId");
-                maxStaffIdDatabase.addListenerForSingleValueEvent(getMaxStaffIdAndUpdateDatabase);
+            if (MyUtil.checkText(staffName) && MyUtil.checkText(staffEmail) && MyUtil.checkText(staffPassword)) {
+                if (staffDao == null) {
+                    frameLayout.setVisibility(View.VISIBLE);
+                    DatabaseReference utilDatabase = UtilDatabase.getUtilDatabase();
+                    DatabaseReference maxStaffIdDatabase = utilDatabase.child("maxStaffId");
+                    maxStaffIdDatabase.addListenerForSingleValueEvent(getMaxStaffIdAndUpdateDatabase);
+                }else{
+                    frameLayout.setVisibility(View.VISIBLE);
+                    DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff/"+staffDao.getId());
+                    staffDao.setName(staffName);
+                    staffDao.setEmail(staffEmail);
+                    staffDao.setPassword(staffPassword);
+                    staffDatabase.setValue(staffDao).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            activity.finish();
+                        }
+                    });
+                }
             }
         }
     };
@@ -133,11 +154,11 @@ public class OwnerEditStaffFragment extends Fragment {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
             int maxStaffId = dataSnapshot.getValue(Integer.class);
-            String staffId = String.format(Locale.ENGLISH,"ST%03d",maxStaffId+1);
-            StaffDao staff = new StaffDao(staffId, staffName,staffEmail,staffPassword);
+            String staffId = String.format(Locale.ENGLISH, "ST%03d", maxStaffId + 1);
+            StaffDao staff = new StaffDao(staffId, staffName, staffEmail, staffPassword);
             DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff");
             staffDatabase.child(staffId).setValue(staff);
-            dataSnapshot.getRef().setValue(maxStaffId+1);
+            dataSnapshot.getRef().setValue(maxStaffId + 1);
             activity.finish();
         }
 

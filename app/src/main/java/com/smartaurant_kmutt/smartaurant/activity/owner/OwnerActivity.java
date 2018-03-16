@@ -14,16 +14,21 @@ import android.widget.Button;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.StaffDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsMenuDialog;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
 
+import java.nio.BufferUnderflowException;
+
 public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
         ,OwnerListMenuFragment.OnOwnerListMenuFragmentListener
         ,OptionsMenuDialog.OnOptionsMenuDialogListener
-        ,OwnerStaffManagementFragment.OnOwnerStaffManagementListener {
+        ,OwnerStaffManagementFragment.OnOwnerStaffManagementListener
+        ,OptionsStaffDialog.OnOptionsStaffDialogListener{
     DrawerLayout drawerLayout;
     Button btRevenue;
     Button btMenuSetting;
@@ -134,6 +139,13 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
 
     @Override
     public void onAddStaffButtonClick(Bundle bundle) {
+        Intent intent = new Intent(OwnerActivity.this,OwnerEditStaffActivity.class);
+        intent.putExtra("bundle",bundle);
+        startActivity(intent);
+    }
+
+    @Override
+    public void onSelectEditOption(Bundle bundle) {
         Intent intent = new Intent(OwnerActivity.this,OwnerEditStaffActivity.class);
         intent.putExtra("bundle",bundle);
         startActivity(intent);
