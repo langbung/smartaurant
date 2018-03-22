@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.widget.TextView;
 
 import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
 import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
@@ -15,27 +14,22 @@ import com.smartaurant_kmutt.smartaurant.R;
 /**
  * Created by nuuneoi on 11/16/2014.
  */
-public class StaffView extends BaseCustomViewGroup {
-    TextView tvName;
-    TextView tvEmail;
-    TextView tvPassword;
-    TextView tvRole;
+public class MenuViewOwner extends BaseCustomViewGroup {
 
-
-    public StaffView(Context context) {
+    public MenuViewOwner(Context context) {
         super(context);
         initInflate();
         initInstances();
     }
 
-    public StaffView(Context context, AttributeSet attrs) {
+    public MenuViewOwner(Context context, AttributeSet attrs) {
         super(context, attrs);
         initInflate();
         initInstances();
         initWithAttrs(attrs, 0, 0);
     }
 
-    public StaffView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public MenuViewOwner(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initInflate();
         initInstances();
@@ -43,7 +37,7 @@ public class StaffView extends BaseCustomViewGroup {
     }
 
     @TargetApi(21)
-    public StaffView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public MenuViewOwner(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initInflate();
         initInstances();
@@ -51,15 +45,11 @@ public class StaffView extends BaseCustomViewGroup {
     }
 
     private void initInflate() {
-        inflate(getContext(), R.layout.custom_staff_item, this);
+        inflate(getContext(), R.layout.activity_menu, this);
     }
 
     private void initInstances() {
         // findViewById here
-        tvName = findViewById(R.id.tvName);
-        tvEmail = findViewById(R.id.tvEmail);
-        tvPassword = findViewById(R.id.tvPassword);
-        tvRole = findViewById(R.id.tvRole);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -96,22 +86,6 @@ public class StaffView extends BaseCustomViewGroup {
 
         Bundle bundle = ss.getBundle();
         // Restore State from bundle here
-    }
-
-    public void setName(String name){
-        tvName.setText(name);
-    }
-
-    public void setEmail(String email){
-        tvEmail.setText(email);
-    }
-
-    public void setPassword(String password){
-        tvPassword.setText(password);
-    }
-
-    public void setRole(String role){
-        tvRole.setText(role);
     }
 
 }

@@ -11,7 +11,6 @@ import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 
 public class MenuItemDao implements Parcelable {
     String name;
-    String id;
     float price;
     String imageUri;
 
@@ -19,16 +18,14 @@ public class MenuItemDao implements Parcelable {
     }
 
 
-    public MenuItemDao(String id,String name,float price,String imageUri) {
+    public MenuItemDao(String name,float price,String imageUri) {
         this.name = name;
-        this.id = id;
         this.price = price;
         this.imageUri = imageUri;
     }
 
     protected MenuItemDao(Parcel in) {
         name = in.readString();
-        id = in.readString();
         price = in.readFloat();
         imageUri = in.readString();
     }
@@ -48,7 +45,6 @@ public class MenuItemDao implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(name);
-        dest.writeString(id);
         dest.writeFloat(price);
         dest.writeString(imageUri);
     }
@@ -74,13 +70,6 @@ public class MenuItemDao implements Parcelable {
         return 0;
     }
 
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getImageUri() {
         return imageUri;

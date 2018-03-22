@@ -8,6 +8,8 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -19,10 +21,13 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.dao.StaffDao;
+import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+import com.weiwangcn.betterspinner.library.BetterSpinner;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 
@@ -38,7 +43,11 @@ public class OwnerEditStaffFragment extends Fragment {
     String staffPassword;
     FrameLayout frameLayout;
     Activity activity;
-    StaffDao staffDao;
+    StaffItemDao staffItemDao;
+    BetterSpinner snRole;
+    String staffRole;
+    ArrayList<String> roleList;
+
 
     public OwnerEditStaffFragment() {
         super();
@@ -59,7 +68,7 @@ public class OwnerEditStaffFragment extends Fragment {
         init(savedInstanceState);
         Bundle bundle = getArguments().getBundle("bundle");
         title = bundle.getString("title");
-        staffDao = bundle.getParcelable("staffDao");
+        staffItemDao = bundle.getParcelable("staffItemDao");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -85,13 +94,31 @@ public class OwnerEditStaffFragment extends Fragment {
         etEmail = rootView.findViewById(R.id.etEmail);
         etPassword = rootView.findViewById(R.id.etPassword);
         frameLayout = rootView.findViewById(R.id.frameLayout);
-        if (staffDao != null) {
-            etName.setText(staffDao.getName());
-            etEmail.setText(staffDao.getEmail());
-            etPassword.setText(staffDao.getPassword());
+        snRole = rootView.findViewById(R.id.snRole);
+
+
+        if (staffItemDao != null) {
+            etName.setText(staffItemDao.getName());
+            etEmail.setText(staffItemDao.getEmail());
+            etPassword.setText(staffItemDao.getPassword());
+            snRole.setText(staffItemDao.getRole());
         }
         activity = getActivity();
         btSave.setOnClickListener(onClickListener);
+        createListRole();
+    }
+
+    private void createListRole() {
+        roleList = new ArrayList<>(Arrays.asList("Manager","Kitchen","Staff"));
+        final ArrayAdapter roleAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, roleList);
+        snRole.setAdapter(roleAdapter);
+        snRole.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                staffRole = roleList.get(position);
+            }
+        });
+
     }
 
     @Override
@@ -127,22 +154,29 @@ public class OwnerEditStaffFragment extends Fragment {
             staffName = etName.getText().toString().trim();
             staffEmail = etEmail.getText().toString().trim();
             staffPassword = etPassword.getText().toString().trim();
-            if (MyUtil.checkText(staffName) && MyUtil.checkText(staffEmail) && MyUtil.checkText(staffPassword)) {
-                if (staffDao == null) {
+            if (MyUtil.checkText(staffName) && MyUtil.checkText(staffEmail) && MyUtil.checkText(staffPassword) && MyUtil.checkText(staffRole)) {
+                if (staffItemDao == null) {
                     frameLayout.setVisibility(View.VISIBLE);
                     DatabaseReference utilDatabase = UtilDatabase.getUtilDatabase();
                     DatabaseReference maxStaffIdDatabase = utilDatabase.child("maxStaffId");
                     maxStaffIdDatabase.addListenerForSingleValueEvent(getMaxStaffIdAndUpdateDatabase);
                 }else{
                     frameLayout.setVisibility(View.VISIBLE);
-                    DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff/"+staffDao.getId());
-                    staffDao.setName(staffName);
-                    staffDao.setEmail(staffEmail);
-                    staffDao.setPassword(staffPassword);
-                    staffDatabase.setValue(staffDao).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff/"+ staffItemDao.getId());
+                    staffItemDao.setName(staffName);
+                    staffItemDao.setEmail(staffEmail);
+                    staffItemDao.setPassword(staffPassword);
+                    staffItemDao.setRole(staffRole);
+                    staffDatabase.setValue(staffItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
-                            activity.finish();
+                            if(task.isSuccessful()){
+                                activity.finish();
+                            }else{
+                                MyUtil.showText("Can't edit staff");
+                                activity.finish();
+                            }
+
                         }
                     });
                 }
@@ -155,7 +189,7 @@ public class OwnerEditStaffFragment extends Fragment {
         public void onDataChange(DataSnapshot dataSnapshot) {
             int maxStaffId = dataSnapshot.getValue(Integer.class);
             String staffId = String.format(Locale.ENGLISH, "ST%03d", maxStaffId + 1);
-            StaffDao staff = new StaffDao(staffId, staffName, staffEmail, staffPassword);
+            StaffItemDao staff = new StaffItemDao(staffId, staffName, staffEmail, staffPassword,staffRole);
             DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff");
             staffDatabase.child(staffId).setValue(staff);
             dataSnapshot.getRef().setValue(maxStaffId + 1);

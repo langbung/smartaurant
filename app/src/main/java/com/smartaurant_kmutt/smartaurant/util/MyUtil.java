@@ -27,11 +27,11 @@ public class MyUtil {
 
     /******************************
      *      MenuListDao menuListDao = new MenuListDao();
-            ArrayList<MenuItemDao> menuList = new ArrayList<>();
-            for (DataSnapshot menuChild : dataSnapshot.getChildren()) {
-            MenuItemDao menuItemDao = menuChild.getValue(MenuItemDao.class);
-            menuList.add(menuItemDao);
-
+     *      ArrayList<MenuItemDao> menuList = new ArrayList<>();
+     *      for (DataSnapshot menuChild : dataSnapshot.getChildren()) {
+     *      MenuItemDao menuItemDao = menuChild.getValue(MenuItemDao.class);
+     *      menuList.add(menuItemDao);
+     *
      *
      */
 }

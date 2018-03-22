@@ -1,9 +1,11 @@
 package com.smartaurant_kmutt.smartaurant.adapter;
 
+import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerCheckBillFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerOrderListFragment;
@@ -14,7 +16,8 @@ import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerPromotionFrag
  */
 
 public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
-
+    int table;
+    OrderItemDao orderItemDao;
     public CustomerPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -32,10 +35,14 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
                 return CustomerPromotionFragment.newInstance();
             }
             case 1:{
-                return CustomerMenuFragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putInt("table",table);
+                return CustomerMenuFragment.newInstance(bundle);
             }
             case 2:{
-                return CustomerOrderListFragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("orderItemDao",orderItemDao);
+                return CustomerOrderListFragment.newInstance(bundle);
             }
             case 3:{
                 return CustomerCheckBillFragment.newInstance();
@@ -67,5 +74,13 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
             }
 
         }
+    }
+
+    public void setTable(int table) {
+        this.table = table;
+    }
+
+    public void setOrderItemDao(OrderItemDao orderItemDao) {
+        this.orderItemDao = orderItemDao;
     }
 }

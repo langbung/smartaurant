@@ -16,9 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 import com.melnykov.fab.FloatingActionButton;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.StaffAdapter;
-import com.smartaurant_kmutt.smartaurant.dao.StaffDao;
+import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.StaffListDao;
-import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsStaffDialog;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.manager.StaffManager;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -80,8 +80,8 @@ public class OwnerStaffManagementFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Bundle bundle = new Bundle();
-                StaffDao staffDao = staffManager.getStaffDao().getStaffList().get(position);
-                bundle.putParcelable("staffDao",staffDao);
+                StaffItemDao staffItemDao = staffManager.getStaffDao().getStaffList().get(position);
+                bundle.putParcelable("staffItemDao", staffItemDao);
                 OptionsStaffDialog optionsStaffDialog = OptionsStaffDialog.newInstance(bundle);
                 optionsStaffDialog.show(getFragmentManager(),"optionsStaffDialog");
             }
@@ -121,10 +121,10 @@ public class OwnerStaffManagementFragment extends Fragment {
         staffDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                ArrayList<StaffDao> staffList = new ArrayList<>();
+                ArrayList<StaffItemDao> staffList = new ArrayList<>();
                 for(DataSnapshot staff:dataSnapshot.getChildren()){
-                    StaffDao staffDao = staff.getValue(StaffDao.class);
-                    staffList.add(staffDao);
+                    StaffItemDao staffItemDao = staff.getValue(StaffItemDao.class);
+                    staffList.add(staffItemDao);
                 }
                 StaffListDao staffListDao = new StaffListDao(staffList);
                 staffManager.setStaffDao(staffListDao);

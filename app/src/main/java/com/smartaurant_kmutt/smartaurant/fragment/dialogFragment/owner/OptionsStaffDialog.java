@@ -1,4 +1,4 @@
-package com.smartaurant_kmutt.smartaurant.fragment.dialogFragment;
+package com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,36 +10,32 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
 @SuppressWarnings("unused")
-public class OptionsMenuDialog extends DialogFragment {
-    MenuItemDao menu;
+public class OptionsStaffDialog extends DialogFragment {
+    StaffItemDao staffItemDao;
     ListView listMenu;
     TextView tvTitle;
     ArrayList<String> optionsList;
 
-    public OptionsMenuDialog() {
+    public OptionsStaffDialog() {
         super();
     }
 
     @SuppressWarnings("unused")
-    public static OptionsMenuDialog newInstance(MenuItemDao menu) {
-        OptionsMenuDialog fragment = new OptionsMenuDialog();
+    public static OptionsStaffDialog newInstance(Bundle bundle) {
+        OptionsStaffDialog fragment = new OptionsStaffDialog();
         Bundle args = new Bundle();
-        args.putParcelable("menu",menu);
+        args.putParcelable("bundle",bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -49,7 +45,7 @@ public class OptionsMenuDialog extends DialogFragment {
         super.onCreate(savedInstanceState);
 
         init(savedInstanceState);
-        menu = getArguments().getParcelable("menu");
+        staffItemDao = getArguments().getBundle("bundle").getParcelable("staffItemDao");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -75,7 +71,7 @@ public class OptionsMenuDialog extends DialogFragment {
         ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, optionsList);
         listMenu.setAdapter(arrayAdapter);
         tvTitle = rootView.findViewById(R.id.tvTitle);
-        tvTitle.setText(menu.getName());
+        tvTitle.setText(staffItemDao.getName());
 
         listMenu.setOnItemClickListener(onItemClickListener);
 
@@ -111,37 +107,24 @@ public class OptionsMenuDialog extends DialogFragment {
     AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            DatabaseReference menuDatabase = FirebaseDatabase.getInstance().getReference().child("menu/"+menu.getId());
+            DatabaseReference staffDatabase = FirebaseDatabase.getInstance().getReference().child("staff/"+ staffItemDao.getId());
             if(optionsList.get(position).equals("Delete")){
-                menuDatabase.addListenerForSingleValueEvent(removingMenu);
+                staffDatabase.removeValue();
+                dismiss();
             }
             else if (optionsList.get(position).equals("Edit")){
                 dismiss();
-                OnOptionsMenuDialogListener onOptionsMenuDialogListener = (OnOptionsMenuDialogListener) getActivity();
-                onOptionsMenuDialogListener.onSelectEditOption(menu);
+                OnOptionsStaffDialogListener onOptionsMenuDialogListener = (OnOptionsStaffDialogListener) getActivity();
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("staffItemDao", staffItemDao);
+                bundle.putString("title","Edit staff: "+ staffItemDao.getName());
+                onOptionsMenuDialogListener.onSelectEditOption(bundle);
             }
-
         }
     };
 
 
-
-    ValueEventListener removingMenu = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            MenuItemDao menuItemDao = dataSnapshot.getValue(MenuItemDao.class);
-            Toast.makeText(getContext(),menuItemDao.getName()+" deleted",Toast.LENGTH_LONG).show();
-            dataSnapshot.getRef().removeValue();
-            dismiss();
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-            Toast.makeText(getContext(),"can't delete",Toast.LENGTH_LONG).show();
-        }
-    };
-
-    public interface OnOptionsMenuDialogListener{
-        void onSelectEditOption(MenuItemDao menuItemDao);
+    public interface OnOptionsStaffDialogListener{
+        void onSelectEditOption(Bundle bundle);
     }
 }

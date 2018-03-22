@@ -17,9 +17,8 @@ public class MainApplication extends Application{
     public void onCreate() {
         super.onCreate();
         Contextor.getInstance().init(getApplicationContext());
-//        if(!FirebaseApp.getApps(this).isEmpty()) {
-//            FirebaseDatabase.getInstance().setPersistenceEnabled(true);
-//        }
+
+
     }
 
     @Override

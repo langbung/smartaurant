@@ -42,6 +42,7 @@ public class StaffAdapter extends BaseAdapter {
         item.setName(staffManager.getStaffDao().getStaffList().get(position).getName());
         item.setEmail(staffManager.getStaffDao().getStaffList().get(position).getEmail());
         item.setPassword(staffManager.getStaffDao().getStaffList().get(position).getPassword());
+        item.setRole(staffManager.getStaffDao().getStaffList().get(position).getRole());
         return item;
     }
 

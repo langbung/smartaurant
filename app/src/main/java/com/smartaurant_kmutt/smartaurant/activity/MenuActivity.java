@@ -43,9 +43,11 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
         SharedPreferences prefs=MenuActivity.this.getSharedPreferences("checkUser", Context.MODE_PRIVATE);
         Boolean userOut = prefs.getBoolean("userOut",false);
         if(userOut==true){
-            String table = prefs.getString("table",null);
+            int numTable = prefs.getInt("numTable",0);
             Intent intent = new Intent(MenuActivity.this,CustomerActivity.class);
-            intent.putExtra("table",table);
+            Bundle bundle = new Bundle();
+            bundle.putInt("numTable",numTable);
+            intent.putExtra("bundle",bundle);
             startActivity(intent);
 
         }

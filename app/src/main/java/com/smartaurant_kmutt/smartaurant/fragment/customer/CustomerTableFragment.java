@@ -55,7 +55,7 @@ public class CustomerTableFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar=(android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
+        toolbar= rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Select table");
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
 
@@ -101,15 +101,17 @@ public class CustomerTableFragment extends Fragment {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             position+=1;
-            String table = "Table: "+position;
+            int numTable = position;
+            Bundle bundle = new Bundle();
+            bundle.putInt("numTable",numTable);
             FragmentListener fragmentListener=(FragmentListener)getActivity();
-            fragmentListener.onTableItemClicked(table);
+            fragmentListener.onTableItemClicked(bundle);
 
         }
     };
 
     public interface FragmentListener{
-        void onTableItemClicked(String table);
+        void onTableItemClicked(Bundle bundle);
     }
 
 }

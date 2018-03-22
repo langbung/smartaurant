@@ -34,6 +34,7 @@ import com.google.firebase.storage.UploadTask;
 import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.io.IOException;
@@ -56,6 +57,7 @@ public class OwnerEditMenuFragment extends Fragment {
     FrameLayout frameLayout;
     Uri imageUriLocal;
     Uri imageUriWeb;
+    EditText etTest1,etTest2;
     public OwnerEditMenuFragment() {
         super();
     }
@@ -101,6 +103,8 @@ public class OwnerEditMenuFragment extends Fragment {
         btSave = rootView.findViewById(R.id.btSave);
         imageView = rootView.findViewById(R.id.imageView);
         frameLayout = rootView.findViewById(R.id.frameLayout);
+        etTest1 = rootView.findViewById(R.id.etTest1);
+        etTest2 = rootView.findViewById(R.id.etTest2);
 
         btSave.setOnClickListener(onClickListener);
         activity = getActivity();
@@ -111,6 +115,8 @@ public class OwnerEditMenuFragment extends Fragment {
             etName.setText(menuItemDao.getName());
             btSave.setText("Save");
             setImage(menuItemDao.getImageUri());
+            etTest1.setText(menuItemDao.getImageUri());
+
         }else{
             activity.setTitle(title);
             btSave.setText("Add");
@@ -202,23 +208,36 @@ public class OwnerEditMenuFragment extends Fragment {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle unsuccessful uploads
-                activity.finish();
+                MyUtil.showText("on failure");
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 imageUriWeb = taskSnapshot.getDownloadUrl();
+
                 if(menuItemDao == null){
-                    DatabaseReference util = UtilDatabase.getUtilDatabase();
-                    util.child("maxMenuId").addListenerForSingleValueEvent(onSaveMenu);
+                    float menuPrice = Float.parseFloat(menuPriceCheck);
+                    String imageUri = imageUriWeb.toString();
+                    MenuItemDao menuItemDao = new MenuItemDao(menuName,menuPrice,imageUri);
+                    DatabaseReference menuDatabase = UtilDatabase.getMenu();
+                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(onCompleteListener);
                 }else{
                     DatabaseReference menuDatabase = UtilDatabase.getMenu();
                     menuItemDao.setName(menuName);
                     menuItemDao.setPrice(Float.parseFloat(menuPriceCheck));
                     menuItemDao.setImageUri(imageUriWeb.toString());
-                    menuDatabase.child(menuItemDao.getId()).setValue(menuItemDao);
-                    activity.finish();               }
+                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if(task.isSuccessful()){
+//                                activity.finish();
+                                etTest2.setText(String.valueOf(imageUriWeb));
+                            }
+                        }
+                    });
+
+                }
             }
         });
     }
@@ -233,12 +252,12 @@ public class OwnerEditMenuFragment extends Fragment {
                     frameLayout.setVisibility(View.VISIBLE);
                     uploadImageAndSetDatabase(imageUriLocal);
                 }
-                else if(checkText(menuName)&& checkText(menuPriceCheck)){
+                else if(checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal==null){
                     frameLayout.setVisibility(View.VISIBLE);
                     DatabaseReference menuDatabase = UtilDatabase.getMenu();
                     menuItemDao.setName(menuName);
                     menuItemDao.setPrice(Float.parseFloat(menuPriceCheck));
-                    menuDatabase.child(menuItemDao.getId()).setValue(menuItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             activity.finish();
@@ -252,38 +271,15 @@ public class OwnerEditMenuFragment extends Fragment {
         }
     };
 
-    ValueEventListener onSaveMenu = new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-            maxMenuId = dataSnapshot.getValue(Integer.class);
-            String menuID = String.format(Locale.ENGLISH,"MN%03d",maxMenuId+1);
-            float menuPrice = Float.parseFloat(menuPriceCheck);
-            String imageUri = imageUriWeb.toString();
-            MenuItemDao menuItemDao = new MenuItemDao(menuID,menuName,menuPrice,imageUri);
-            DatabaseReference menuDatabase = UtilDatabase.getMenu();
-            menuDatabase.child(menuID).setValue(menuItemDao).addOnCompleteListener(onAddMenuCompleteListener);
-
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-    };
-
-    OnCompleteListener<Void> onAddMenuCompleteListener = new OnCompleteListener<Void>() {
+    OnCompleteListener onCompleteListener = new OnCompleteListener() {
         @Override
         public void onComplete(@NonNull Task task) {
-
             if(task.isSuccessful()){
-                DatabaseReference util = UtilDatabase.getUtilDatabase();
-                util.child("maxMenuId").setValue(maxMenuId+1);
-                showText("Already add menu");
                 activity.finish();
-            }else{
-                showText("Error: Can't add menu");
             }
         }
     };
+
+
 
 }

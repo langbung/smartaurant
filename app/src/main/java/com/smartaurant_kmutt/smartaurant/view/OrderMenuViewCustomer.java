@@ -5,37 +5,38 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
+import android.view.Gravity;
 import android.widget.TextView;
 
 import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
 import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.smartaurant_kmutt.smartaurant.R;
 
+import java.util.Locale;
+
 
 /**
  * Created by nuuneoi on 11/16/2014.
  */
-public class StaffView extends BaseCustomViewGroup {
+public class OrderMenuViewCustomer extends BaseCustomViewGroup {
     TextView tvName;
-    TextView tvEmail;
-    TextView tvPassword;
-    TextView tvRole;
+    TextView tvPrice;
+    TextView tvQuantity;
 
-
-    public StaffView(Context context) {
+    public OrderMenuViewCustomer(Context context) {
         super(context);
         initInflate();
         initInstances();
     }
 
-    public StaffView(Context context, AttributeSet attrs) {
+    public OrderMenuViewCustomer(Context context, AttributeSet attrs) {
         super(context, attrs);
         initInflate();
         initInstances();
         initWithAttrs(attrs, 0, 0);
     }
 
-    public StaffView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public OrderMenuViewCustomer(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initInflate();
         initInstances();
@@ -43,38 +44,11 @@ public class StaffView extends BaseCustomViewGroup {
     }
 
     @TargetApi(21)
-    public StaffView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public OrderMenuViewCustomer(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
         initInflate();
         initInstances();
         initWithAttrs(attrs, defStyleAttr, defStyleRes);
-    }
-
-    private void initInflate() {
-        inflate(getContext(), R.layout.custom_staff_item, this);
-    }
-
-    private void initInstances() {
-        // findViewById here
-        tvName = findViewById(R.id.tvName);
-        tvEmail = findViewById(R.id.tvEmail);
-        tvPassword = findViewById(R.id.tvPassword);
-        tvRole = findViewById(R.id.tvRole);
-    }
-
-    private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        /*
-        TypedArray a = getContext().getTheme().obtainStyledAttributes(
-                attrs,
-                R.styleable.StyleableName,
-                defStyleAttr, defStyleRes);
-
-        try {
-
-        } finally {
-            a.recycle();
-        }
-        */
     }
 
     @Override
@@ -98,20 +72,40 @@ public class StaffView extends BaseCustomViewGroup {
         // Restore State from bundle here
     }
 
+    private void initInflate() {
+        inflate(getContext(), R.layout.custom_customer_orderlist, this);
+    }
+
+    private void initInstances() {
+        // findViewById here
+        tvName=findViewById(R.id.tvName);
+        tvPrice=findViewById(R.id.tvPrice);
+        tvQuantity=findViewById(R.id.tvQuantity);
+    }
+
+    private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+        /*
+        TypedArray a = getContext().getTheme().obtainStyledAttributes(
+                attrs,
+                R.styleable.StyleableName,
+                defStyleAttr, defStyleRes);
+
+        try {
+
+        } finally {
+            a.recycle();
+        }
+        */
+    }
     public void setName(String name){
         tvName.setText(name);
     }
-
-    public void setEmail(String email){
-        tvEmail.setText(email);
+    public void setPrice(float price){
+        String textPrice=String.format(Locale.ENGLISH,"%.2f",price);
+        tvPrice.setText(textPrice);
     }
-
-    public void setPassword(String password){
-        tvPassword.setText(password);
-    }
-
-    public void setRole(String role){
-        tvRole.setText(role);
+    public void setQuantity(int quantity){
+        tvQuantity.setText(String.valueOf(quantity));
     }
 
 }

@@ -14,19 +14,16 @@ import android.widget.Button;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.StaffDao;
-import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsMenuDialog;
-import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OptionsStaffDialog;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsOwnerMenuDialog;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
 
-import java.nio.BufferUnderflowException;
-
 public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
         ,OwnerListMenuFragment.OnOwnerListMenuFragmentListener
-        ,OptionsMenuDialog.OnOptionsMenuDialogListener
+        ,OptionsOwnerMenuDialog.OnOptionsMenuDialogListener
         ,OwnerStaffManagementFragment.OnOwnerStaffManagementListener
         ,OptionsStaffDialog.OnOptionsStaffDialogListener{
     DrawerLayout drawerLayout;

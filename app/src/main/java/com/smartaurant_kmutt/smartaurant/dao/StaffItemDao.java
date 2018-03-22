@@ -7,27 +7,30 @@ import android.os.Parcelable;
  * Created by LB on 16/3/2561.
  */
 
-public class StaffDao implements Parcelable{
+public class StaffItemDao implements Parcelable{
     String id;
     String name;
     String email;
     String password;
+    String role;
 
-    public StaffDao() {
+    public StaffItemDao() {
     }
 
-    public StaffDao(String id,String name, String email, String password) {
+    public StaffItemDao(String id, String name, String email, String password,String role) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
+        this.role = role;
     }
 
-    protected StaffDao(Parcel in) {
+    protected StaffItemDao(Parcel in) {
         name = in.readString();
         email = in.readString();
         password = in.readString();
         id = in.readString();
+        role = in.readString();
     }
 
     @Override
@@ -36,6 +39,7 @@ public class StaffDao implements Parcelable{
         dest.writeString(email);
         dest.writeString(password);
         dest.writeString(id);
+        dest.writeString(role);
     }
 
     @Override
@@ -43,15 +47,15 @@ public class StaffDao implements Parcelable{
         return 0;
     }
 
-    public static final Creator<StaffDao> CREATOR = new Creator<StaffDao>() {
+    public static final Creator<StaffItemDao> CREATOR = new Creator<StaffItemDao>() {
         @Override
-        public StaffDao createFromParcel(Parcel in) {
-            return new StaffDao(in);
+        public StaffItemDao createFromParcel(Parcel in) {
+            return new StaffItemDao(in);
         }
 
         @Override
-        public StaffDao[] newArray(int size) {
-            return new StaffDao[size];
+        public StaffItemDao[] newArray(int size) {
+            return new StaffItemDao[size];
         }
     };
 
@@ -85,5 +89,13 @@ public class StaffDao implements Parcelable{
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
     }
 }

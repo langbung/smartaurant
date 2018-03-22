@@ -17,48 +17,45 @@ import android.widget.TextView;
 import com.inthecheesefactory.thecheeselibrary.view.SlidingTabLayout;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerPagerAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
+import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 
 /**
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerFragment extends Fragment {
+public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener {
     boolean userOut;
     CustomerPagerAdapter customerPagerAdapter;
-    String table;
+    int numTable;
     SlidingTabLayout slidingTab;
     android.support.v7.widget.Toolbar toolbar;
     ViewPager viewPager;
     Boolean checkUserLogout;
     Button btLogOut;
+    OrderItemDao orderItemDao;
+    boolean countRefresh;
 
     public CustomerFragment() {
         super();
     }
 
     @SuppressWarnings("unused")
-    public static CustomerFragment newInstance(String table) {
+    public static CustomerFragment newInstance(Bundle bundle) {
         CustomerFragment fragment = new CustomerFragment();
         Bundle args = new Bundle();
-//        Toast.makeText(Contextor.getInstance().getContext(),table,Toast.LENGTH_SHORT).show();
-        args.putString("table",table);
+        args.putBundle("bundle",bundle);
         fragment.setArguments(args);
         return fragment;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
     }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setTable(getArguments().getString("table"));
+        numTable = getArguments().getBundle("bundle").getInt("numTable");
         writUserOut(true);
         init(savedInstanceState);
         //Toast.makeText(getContext(),getTable(),Toast.LENGTH_SHORT).show();
@@ -82,17 +79,34 @@ public class CustomerFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar= (android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
-        toolbar.setTitle(getTable());
+        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.setTitle("Table: "+numTable);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
         TextView tv=new TextView(rootView.getContext());
+
         customerPagerAdapter=new CustomerPagerAdapter(getChildFragmentManager());
-        viewPager=(ViewPager)rootView.findViewById(R.id.viewPager);
+        customerPagerAdapter.setTable(numTable);
+
+        viewPager = rootView.findViewById(R.id.viewPager);
         viewPager.setAdapter(customerPagerAdapter);
-        slidingTab=(SlidingTabLayout)rootView.findViewById(R.id.slidingTab);
+        slidingTab = rootView.findViewById(R.id.slidingTab);
         setSlidingTab(slidingTab,rootView);
+        slidingTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
+            }
 
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     private void setSlidingTab(SlidingTabLayout slidingTab,View rootView){
@@ -129,17 +143,27 @@ public class CustomerFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-
         super.onDestroy();
     }
     public void writUserOut(Boolean result){
         SharedPreferences prefs=getContext().getSharedPreferences("checkUser", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor= prefs.edit();
         editor.putBoolean("userOut",result);
-        editor.putString("table",table);
+        editor.putInt("numTable",numTable);
         editor.apply();
     }
 
+    @Override
+    public void onOrderClick(Bundle bundle) {
+        orderItemDao = bundle.getParcelable("orderItemDao");
+        customerPagerAdapter.setOrderItemDao(orderItemDao);
+        if(!countRefresh){
+            int page = viewPager.getCurrentItem();
+            viewPager.setAdapter(customerPagerAdapter);
+            viewPager.setCurrentItem(page);
+            countRefresh=true;
+        }
 
 
+    }
 }

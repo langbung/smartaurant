@@ -14,32 +14,26 @@ import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 
 public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked {
-    String table;
+    int numTable;
     Button btLogOut;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer);
-        setTable(getIntent().getStringExtra("table"));
+        Bundle bundle = getIntent().getBundleExtra("bundle");
+        numTable = bundle.getInt("numTable");
         initInstance();
         if (savedInstanceState == null) {
-            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, CustomerFragment.newInstance(getTable())).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, CustomerFragment.newInstance(bundle)).commit();
         }
     }
 
     private void initInstance() {
-        btLogOut = (Button) findViewById(R.id.btLogOut);
+        btLogOut = findViewById(R.id.btLogOut);
         btLogOut.setOnClickListener(onClickListener);
     }
 
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
 
     @Override
     public void onBackPressed() {
@@ -51,7 +45,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
         SharedPreferences prefs = CustomerActivity.this.getSharedPreferences("checkUser", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = prefs.edit();
         editor.putBoolean("userOut", result);
-        editor.putString("table", table);
+        editor.putInt("table", numTable);
         editor.apply();
     }
 

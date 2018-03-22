@@ -46,5 +46,8 @@ dependencies {
     implementation 'com.github.bumptech.glide:glide:4.6.1'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.6.1'
 
+    compile ('com.weiwangcn.betterspinner:library:1.1.0')
+    compile 'com.anupcowkur:reservoir:3.1.0'
+
 }
 apply plugin: 'com.google.gms.google-services'

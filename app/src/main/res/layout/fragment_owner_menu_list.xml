@@ -1,24 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<FrameLayout
     android:orientation="vertical"
-    android:paddingLeft="20dp"
-    android:paddingRight="20dp"
-    android:paddingTop="20dp"
-    android:paddingBottom="0dp"
     android:gravity="center_horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:fab="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <FrameLayout
-        android:layout_weight="1"
         android:layout_width="match_parent"
-        android:layout_height="0dp">
-        <ListView
+        android:layout_height="match_parent"
+        android:padding="20dp">
+        <GridView
             android:id="@+id/lvAllMenu"
+            android:numColumns="3"
+            android:verticalSpacing="20dp"
+            android:horizontalSpacing="20dp"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
-        </ListView>
+        </GridView>
+    </FrameLayout>
         <com.melnykov.fab.FloatingActionButton
             android:id="@+id/btAddMenuFloat"
             android:layout_width="56dp"
@@ -30,6 +30,6 @@
             fab:fab_colorPressed="@color/colorBackground"
             fab:fab_colorRipple="@color/cardview_shadow_end_color" />
 
-    </FrameLayout>
 
-</LinearLayout>
+
+</FrameLayout>
