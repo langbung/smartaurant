@@ -4,22 +4,22 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
-import com.smartaurant_kmutt.smartaurant.manager.OrderMenuManager;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
 /**
  * Created by LB on 21/3/2561.
  */
 
-public class OrderMenuAdapterCustomer extends BaseAdapter {
-    OrderMenuManager orderMenuManager;
+public class OrderMenuOnlyAdapter extends BaseAdapter {
+    OrderMenuOnlyManager orderMenuOnlyManager;
     @Override
     public int getCount() {
-        if(orderMenuManager ==null)
+        if(orderMenuOnlyManager ==null)
             return 0;
-        if(orderMenuManager.getOrderMenuDao().getOrderList().size()<=0)
+        if(orderMenuOnlyManager.getOrderMenuDao().getOrderList().size()<=0)
             return 0;
-        return orderMenuManager.getOrderMenuDao().getOrderList().size();
+        return orderMenuOnlyManager.getOrderMenuDao().getOrderList().size();
 
     }
 
@@ -41,13 +41,13 @@ public class OrderMenuAdapterCustomer extends BaseAdapter {
         else
             item = new OrderMenuViewCustomer(parent.getContext());
 
-        item.setName(orderMenuManager.getOrderMenuDao().getOrderList().get(position).getName());
-        item.setQuantity(orderMenuManager.getOrderMenuDao().getOrderList().get(position).getQuantity());
-        item.setPrice(orderMenuManager.getOrderMenuDao().getOrderList().get(position).getPrice());
+        item.setName(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getName());
+        item.setQuantity(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getQuantity());
+        item.setPrice(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getPrice());
         return item;
     }
 
-    public void setOrderMenuManager(OrderMenuManager orderMenuManager) {
-        this.orderMenuManager = orderMenuManager;
+    public void setOrderMenuOnlyManager(OrderMenuOnlyManager orderMenuOnlyManager) {
+        this.orderMenuOnlyManager = orderMenuOnlyManager;
     }
 }

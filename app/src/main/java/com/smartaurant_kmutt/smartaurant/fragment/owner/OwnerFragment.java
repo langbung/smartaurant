@@ -73,10 +73,10 @@ public class OwnerFragment extends Fragment{
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar= (android.support.v7.widget.Toolbar)rootView.findViewById(R.id.toolbar);
+        toolbar= rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Owner");
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        viewPager = (ViewPager)rootView.findViewById(R.id.viewPager);
+        viewPager = rootView.findViewById(R.id.viewPager);
         ownerPagerAdapter = new OwnerPagerAdapter(getChildFragmentManager());
         viewPager.setAdapter(ownerPagerAdapter);
         viewPager.setCurrentItem(getItem(),true);

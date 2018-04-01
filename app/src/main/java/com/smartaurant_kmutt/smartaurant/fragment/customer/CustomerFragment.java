@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.fragment.customer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -9,6 +10,9 @@ import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -16,8 +20,10 @@ import android.widget.TextView;
 
 import com.inthecheesefactory.thecheeselibrary.view.SlidingTabLayout;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.customer.CustomerActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerPagerAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
@@ -27,7 +33,7 @@ import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener {
+public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener,YesNoDialog.OnYesNoDialogListener {
     boolean userOut;
     CustomerPagerAdapter customerPagerAdapter;
     int numTable;
@@ -38,6 +44,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     Button btLogOut;
     OrderItemDao orderItemDao;
     boolean countRefresh;
+    Menu callWaiter;
 
     public CustomerFragment() {
         super();
@@ -55,11 +62,11 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        numTable = getArguments().getBundle("bundle").getInt("numTable");
+        numTable = getArguments().getBundle("bundle").getInt("table");
         writUserOut(true);
         init(savedInstanceState);
         //Toast.makeText(getContext(),getTable(),Toast.LENGTH_SHORT).show();
-
+        setHasOptionsMenu(true);
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -82,7 +89,6 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         toolbar = rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Table: "+numTable);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        TextView tv=new TextView(rootView.getContext());
 
         customerPagerAdapter=new CustomerPagerAdapter(getChildFragmentManager());
         customerPagerAdapter.setTable(numTable);
@@ -91,22 +97,6 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         viewPager.setAdapter(customerPagerAdapter);
         slidingTab = rootView.findViewById(R.id.slidingTab);
         setSlidingTab(slidingTab,rootView);
-        slidingTab.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
     }
 
     private void setSlidingTab(SlidingTabLayout slidingTab,View rootView){
@@ -154,16 +144,45 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     }
 
     @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.customer_menu,menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == R.id.waiterCalling ){
+            Bundle bundle = new Bundle();
+            bundle.putString("title","Call waiter");
+            bundle.putString("detail","Do you want to call Waiter");
+            YesNoDialog yesNoDialog = YesNoDialog.newInstance(bundle);
+            yesNoDialog.setTargetFragment(CustomerFragment.this,2);
+            yesNoDialog.show(getFragmentManager(),"yesNoDialog");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
     public void onOrderClick(Bundle bundle) {
         orderItemDao = bundle.getParcelable("orderItemDao");
-        customerPagerAdapter.setOrderItemDao(orderItemDao);
+//         ((CustomerActivity)getActivity()).setOrderItemDao(orderItemDao);
         if(!countRefresh){
+            customerPagerAdapter.setOrderItemDao(orderItemDao);
             int page = viewPager.getCurrentItem();
             viewPager.setAdapter(customerPagerAdapter);
             viewPager.setCurrentItem(page);
             countRefresh=true;
         }
+    }
 
 
+    @Override
+    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+        MyUtil.showText("Already call waiter");
+    }
+
+    @Override
+    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+        MyUtil.showText("cancel call waiter");
     }
 }

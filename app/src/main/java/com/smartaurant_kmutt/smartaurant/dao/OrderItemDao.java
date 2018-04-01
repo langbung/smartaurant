@@ -17,21 +17,24 @@ public class OrderItemDao implements Parcelable ,Serializable{
     int table;
     boolean beginOrder;
     Map<String,Integer> orderList;
+    float total;
 
     public OrderItemDao() {
 
     }
 
-    public OrderItemDao(String orderId, int table, boolean beginOrder,Map<String, Integer> orderList) {
+    public OrderItemDao(String orderId, int table, boolean beginOrder,Map<String, Integer> orderList,float total) {
         this.orderId = orderId;
         this.table = table;
         this.orderList = orderList;
+        this.total = total;
     }
 
     protected OrderItemDao(Parcel in) {
         orderId = in.readString();
         table = in.readInt();
         beginOrder = in.readByte() != 0;
+        total = in.readFloat();
     }
 
     @Override
@@ -39,6 +42,7 @@ public class OrderItemDao implements Parcelable ,Serializable{
         dest.writeString(orderId);
         dest.writeInt(table);
         dest.writeByte((byte) (beginOrder ? 1 : 0));
+        dest.writeFloat(total);
     }
 
     @Override
@@ -88,5 +92,13 @@ public class OrderItemDao implements Parcelable ,Serializable{
 
     public void setOrderList(Map<String, Integer> orderList) {
         this.orderList = orderList;
+    }
+
+    public float getTotal() {
+        return total;
+    }
+
+    public void setTotal(float total) {
+        this.total = total;
     }
 }

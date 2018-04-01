@@ -46,7 +46,7 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
             int numTable = prefs.getInt("numTable",0);
             Intent intent = new Intent(MenuActivity.this,CustomerActivity.class);
             Bundle bundle = new Bundle();
-            bundle.putInt("numTable",numTable);
+            bundle.putInt("table",numTable);
             intent.putExtra("bundle",bundle);
             startActivity(intent);
 

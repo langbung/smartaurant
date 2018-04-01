@@ -2,6 +2,7 @@ package com.smartaurant_kmutt.smartaurant.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -94,6 +95,7 @@ public class TableView extends BaseCustomViewGroup {
         Bundle bundle = ss.getBundle();
         // Restore State from bundle here
     }
+
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
@@ -107,6 +109,12 @@ public class TableView extends BaseCustomViewGroup {
     }
     public void setImage(int idDrawableResource){
         imageView.setImageResource(idDrawableResource);
+    }
+    public void setBackground(int resId){
+        imageView.setBackgroundResource(resId);
+    }
+    public void setBackground(String color){
+        imageView.setBackgroundColor(Color.parseColor(color));
     }
 
 }

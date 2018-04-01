@@ -1,41 +1,27 @@
 package com.smartaurant_kmutt.smartaurant.fragment;
 
 import android.content.Intent;
-import android.nfc.Tag;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
-import android.util.MonthDisplayHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.activity.StaffLoginActivity;
-import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierActivity;
-import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.activity.owner.OwnerActivity;
+import com.smartaurant_kmutt.smartaurant.activity.staff.StaffActivity;
 import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.StaffListDao;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
-
-import okhttp3.internal.Util;
 
 
 /**
@@ -75,7 +61,7 @@ public class StaffLoginFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_staff_login, container, false);
+        View rootView = inflater.inflate(R.layout.fragmentf_login, container, false);
         initInstances(rootView, savedInstanceState);
         return rootView;
     }
@@ -103,10 +89,26 @@ public class StaffLoginFragment extends Fragment {
 //        updateUI();
     }
 
-    private void updateUI() {
-        Intent intent = new Intent(getActivity(), OwnerActivity.class);
-        FragmentListener fragmentListener = (FragmentListener) getActivity();
-        fragmentListener.onSubmitClicked(intent);
+    private void updateUI(String role) {
+        switch (role){
+            case "owner":{
+                Intent intent = new Intent(getActivity(), OwnerActivity.class);
+                FragmentListener fragmentListener = (FragmentListener) getActivity();
+                fragmentListener.onSubmitClicked(intent);
+                break;
+            }
+            case "staff":{
+                Intent intent = new Intent(getActivity(), StaffActivity.class);
+                FragmentListener fragmentListener = (FragmentListener) getActivity();
+                fragmentListener.onSubmitClicked(intent);
+                break;
+            }
+            default:{
+                tvWrongPassord.setVisibility(View.VISIBLE);
+                break;
+            }
+        }
+
     }
 
     @Override
@@ -131,7 +133,7 @@ public class StaffLoginFragment extends Fragment {
         // Restore Instance State here
     }
 
-    private void signIn(String email, String password) {
+    private void signIn(final String email, String password) {
         DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff");
         staffDatabase.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -140,12 +142,12 @@ public class StaffLoginFragment extends Fragment {
                 for (DataSnapshot staffChild : dataSnapshot.getChildren()) {
                   staff = staffChild.getValue(StaffItemDao.class);
                 }
-                if (staff.getId()!=null) {
+                if (staff.getRole()!=null) {
                     tvWrongPassord.setVisibility(View.INVISIBLE);
                     MyUtil.showText(staff.getEmail());
-                    updateUI();
-
-                } else {
+                    updateUI(staff.getRole());
+                }
+                else {
                     tvWrongPassord.setVisibility(View.VISIBLE);
                 }
             }
@@ -156,7 +158,10 @@ public class StaffLoginFragment extends Fragment {
             }
         });
         if(email.equals("owner")){
-            updateUI();
+            updateUI("owner");
+        }
+        else if(email.equals("staff")){
+            updateUI("staff");
         }
     }
 

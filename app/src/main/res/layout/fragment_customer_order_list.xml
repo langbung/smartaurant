@@ -11,6 +11,7 @@
     </ListView>
     <LinearLayout
         android:paddingLeft="15dp"
+        android:paddingRight="15dp"
         android:background="@android:color/holo_blue_light"
         android:orientation="horizontal"
         android:layout_width="match_parent"
@@ -24,7 +25,7 @@
             android:layout_height="@dimen/height_listView_one_row" />
         <TextView
             android:text="test"
-            android:gravity="center_vertical"
+            android:gravity="right"
             android:id="@+id/tvTotal"
             android:textSize="@dimen/listview_text_size"
             android:layout_width="100dp"

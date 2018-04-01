@@ -59,11 +59,11 @@ public class CashierTableFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar = (Toolbar) rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Cashier");
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        gvTable = (GridView)rootView.findViewById(R.id.gvTable);
-        tableAdapter = new TableAdapter();
+        gvTable = rootView.findViewById(R.id.gvTable);
+        tableAdapter = new TableAdapter(TableAdapter.MODE_STAFF);
         gvTable.setAdapter(tableAdapter);
         gvTable.setOnItemClickListener(onItemClickListener);
 

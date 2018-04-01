@@ -117,14 +117,14 @@ public class OptionsStaffDialog extends DialogFragment {
                 OnOptionsStaffDialogListener onOptionsMenuDialogListener = (OnOptionsStaffDialogListener) getActivity();
                 Bundle bundle = new Bundle();
                 bundle.putParcelable("staffItemDao", staffItemDao);
-                bundle.putString("title","Edit staff: "+ staffItemDao.getName());
-                onOptionsMenuDialogListener.onSelectEditOption(bundle);
+                bundle.putString("title","Edit staff");
+                onOptionsMenuDialogListener.onSelectEditStaffOptionDialog(bundle);
             }
         }
     };
 
 
     public interface OnOptionsStaffDialogListener{
-        void onSelectEditOption(Bundle bundle);
+        void onSelectEditStaffOptionDialog(Bundle bundle);
     }
 }

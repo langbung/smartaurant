@@ -7,6 +7,7 @@ import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -53,6 +55,7 @@ public class OrderDialogFragment extends DialogFragment {
     MenuItemDao menu;
     OrderItemDao orderItemDao;
     int table;
+    String textMaxOrderId;
 
     OnOrderDialogListener onOrderDialogListener;
     int maxOrderId;
@@ -78,7 +81,7 @@ public class OrderDialogFragment extends DialogFragment {
         Bundle bundle = getArguments().getBundle("bundle");
         menu = bundle.getParcelable("menu");
         orderItemDao = bundle.getParcelable("orderItemDao");
-        table = bundle.getInt("table");
+        table = bundle.getInt("table",-1);
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
 
@@ -188,19 +191,27 @@ public class OrderDialogFragment extends DialogFragment {
                 if(orderItemDao == null){
                     DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
                     maxOrderDatabase.addListenerForSingleValueEvent(maxOrderListener);
+
                 }else if(orderItemDao.getOrderList() != null){
+                    Log.e("orderDialog","into second if");
                     Map<String,Integer> orderList = orderItemDao.getOrderList();
+//                    Log.e("123",orderList.toString());
+
                     if(orderList.containsKey(menu.getName())){
                         orderList.put(menu.getName(),quantity+orderList.get(menu.getName()));
                     }else{
                         orderList.put(menu.getName(),quantity);
                     }
-
+                    orderItemDao.setOrderList(orderList);
                     DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId());
                     orderDatabase.setValue(orderItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
                         @Override
                         public void onComplete(@NonNull Task<Void> task) {
                             if(task.isSuccessful()){
+                                Bundle bundle = new Bundle();
+                                bundle.putParcelable("orderItemDao",orderItemDao);
+                                onOrderDialogListener = (OnOrderDialogListener)getTargetFragment();
+                                onOrderDialogListener.onOrderClick(bundle);
                                 dismiss();
                             }
                         }
@@ -214,19 +225,18 @@ public class OrderDialogFragment extends DialogFragment {
     ValueEventListener maxOrderListener = new ValueEventListener() {
         @Override
         public void onDataChange(DataSnapshot dataSnapshot) {
+            Log.e("orderDialog","into first if");
             maxOrderId = dataSnapshot.getValue(Integer.class);
             maxOrderId++;
-            String textMaxOrderId = String.format(Locale.ENGLISH,"OD%04d",maxOrderId);
-
-
+            textMaxOrderId = String.format(Locale.ENGLISH,"OD%04d",maxOrderId);
             Map<String,Integer> orderList = new HashMap<>();
             orderList.put(menu.getName(),quantity);
-
             orderItemDao = new OrderItemDao();
             orderItemDao.setOrderId(textMaxOrderId);
             orderItemDao.setBeginOrder(true);
             orderItemDao.setOrderList(orderList);
             orderItemDao.setTable(table);
+            orderItemDao.setTotal(0);
 
             DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId());
             orderDatabase.setValue(orderItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -235,12 +245,28 @@ public class OrderDialogFragment extends DialogFragment {
                     if(task.isSuccessful()){
                         Bundle bundle = new Bundle();
                         bundle.putParcelable("orderItemDao",orderItemDao);
-                        onOrderDialogListener = (OnOrderDialogListener)getTargetFragment();
-                        OnOrderDialogListener onOrderDialogListener2 = (OnOrderDialogListener)getActivity()
-                                .getSupportFragmentManager().findFragmentById(R.id.contentContainer);
+                        onOrderDialogListener = (OnOrderDialogListener) getActivity()
+                                .getSupportFragmentManager()
+                                .findFragmentById(R.id.contentContainer);
                         onOrderDialogListener.onOrderClick(bundle);
-                        onOrderDialogListener2.onOrderClick(bundle);
-                        dismiss();
+                        OnOrderDialogListener onOrderDialogListenerToActivity = (OnOrderDialogListener) getActivity();
+                        onOrderDialogListenerToActivity.onOrderClick(bundle);
+                        DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table")
+                                .child(String.format(Locale.ENGLISH,"TB%03d",table));
+                        TableItemDao tableItem = new TableItemDao();
+                        tableItem.setAvailableTable(false);
+                        tableItem.setAvailableToCallWaiter(true);
+                        tableItem.setTable(table);
+                        tableItem.setOrderId(textMaxOrderId);
+                        tableDatabase.setValue(tableItem).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if(task.isSuccessful()){
+                                    dismiss();
+                                }
+                            }
+                        });
+
                     }
                 }
             });
@@ -248,7 +274,6 @@ public class OrderDialogFragment extends DialogFragment {
 
         @Override
         public void onCancelled(DatabaseError databaseError) {
-
         }
     };
 

@@ -118,7 +118,10 @@ public class OptionsOwnerMenuDialog extends DialogFragment {
             else if (optionsList.get(position).equals("Edit")){
                 dismiss();
                 OnOptionsMenuDialogListener onOptionsMenuDialogListener = (OnOptionsMenuDialogListener) getActivity();
-                onOptionsMenuDialogListener.onSelectEditOption(menu);
+                Bundle bundle = new Bundle();
+                bundle.putParcelable("menu",menu);
+                bundle.putString("title","Edit menu");
+                onOptionsMenuDialogListener.onSelectEditMenuOptionDialog(bundle);
             }
 
         }
@@ -142,6 +145,6 @@ public class OptionsOwnerMenuDialog extends DialogFragment {
     };
 
     public interface OnOptionsMenuDialogListener{
-        void onSelectEditOption(MenuItemDao menuItemDao);
+        void onSelectEditMenuOptionDialog(Bundle bundle);
     }
 }

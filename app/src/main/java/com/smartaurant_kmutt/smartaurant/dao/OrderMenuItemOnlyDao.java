@@ -7,21 +7,21 @@ import android.os.Parcelable;
  * Created by LB on 21/3/2561.
  */
 
-public class OrderMenuItemDao implements Parcelable {
+public class OrderMenuItemOnlyDao implements Parcelable {
     String name;
     int quantity;
     float price;
 
-    public OrderMenuItemDao() {
+    public OrderMenuItemOnlyDao() {
     }
 
-    public OrderMenuItemDao(String name, int quantity, float price) {
+    public OrderMenuItemOnlyDao(String name, int quantity, float price) {
         this.name = name;
         this.quantity = quantity;
         this.price = price;
     }
 
-    protected OrderMenuItemDao(Parcel in) {
+    protected OrderMenuItemOnlyDao(Parcel in) {
         name = in.readString();
         quantity = in.readInt();
         price = in.readFloat();
@@ -39,15 +39,15 @@ public class OrderMenuItemDao implements Parcelable {
         return 0;
     }
 
-    public static final Creator<OrderMenuItemDao> CREATOR = new Creator<OrderMenuItemDao>() {
+    public static final Creator<OrderMenuItemOnlyDao> CREATOR = new Creator<OrderMenuItemOnlyDao>() {
         @Override
-        public OrderMenuItemDao createFromParcel(Parcel in) {
-            return new OrderMenuItemDao(in);
+        public OrderMenuItemOnlyDao createFromParcel(Parcel in) {
+            return new OrderMenuItemOnlyDao(in);
         }
 
         @Override
-        public OrderMenuItemDao[] newArray(int size) {
-            return new OrderMenuItemDao[size];
+        public OrderMenuItemOnlyDao[] newArray(int size) {
+            return new OrderMenuItemOnlyDao[size];
         }
     };
 

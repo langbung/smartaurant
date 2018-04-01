@@ -13,7 +13,7 @@ import com.smartaurant_kmutt.smartaurant.view.MenuViewList;
  * Created by LB on 4/3/2561.
  */
 
-public class MenuAdapterCustomer extends BaseAdapter {
+public class CustomerMenuAdapter extends BaseAdapter {
     MenuManager menuManager;
     @Override
     public int getCount() {

@@ -4,7 +4,6 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Library/Library.iml" filepath="$PROJECT_DIR$/Library/Library.iml" />
       <module fileurl="file://$PROJECT_DIR$/Smartaurant.iml" filepath="$PROJECT_DIR$/Smartaurant.iml" />
-      <module fileurl="file://E:\Bank\Study\My self\android\androidNuuNeui\Project\Smartaurant\Library\TheCheeseLibrary.iml" filepath="E:\Bank\Study\My self\android\androidNuuNeui\Project\Smartaurant\Library\TheCheeseLibrary.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

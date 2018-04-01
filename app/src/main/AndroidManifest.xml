@@ -44,7 +44,9 @@
             android:name=".activity.owner.OwnerActivity"
             android:theme="@style/AppThemeNoActionBar" />
         <activity android:name=".activity.owner.OwnerEditMenuActivity" />
-        <activity android:name=".activity.owner.OwnerEditStaffActivity"></activity>
+        <activity android:name=".activity.owner.OwnerEditStaffActivity" />
+        <activity android:name=".activity.staff.StaffActivity" />
+        <activity android:name=".activity.staff.StaffCheckOrderActivity"></activity>
     </application>
 
 </manifest>

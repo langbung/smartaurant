@@ -37,15 +37,19 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
             case 1:{
                 Bundle bundle = new Bundle();
                 bundle.putInt("table",table);
+                bundle.putParcelable("orderItemDao",orderItemDao);
                 return CustomerMenuFragment.newInstance(bundle);
             }
             case 2:{
                 Bundle bundle = new Bundle();
+                bundle.putInt("table",table);
                 bundle.putParcelable("orderItemDao",orderItemDao);
                 return CustomerOrderListFragment.newInstance(bundle);
             }
             case 3:{
-                return CustomerCheckBillFragment.newInstance();
+                Bundle bundle = new Bundle();
+                bundle.putInt("table",table);
+                return CustomerCheckBillFragment.newInstance(bundle);
             }
             default:
                 return null;

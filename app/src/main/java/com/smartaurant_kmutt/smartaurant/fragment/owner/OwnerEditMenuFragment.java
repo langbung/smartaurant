@@ -121,6 +121,7 @@ public class OwnerEditMenuFragment extends Fragment {
             activity.setTitle(title);
             btSave.setText("Add");
         }
+
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -236,7 +237,6 @@ public class OwnerEditMenuFragment extends Fragment {
                             }
                         }
                     });
-
                 }
             }
         });
@@ -249,9 +249,12 @@ public class OwnerEditMenuFragment extends Fragment {
                 menuName = etName.getText().toString().trim();
                 menuPriceCheck = etPrice.getText().toString().trim();
                 if(checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal!=null){
+                    boolean b = checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal!=null;
+                    MyUtil.showText(String.valueOf(b));
                     frameLayout.setVisibility(View.VISIBLE);
                     uploadImageAndSetDatabase(imageUriLocal);
                 }
+
                 else if(checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal==null){
                     frameLayout.setVisibility(View.VISIBLE);
                     DatabaseReference menuDatabase = UtilDatabase.getMenu();

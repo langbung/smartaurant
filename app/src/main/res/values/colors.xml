@@ -6,4 +6,5 @@
     <color name="colorBackground">#B2DFDB</color>
     <color name="textColor">#ffffff</color>
     <color name="transparent">#00000000</color>
+    <color name="coverPress">#aa000000</color>
 </resources>

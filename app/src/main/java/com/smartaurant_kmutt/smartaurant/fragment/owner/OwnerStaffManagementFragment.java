@@ -15,7 +15,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.melnykov.fab.FloatingActionButton;
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.adapter.StaffAdapter;
+import com.smartaurant_kmutt.smartaurant.adapter.OwnerStaffListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.StaffListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsStaffDialog;
@@ -30,7 +30,7 @@ public class OwnerStaffManagementFragment extends Fragment {
     FloatingActionButton btAddStaff;
     ListView listViewStaff;
     StaffManager staffManager;
-    StaffAdapter staffAdapter;
+    OwnerStaffListAdapter ownerStaffListAdapter;
 
     public OwnerStaffManagementFragment() {
         super();
@@ -72,10 +72,10 @@ public class OwnerStaffManagementFragment extends Fragment {
         btAddStaff = rootView.findViewById(R.id.btAddStaffFloat);
         listViewStaff = rootView.findViewById(R.id.listViewStaff);
         staffManager = new StaffManager();
-        staffAdapter = new StaffAdapter();
+        ownerStaffListAdapter = new OwnerStaffListAdapter();
         setRealTime();
         btAddStaff.setOnClickListener(onButtonOnClickListener);
-        listViewStaff.setAdapter(staffAdapter);
+        listViewStaff.setAdapter(ownerStaffListAdapter);
         AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -128,8 +128,8 @@ public class OwnerStaffManagementFragment extends Fragment {
                 }
                 StaffListDao staffListDao = new StaffListDao(staffList);
                 staffManager.setStaffDao(staffListDao);
-                staffAdapter.setStaffManager(staffManager);
-                staffAdapter.notifyDataSetChanged();
+                ownerStaffListAdapter.setStaffManager(staffManager);
+                ownerStaffListAdapter.notifyDataSetChanged();
             }
 
             @Override

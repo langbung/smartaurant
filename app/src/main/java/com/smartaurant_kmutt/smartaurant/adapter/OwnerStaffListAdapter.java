@@ -11,7 +11,7 @@ import com.smartaurant_kmutt.smartaurant.view.StaffView;
  * Created by LB on 16/3/2561.
  */
 
-public class StaffAdapter extends BaseAdapter {
+public class OwnerStaffListAdapter extends BaseAdapter {
     StaffManager staffManager;
     @Override
     public int getCount() {

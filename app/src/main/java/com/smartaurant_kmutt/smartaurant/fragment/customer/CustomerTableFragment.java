@@ -10,8 +10,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.TableAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.TableListDao;
+import com.smartaurant_kmutt.smartaurant.manager.TableManager;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
+import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+
+import java.util.ArrayList;
 
 
 @SuppressWarnings("unused")
@@ -19,6 +30,8 @@ public class CustomerTableFragment extends Fragment {
     GridView gridViewTable;
     TableAdapter tableAdapter;
     android.support.v7.widget.Toolbar toolbar;
+    TableManager tableManager;
+
     public CustomerTableFragment() {
         super();
     }
@@ -55,19 +68,49 @@ public class CustomerTableFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar= rootView.findViewById(R.id.toolbar);
-        toolbar.setTitle("Select table");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        initToolbar(rootView);
+        initGridView(rootView);
 
-        gridViewTable = (GridView) rootView.findViewById(R.id.listViewTable);
+    }
+
+    private void initGridView(View rootView) {
+        gridViewTable = rootView.findViewById(R.id.listViewTable);
         gridViewTable.setOnItemClickListener(gridViewOnItemClickListener);
-        tableAdapter = new TableAdapter();
+        tableAdapter = new TableAdapter(TableAdapter.MODE_CUSTOMER);
         gridViewTable.setAdapter(tableAdapter);
+        setTableDatabaseRealTime();
+    }
 
+    private void initToolbar(View rootView) {
+        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.setTitle("Select table");
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+    }
 
+    private void setTableDatabaseRealTime() {
+        final DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table");
+        tableDatabase.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot listTable) {
+                ArrayList<TableItemDao> tableListDao = new ArrayList<>();
+                for (DataSnapshot tableItemRetrieve : listTable.getChildren()) {
+                    TableItemDao tableItemDao = tableItemRetrieve.getValue(TableItemDao.class);
+                    tableListDao.add(tableItemDao);
+                }
+                TableListDao tableList = new TableListDao();
+                tableList.setTableList(tableListDao);
+                if (tableManager == null)
+                    tableManager = new TableManager();
+                tableManager.setTableDao(tableList);
+                tableAdapter.setTableManager(tableManager);
+                tableAdapter.notifyDataSetChanged();
+            }
 
-
-
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                MyUtil.showText("Error retrieve TABLE DATA in staff check Order");
+            }
+        });
     }
 
     @Override
@@ -100,17 +143,19 @@ public class CustomerTableFragment extends Fragment {
     AdapterView.OnItemClickListener gridViewOnItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            position+=1;
-            int numTable = position;
-            Bundle bundle = new Bundle();
-            bundle.putInt("numTable",numTable);
-            FragmentListener fragmentListener=(FragmentListener)getActivity();
-            fragmentListener.onTableItemClicked(bundle);
+            TableItemDao tableItemDao = tableManager.getTableDao().getTableList().get(position);
+            if (tableItemDao.isAvailableTable()) {
+                int numTable = position + 1;
+                Bundle bundle = new Bundle();
+                bundle.putInt("table", numTable);
+                FragmentListener fragmentListener = (FragmentListener) getActivity();
+                fragmentListener.onTableItemClicked(bundle);
+            }
 
         }
     };
 
-    public interface FragmentListener{
+    public interface FragmentListener {
         void onTableItemClicked(Bundle bundle);
     }
 

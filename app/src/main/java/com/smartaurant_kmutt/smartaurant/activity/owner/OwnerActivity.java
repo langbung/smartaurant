@@ -43,22 +43,24 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     }
 
     private void initInstance() {
-        btRevenue=(Button)findViewById(R.id.btRevenue);
-        btMenuSetting =(Button)findViewById(R.id.btMenuSetting);
-        btStaffManagement=(Button)findViewById(R.id.btStaffManagement);
-        btLogout=(Button)findViewById(R.id.btLogOut);
+        btRevenue = findViewById(R.id.btRevenue);
+        btMenuSetting = findViewById(R.id.btMenuSetting);
+        btStaffManagement = findViewById(R.id.btStaffManagement);
+        btLogout = findViewById(R.id.btLogOut);
         btLogout.setOnClickListener(onClickListener);
         btRevenue.setOnClickListener(onClickListener);
         btMenuSetting.setOnClickListener(onClickListener);
         btStaffManagement.setOnClickListener(onClickListener);
-        drawerLayout = findViewById(R.id.drawerLayout);
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        drawerLayout = findViewById(R.id.drawerLayout);
         actionBarDrawerToggle=new ActionBarDrawerToggle(
                 OwnerActivity.this,
                 drawerLayout,
                 R.string.open_drawer,
                 R.string.close_drawer);
+
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -116,20 +118,15 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     }
 
     @Override
-    public void onBtAddMenuFloatClick() {
+    public void onBtAddMenuFloatClick(Bundle bundle) {
         Intent intent = new Intent(OwnerActivity.this, OwnerEditMenuActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putString("title","Add menu");
         intent.putExtra("bundle",bundle);
         startActivity(intent);
     }
 
     @Override
-    public void onSelectEditOption(MenuItemDao menuItemDao) {
+    public void onSelectEditMenuOptionDialog(Bundle bundle) {
         Intent intent = new Intent(OwnerActivity.this, OwnerEditMenuActivity.class);
-        Bundle bundle = new Bundle();
-        bundle.putParcelable("menu",menuItemDao);
-        bundle.putString("title","Edit menu");
         intent.putExtra("bundle",bundle);
         startActivity(intent);
     }
@@ -142,7 +139,7 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     }
 
     @Override
-    public void onSelectEditOption(Bundle bundle) {
+    public void onSelectEditStaffOptionDialog(Bundle bundle) {
         Intent intent = new Intent(OwnerActivity.this,OwnerEditStaffActivity.class);
         intent.putExtra("bundle",bundle);
         startActivity(intent);
