@@ -7,7 +7,7 @@ import android.os.Bundle;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.fragment.cashier.CashierTableFragment;
 
-public class CashierTableActivity extends AppCompatActivity implements CashierTableFragment.FragmentListener {
+public class CashierTableActivity extends AppCompatActivity implements CashierTableFragment.CashierTableFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +20,10 @@ public class CashierTableActivity extends AppCompatActivity implements CashierTa
     }
 
     @Override
-    public void onItemClicked(String table) {
+    public void onTableItemClickInCashierTableFragment(Bundle bundle) {
         Intent intent = new Intent(CashierTableActivity.this,CashierActivity.class);
-        intent.putExtra("table",table);
+        intent.putExtra("bundle",bundle);
         startActivity(intent);
+        finish();
     }
 }

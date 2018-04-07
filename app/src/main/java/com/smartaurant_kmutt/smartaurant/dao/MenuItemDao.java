@@ -10,24 +10,41 @@ import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
  */
 
 public class MenuItemDao implements Parcelable {
-    String name;
-    float price;
-    String imageUri;
+    private String name;
+    private float price;
+    private String imageUri;
+    private boolean enable;
 
     public MenuItemDao() {
     }
 
 
-    public MenuItemDao(String name,float price,String imageUri) {
+    public MenuItemDao(String name,float price,String imageUri,boolean enable) {
         this.name = name;
         this.price = price;
         this.imageUri = imageUri;
+        this.enable = enable;
     }
+
 
     protected MenuItemDao(Parcel in) {
         name = in.readString();
         price = in.readFloat();
         imageUri = in.readString();
+        enable = in.readByte() != 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeFloat(price);
+        dest.writeString(imageUri);
+        dest.writeByte((byte) (enable ? 1 : 0));
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<MenuItemDao> CREATOR = new Creator<MenuItemDao>() {
@@ -41,13 +58,6 @@ public class MenuItemDao implements Parcelable {
             return new MenuItemDao[size];
         }
     };
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(name);
-        dest.writeFloat(price);
-        dest.writeString(imageUri);
-    }
 
     public float getPrice() {
         return price;
@@ -65,17 +75,19 @@ public class MenuItemDao implements Parcelable {
         this.name = name;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-
     public String getImageUri() {
         return imageUri;
     }
 
     public void setImageUri(String imageUri) {
         this.imageUri = imageUri;
+    }
+
+    public boolean isEnable() {
+        return enable;
+    }
+
+    public void setEnable(boolean enable) {
+        this.enable = enable;
     }
 }

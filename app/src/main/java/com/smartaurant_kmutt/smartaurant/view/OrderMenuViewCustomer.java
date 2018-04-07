@@ -104,8 +104,24 @@ public class OrderMenuViewCustomer extends BaseCustomViewGroup {
         String textPrice=String.format(Locale.ENGLISH,"%.2f",price);
         tvPrice.setText(textPrice);
     }
+    public void setTotal(float total){
+        String textPrice=String.format(Locale.ENGLISH,"%.2f",total);
+        tvPrice.setText(textPrice);
+    }
+
+    public void setTable(int table){
+       String tableText="table "+table;
+        tvQuantity.setText(tableText);
+    }
+
+
     public void setQuantity(int quantity){
-        tvQuantity.setText(String.valueOf(quantity));
+        String quantityText = "x "+quantity;
+        tvQuantity.setText(quantityText);
+    }
+
+    public void setStatus(String status){
+        tvPrice.setText(status);
     }
 
 }

@@ -220,7 +220,7 @@ public class OwnerEditMenuFragment extends Fragment {
                 if(menuItemDao == null){
                     float menuPrice = Float.parseFloat(menuPriceCheck);
                     String imageUri = imageUriWeb.toString();
-                    MenuItemDao menuItemDao = new MenuItemDao(menuName,menuPrice,imageUri);
+                    MenuItemDao menuItemDao = new MenuItemDao(menuName,menuPrice,imageUri,true);
                     DatabaseReference menuDatabase = UtilDatabase.getMenu();
                     menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(onCompleteListener);
                 }else{

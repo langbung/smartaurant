@@ -18,11 +18,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.adapter.OrderMenuOnlyAdapter;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemOnlyDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListOnlyDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
-import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
@@ -35,10 +37,10 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
     TextView tvTotal;
     int table;
     ListView lvListMenu;
-    OrderMenuOnlyManager orderMenuManager;
-    OrderMenuOnlyAdapter orderMenuOnlyAdapter;
+    OrderMenuKitchenManager orderMenuManager;
+    CustomerOrderListAdapter orderMenuOnlyAdapter;
     String orderId;
-    ArrayList<OrderMenuItemOnlyDao> orderList;
+    ArrayList<OrderMenuItemDao> orderList;
     int countDatabase;
     float total;
 
@@ -86,8 +88,8 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
 
     private void initListView(View rootView) {
         lvListMenu = rootView.findViewById(R.id.lvListMenu);
-        orderMenuManager = new OrderMenuOnlyManager();
-        orderMenuOnlyAdapter = new OrderMenuOnlyAdapter();
+        orderMenuManager = new OrderMenuKitchenManager();
+        orderMenuOnlyAdapter = new CustomerOrderListAdapter(CustomerOrderListAdapter.MODE_ORDER_KITCHEN_CUSTOMER);
         lvListMenu.setAdapter(orderMenuOnlyAdapter);
         setOrderRealTime();
     }
@@ -125,46 +127,18 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 orderId = dataSnapshot.getValue(String.class);
-                DatabaseReference orderMenuListDatabase = UtilDatabase.getDatabase().child("order/"+orderId+"/orderList");
-                orderMenuListDatabase.addValueEventListener(new ValueEventListener() {
+                DatabaseReference orderMenuListDatabase = UtilDatabase.getDatabase().child("order_kitchen");
+                Query query = orderMenuListDatabase.orderByChild("orderId").equalTo(orderId);
+                query.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        countDatabase = 0;
-                        total=0;
-                        orderList = new ArrayList<>();
-                        for (DataSnapshot order : dataSnapshot.getChildren()) {
-                            OrderMenuItemOnlyDao orderItem = new OrderMenuItemOnlyDao();
-                            orderItem.setName(order.getKey());
-                            orderItem.setQuantity(order.getValue(Integer.class));
-                            orderList.add(orderItem);
-
-                            DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
-                                    .child(orderItem.getName())
-                                    .child("price");
-                            priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot price) {
-                                    orderList.get(countDatabase).setPrice(orderList.get(countDatabase).getQuantity() * price.getValue(Float.class));
-                                    Log.e("123", orderList.get(countDatabase).getName() + " จำนวน " + orderList.get(countDatabase).getQuantity() + " ราคา " + orderList.get(countDatabase).getPrice());
-                                    total += orderList.get(countDatabase).getPrice();
-                                    String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                    tvTotal.setText(textTotal);
-//                                    orderItemDao.setTotal(total);
-
-                                    countDatabase++;
-                                    OrderMenuListOnlyDao orderMenuListOnlyDao = new OrderMenuListOnlyDao();
-                                    orderMenuListOnlyDao.setOrderList(orderList);
-                                    orderMenuManager.setOrderMenuDao(orderMenuListOnlyDao);
-                                    orderMenuOnlyAdapter.setOrderMenuOnlyManager(orderMenuManager);
-                                    orderMenuOnlyAdapter.notifyDataSetChanged();
-                                }
-
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-
-                                }
-                            });
+                        ArrayList<OrderMenuKitchenItemDao> orderKitchenList = new ArrayList<>();
+                        for (DataSnapshot test : dataSnapshot.getChildren()){
+                            orderKitchenList.add(test.getValue(OrderMenuKitchenItemDao.class));
                         }
+                        orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                        orderMenuOnlyAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                        orderMenuOnlyAdapter.notifyDataSetChanged();
                     }
 
                     @Override

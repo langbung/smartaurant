@@ -109,7 +109,7 @@ public class OwnerEditStaffFragment extends Fragment {
     }
 
     private void createListRole() {
-        roleList = new ArrayList<>(Arrays.asList("Manager","Kitchen","Staff"));
+        roleList = new ArrayList<>(Arrays.asList("Kitchen","Staff","Cashier"));
         final ArrayAdapter roleAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, roleList);
         snRole.setAdapter(roleAdapter);
         snRole.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -154,6 +154,7 @@ public class OwnerEditStaffFragment extends Fragment {
             staffName = etName.getText().toString().trim();
             staffEmail = etEmail.getText().toString().trim();
             staffPassword = etPassword.getText().toString().trim();
+            staffRole = snRole.getText().toString();
             if (MyUtil.checkText(staffName) && MyUtil.checkText(staffEmail) && MyUtil.checkText(staffPassword) && MyUtil.checkText(staffRole)) {
                 if (staffItemDao == null) {
                     frameLayout.setVisibility(View.VISIBLE);

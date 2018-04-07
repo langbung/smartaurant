@@ -46,7 +46,8 @@
         <activity android:name=".activity.owner.OwnerEditMenuActivity" />
         <activity android:name=".activity.owner.OwnerEditStaffActivity" />
         <activity android:name=".activity.staff.StaffActivity" />
-        <activity android:name=".activity.staff.StaffCheckOrderActivity"></activity>
+        <activity android:name=".activity.staff.StaffCheckOrderActivity" />
+        <activity android:name=".activity.kitchen.KitchenActivity"></activity>
     </application>
 
 </manifest>

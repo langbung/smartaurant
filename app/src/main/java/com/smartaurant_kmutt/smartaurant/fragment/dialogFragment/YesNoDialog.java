@@ -5,6 +5,8 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
+import android.text.Html;
+import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -53,9 +55,12 @@ public class YesNoDialog extends android.support.v4.app.DialogFragment{
         initInstance(view);
         setListener();
         Bundle bundle = getArguments().getBundle("bundle");
-        String title = bundle.getString("title","none");
-        String detail = bundle.getString("detail","none");
-        if (title.equals("none")||detail.equals("none")){
+        String title;
+        String detail;
+        if (bundle!=null){
+            title = bundle.getString("title","none");
+            detail = bundle.getString("detail","none");
+        }else{
             title = getArguments().getString("title");
             detail = getArguments().getString("detail");
         }

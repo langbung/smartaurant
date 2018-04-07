@@ -12,8 +12,8 @@ public class CashierActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cashier);
-        String table = getIntent().getStringExtra("table");
+        Bundle bundle = getIntent().getBundleExtra("bundle");
         if(savedInstanceState==null)
-            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, CashierFragment.newInstance(table)).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, CashierFragment.newInstance(bundle)).commit();
     }
 }

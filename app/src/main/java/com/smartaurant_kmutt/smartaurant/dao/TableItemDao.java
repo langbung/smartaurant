@@ -8,10 +8,10 @@ import android.os.Parcelable;
  */
 
 public class TableItemDao implements Parcelable {
-    int table;
-    boolean availableToCallWaiter;
-    boolean availableTable;
-    String orderId;
+    private int table;
+    private boolean availableToCallWaiter;
+    private boolean availableTable;
+    private String orderId;
 
     public TableItemDao() {
     }

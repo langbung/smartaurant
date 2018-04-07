@@ -4,8 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -13,17 +11,17 @@ import java.util.Map;
  */
 
 public class OrderItemDao implements Parcelable ,Serializable{
-    String orderId;
-    int table;
-    boolean beginOrder;
-    Map<String,Integer> orderList;
-    float total;
+    private String orderId;
+    private int table;
+    private boolean beginOrder;
+    private Map<String,OrderMenuItemDao> orderList;
+    private float total;
 
     public OrderItemDao() {
 
     }
 
-    public OrderItemDao(String orderId, int table, boolean beginOrder,Map<String, Integer> orderList,float total) {
+    public OrderItemDao(String orderId, int table, boolean beginOrder, Map<String, OrderMenuItemDao> orderList, float total) {
         this.orderId = orderId;
         this.table = table;
         this.orderList = orderList;
@@ -86,11 +84,11 @@ public class OrderItemDao implements Parcelable ,Serializable{
         this.beginOrder = beginOrder;
     }
 
-    public Map<String, Integer> getOrderList() {
+    public Map<String, OrderMenuItemDao> getOrderList() {
         return orderList;
     }
 
-    public void setOrderList(Map<String, Integer> orderList) {
+    public void setOrderList(Map<String, OrderMenuItemDao> orderList) {
         this.orderList = orderList;
     }
 

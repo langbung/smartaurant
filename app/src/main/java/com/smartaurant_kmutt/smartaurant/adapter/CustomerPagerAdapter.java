@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerCheckBillFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerOrderListFragment;
@@ -16,8 +17,10 @@ import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerPromotionFrag
  */
 
 public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
-    int table;
-    OrderItemDao orderItemDao;
+    private int table;
+    private OrderItemDao orderItemDao;
+    OrderKitchenItemDao orderKitchenItemDao;
+
     public CustomerPagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -38,6 +41,7 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
                 Bundle bundle = new Bundle();
                 bundle.putInt("table",table);
                 bundle.putParcelable("orderItemDao",orderItemDao);
+                bundle.putParcelable("orderKitchenItemDao",orderKitchenItemDao);
                 return CustomerMenuFragment.newInstance(bundle);
             }
             case 2:{
@@ -49,6 +53,7 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
             case 3:{
                 Bundle bundle = new Bundle();
                 bundle.putInt("table",table);
+                bundle.putParcelable("orderItemDao",orderItemDao);
                 return CustomerCheckBillFragment.newInstance(bundle);
             }
             default:
@@ -86,5 +91,9 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
 
     public void setOrderItemDao(OrderItemDao orderItemDao) {
         this.orderItemDao = orderItemDao;
+    }
+
+    public void setOrderKitchenItemDao(OrderKitchenItemDao orderKitchenItemDao) {
+        this.orderKitchenItemDao = orderKitchenItemDao;
     }
 }

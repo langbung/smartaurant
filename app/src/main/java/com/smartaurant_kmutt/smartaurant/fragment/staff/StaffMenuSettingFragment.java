@@ -1,6 +1,7 @@
 package com.smartaurant_kmutt.smartaurant.fragment.staff;
 
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -9,16 +10,19 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.adapter.CustomerMenuAdapter;
+import com.smartaurant_kmutt.smartaurant.adapter.MenuAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
@@ -26,9 +30,10 @@ import java.util.ArrayList;
 
 @SuppressWarnings("unused")
 public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
-    CustomerMenuAdapter menuAdapter;
+    MenuAdapter menuAdapter;
     MenuManager menuManager;
     GridView gridViewMenu;
+    int pos;
     public StaffMenuSettingFragment() {
         super();
     }
@@ -72,15 +77,17 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
     private void initMenuGridView(View rootView) {
         gridViewMenu = rootView.findViewById(R.id.gridViewMenu);
         menuManager = new MenuManager();
-        menuAdapter = new CustomerMenuAdapter();
+        menuAdapter = new MenuAdapter(MenuAdapter.STAFF_MODE);
         menuRealTime();
         gridViewMenu.setAdapter(menuAdapter);
         gridViewMenu.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                pos = position;
                 MenuItemDao menuItemDao = menuManager.getMenuDao().getMenuList().get(position);
                 String title = menuItemDao.getName();
-                String detail = "Do you set menu to DISABLE ?";
+                String enable = (menuItemDao.isEnable())?"DISABLE":"ENABLE";
+                String detail = "Do you want to set "+enable+" to "+menuItemDao.getName()+" ?";
                 YesNoDialog yesNoDialog = YesNoDialog.newInstance(title,detail);
                 yesNoDialog.setTargetFragment(StaffMenuSettingFragment.this,01);
                 yesNoDialog.show(getFragmentManager(),"setEnableMenuDialog");
@@ -142,11 +149,24 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
 
     @Override
     public void onYesButtonClickInYesNODialog(Bundle bundle) {
-
+              setEnableMenu();
     }
 
     @Override
     public void onNoButtonClickInYesNODialog(Bundle bundle) {
 
+    }
+
+    private void setEnableMenu(){
+        MenuItemDao menuItem = menuManager.getMenuDao().getMenuList().get(pos);
+        menuItem.setEnable(!menuItem.isEnable());
+        DatabaseReference menuDatabase = UtilDatabase.getMenu().child(menuItem.getName()+"/enable");
+        menuDatabase.setValue(menuItem.isEnable()).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(!task.isSuccessful())
+                    MyUtil.showText("can't set enable menu");
+            }
+        });
     }
 }

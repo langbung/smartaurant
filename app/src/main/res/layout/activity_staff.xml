@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.DrawerLayout
+    android:theme="@style/ThemeOverlay.AppCompat.Dark"
     android:id="@+id/drawerLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
@@ -19,28 +20,41 @@
 
 
     <LinearLayout
+
         android:background="@android:color/white"
         android:orientation="vertical"
         android:layout_gravity="start"
         android:layout_width="@dimen/drawer_menu_width"
         android:layout_height="match_parent">
         <Button
+            android:gravity="left|center_vertical"
             android:paddingStart="15dp"
-            android:text="check order"
+            android:text="Customer call"
             android:background="@drawable/selector_button"
             android:id="@+id/btCheckOrder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
         <Button
+            android:gravity="left|center_vertical"
             android:paddingStart="15dp"
-            android:text="menu management"
+            android:text="Check order"
+            android:background="@drawable/selector_button"
+            android:id="@+id/btCustomerCall"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            />
+        <Button
+            android:gravity="left|center_vertical"
+            android:paddingStart="15dp"
+            android:text="Menu setting"
             android:background="@drawable/selector_button"
             android:id="@+id/btMenuSetting"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             />
         <Button
+            android:gravity="left|center_vertical"
             android:paddingStart="15dp"
             android:text="Log out"
             android:background="@drawable/selector_button"

@@ -23,7 +23,7 @@ import com.inthecheesefactory.thecheeselibrary.manager.Contextor;
 import com.melnykov.fab.FloatingActionButton;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
-import com.smartaurant_kmutt.smartaurant.adapter.CustomerMenuAdapter;
+import com.smartaurant_kmutt.smartaurant.adapter.MenuAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
@@ -43,7 +43,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     FloatingActionButton btAddMenuFloat;
     GridView lvAllMenu;
     DatabaseReference database;
-    CustomerMenuAdapter menuAdapter;
+    MenuAdapter menuAdapter;
     MenuManager menuManager;
     int countDatabaseChange;
     String menuName;
@@ -95,7 +95,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
 
         lvAllMenu = rootView.findViewById(R.id.lvAllMenu);
 
-        menuAdapter = new CustomerMenuAdapter();
+        menuAdapter = new MenuAdapter(MenuAdapter.OWNER_MODE);
         menuManager = new MenuManager();
 
         lvAllMenu.setAdapter(menuAdapter);

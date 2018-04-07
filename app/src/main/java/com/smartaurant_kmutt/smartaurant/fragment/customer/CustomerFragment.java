@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -18,15 +19,21 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DatabaseReference;
 import com.inthecheesefactory.thecheeselibrary.view.SlidingTabLayout;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.customer.CustomerActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerPagerAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+
+import java.util.Locale;
 
 
 /**
@@ -43,6 +50,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     Boolean checkUserLogout;
     Button btLogOut;
     OrderItemDao orderItemDao;
+    OrderKitchenItemDao orderKitchenItemDao;
     boolean countRefresh;
     Menu callWaiter;
 
@@ -175,9 +183,18 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         }
     }
 
-
     @Override
     public void onYesButtonClickInYesNODialog(Bundle bundle) {
+        String tableId = String.format(Locale.ENGLISH,"TB%03d",numTable);
+        DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/").child(tableId+"/availableToCallWaiter");
+        tableDatabase.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if(task.isSuccessful()){
+                    MyUtil.showText("please wait for waiter.");
+                }
+            }
+        });
         MyUtil.showText("Already call waiter");
     }
 

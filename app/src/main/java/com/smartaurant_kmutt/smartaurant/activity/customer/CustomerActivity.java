@@ -28,7 +28,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
         ,OrderDialogFragment.OnOrderDialogListener {
     int numTable;
     Button btLogOut;
-    public OrderItemDao orderItemDao;
+    private OrderItemDao orderItemDao;
     Button btTest;
 
     @Override
@@ -54,7 +54,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
-        MyUtil.showText(orderItemDao+"");
+//        MyUtil.showText(orderItemDao+"");
     }
 
 
@@ -129,6 +129,5 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
 
     @Override
     public void onOrderClick(Bundle bundle) {
-        this.orderItemDao = bundle.getParcelable("orderItemDao");
     }
 }

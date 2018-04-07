@@ -1,18 +1,12 @@
 package com.smartaurant_kmutt.smartaurant.adapter;
 
-import android.graphics.Color;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.Toast;
 
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.manager.TableManager;
-import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.view.TableView;
 
 /**
@@ -23,6 +17,7 @@ public class TableAdapter extends BaseAdapter {
     private TableManager tableManager;
     public static final int MODE_STAFF=1;
     public static final int MODE_CUSTOMER=2;
+    public static final int MODE_STAFF_CALL_WAITER=3;
     int mode;
 
     public TableAdapter(int mode) {
@@ -58,20 +53,25 @@ public class TableAdapter extends BaseAdapter {
         }
 
         int tableNumber=position+1;
-        item.setText("Table "+tableNumber);
+        item.setTable(tableNumber);
         TableItemDao tableItemDao =(TableItemDao)getItem(position);
         if(mode==MODE_CUSTOMER){
-            if(tableItemDao.isAvailableTable()){
+            if(tableItemDao.isAvailableTable())
                 item.setBackground(R.drawable.selector_button);
-            }else{
+            else
                 item.setBackground("#55555555");
-            }
+
         }else if(mode==MODE_STAFF){
-            if(tableItemDao.isAvailableTable()){
+            if(tableItemDao.isAvailableTable())
                 item.setBackground("#55555555");
-            }else{
+            else
                 item.setBackground(R.drawable.selector_button);
-            }
+
+        }else if(mode==MODE_STAFF_CALL_WAITER){
+            if(tableItemDao.isAvailableToCallWaiter())
+                item.setBackground("#55555555");
+            else
+                item.setBackground(android.R.color.holo_red_light);
         }
 
 

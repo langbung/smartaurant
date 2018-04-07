@@ -3,10 +3,7 @@ package com.smartaurant_kmutt.smartaurant.dao;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.smartaurant_kmutt.smartaurant.adapter.MenuAdapter;
-
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by LB on 4/3/2561.

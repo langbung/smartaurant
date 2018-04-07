@@ -1,26 +1,26 @@
 package com.smartaurant_kmutt.smartaurant.manager;
 
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListOnlyDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 
 /**
  * Created by LB on 21/3/2561.
  */
 
 public class OrderMenuOnlyManager {
-    OrderMenuListOnlyDao orderMenuDao;
+    OrderMenuListDao orderMenuDao;
 
-    public OrderMenuOnlyManager(OrderMenuListOnlyDao orderMenuListOnlyDao) {
-        this.orderMenuDao = orderMenuListOnlyDao;
+    public OrderMenuOnlyManager(OrderMenuListDao orderMenuListDao) {
+        this.orderMenuDao = orderMenuListDao;
     }
 
     public OrderMenuOnlyManager() {
     }
 
-    public OrderMenuListOnlyDao getOrderMenuDao() {
+    public OrderMenuListDao getOrderMenuDao() {
         return orderMenuDao;
     }
 
-    public void setOrderMenuDao(OrderMenuListOnlyDao orderMenuDao) {
+    public void setOrderMenuDao(OrderMenuListDao orderMenuDao) {
         this.orderMenuDao = orderMenuDao;
     }
 }

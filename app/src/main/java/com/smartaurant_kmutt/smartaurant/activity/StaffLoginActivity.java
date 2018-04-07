@@ -1,17 +1,13 @@
 package com.smartaurant_kmutt.smartaurant.activity;
 
 import android.content.Intent;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.smartaurant_kmutt.smartaurant.R;
-import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.StaffLoginFragment;
 
-public class StaffLoginActivity extends AppCompatActivity implements StaffLoginFragment.FragmentListener {
-    String cashierEmail = "cashier";
-    String password = "0000";
+public class StaffLoginActivity extends AppCompatActivity implements StaffLoginFragment.StaffLoginFragmentListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

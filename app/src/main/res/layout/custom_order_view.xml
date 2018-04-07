@@ -12,14 +12,14 @@
         android:layout_height="@dimen/height_listView_one_row" />
     <TextView
         android:id="@+id/tvMenuQuantity"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/height_listView_one_row" />
     <TextView
+        android:gravity="end|center_vertical"
         android:paddingEnd="15dp"
         android:id="@+id/tvMenuPrice"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+
+        android:layout_width="wrap_content"
         android:layout_height="@dimen/height_listView_one_row" />
 
 </LinearLayout>

@@ -18,6 +18,7 @@ public class StaffActivity extends AppCompatActivity {
     Button btCheckOrder;
     Button btMenuSetting;
     Button btLogOut;
+    Button btCustomerCall;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -46,6 +47,8 @@ public class StaffActivity extends AppCompatActivity {
         btCheckOrder.setOnClickListener(buttonOnClickListener);
         btMenuSetting.setOnClickListener(buttonOnClickListener);
         btLogOut.setOnClickListener(buttonOnClickListener);
+        btCustomerCall = findViewById(R.id.btCustomerCall);
+        btCustomerCall.setOnClickListener(buttonOnClickListener);
 
     }
 
@@ -67,8 +70,10 @@ public class StaffActivity extends AppCompatActivity {
         Bundle bundle = new Bundle();
         bundle.putInt("currentPage",currentPage);
         if(currentPage==0)
-            bundle.putString("title","Check order");
+            bundle.putString("title","Customer call");
         else if(currentPage==1)
+            bundle.putString("title","Check order");
+        else if(currentPage==2)
             bundle.putString("title","Menu setting");
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.contentContainer,StaffFragment.newInstance(bundle))
@@ -102,6 +107,10 @@ public class StaffActivity extends AppCompatActivity {
                 drawerLayout.closeDrawers();
             }
             else if(v==btMenuSetting){
+                setCurrentPageInViewPager(2);
+                drawerLayout.closeDrawers();
+            }
+            else if(v==btCustomerCall){
                 setCurrentPageInViewPager(1);
                 drawerLayout.closeDrawers();
             }

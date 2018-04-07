@@ -3,27 +3,25 @@ package com.smartaurant_kmutt.smartaurant.fragment.customer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemOnlyDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListOnlyDao;
-import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 
 /**
@@ -33,14 +31,10 @@ import java.util.Locale;
 public class CustomerOrderListFragment extends Fragment {
     OrderItemDao orderItemDao;
     ListView lvOrder;
-    TextView tvTotal;
-    OrderMenuOnlyManager orderMenuOnlyManager;
+    OrderMenuKitchenManager orderMenuKitchenManager;
     CustomerOrderListAdapter customerOrderListAdapter;
-    DatabaseReference orderListDatabase;
-    OrderMenuItemOnlyDao orderItem;
-    ArrayList<OrderMenuItemOnlyDao> orderList;
-    int countDatabase;
-    float total;
+    DatabaseReference orderMenuKitchenDatabase;
+    ArrayList<OrderMenuItemDao> orderList;
     public CustomerOrderListFragment() {
         super();
     }
@@ -105,25 +99,23 @@ public class CustomerOrderListFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        tvTotal=rootView.findViewById(R.id.tvTotal);
         lvOrder= rootView.findViewById(R.id.lvOrder);
 
-        customerOrderListAdapter = new CustomerOrderListAdapter();
-        orderMenuOnlyManager = new OrderMenuOnlyManager();
+        customerOrderListAdapter = new CustomerOrderListAdapter(CustomerOrderListAdapter.MODE_ORDER_KITCHEN_CUSTOMER);
+        orderMenuKitchenManager = new OrderMenuKitchenManager();
         setOrderRealTime();
         lvOrder.setAdapter(customerOrderListAdapter);
 
     }
     void initial(){
         orderList = new ArrayList<>();
-        countDatabase = 0;
-        total = 0;
+
     }
     void setOrderRealTime(){
         if(orderItemDao!=null) {
-            orderListDatabase = UtilDatabase.getDatabase().child("order/" + orderItemDao.getOrderId())
-                    .child("orderList");
-            orderListDatabase.addValueEventListener(new ValueEventListener() {
+            orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
+            Query orderListQuery = orderMenuKitchenDatabase.orderByChild("orderId").equalTo(orderItemDao.getOrderId());
+            orderListQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
 //                    Log.e("123",dataSnapshot.toString());
@@ -131,40 +123,14 @@ public class CustomerOrderListFragment extends Fragment {
 
 //                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
                     initial();
-                    for(final DataSnapshot order:dataSnapshot.getChildren()){
-                        orderItem = new OrderMenuItemOnlyDao();
-                        orderItem.setName(order.getKey());
-                        orderItem.setQuantity(order.getValue(Integer.class));
-                        orderList.add(orderItem);
-//                        Log.e("123",order.toString()+"    "+orderItem.getName()+ orderItem.getQuantity());
-                        DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
-                                .child(orderItem.getName())
-                                .child("price");
-//                        Log.e("123",priceMenuDatabase.toString());
-                        priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot price) {
-                                orderList.get(countDatabase).setPrice(orderList.get(countDatabase).getQuantity()*price.getValue(Float.class));
-                                Log.e("123",orderList.get(countDatabase).getName()+" จำนวน "+orderList.get(countDatabase).getQuantity()+" ราคา "+orderList.get(countDatabase).getPrice());
-                                total+=orderList.get(countDatabase).getPrice();
-                                String textTotal = String.format(Locale.ENGLISH,"%.2f",total);
-                                tvTotal.setText(textTotal);
-                                orderItemDao.setTotal(total);
-
-                                countDatabase++;
-                                OrderMenuListOnlyDao orderMenuListOnlyDao = new OrderMenuListOnlyDao();
-                                orderMenuListOnlyDao.setOrderList(orderList);
-                                orderMenuOnlyManager.setOrderMenuDao(orderMenuListOnlyDao);
-                                customerOrderListAdapter.setOrderMenuOnlyManager(orderMenuOnlyManager);
-                                customerOrderListAdapter.notifyDataSetChanged();
-                                DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId());
-                                orderDatabase.setValue(orderItemDao);
-                               }
-                            @Override
-                            public void onCancelled(DatabaseError databaseError) {
-                            }
-                        });
+                    ArrayList<OrderMenuKitchenItemDao> orderKitchenList = new ArrayList<>();
+                    for (DataSnapshot test : dataSnapshot.getChildren()){
+                        orderKitchenList.add(test.getValue(OrderMenuKitchenItemDao.class));
                     }
+
+                    orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
+                    customerOrderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
+                    customerOrderListAdapter.notifyDataSetChanged();
                 }
 
                 @Override

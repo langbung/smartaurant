@@ -1,42 +1,69 @@
 package com.smartaurant_kmutt.smartaurant.fragment.cashier;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toolbar;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
+import com.smartaurant_kmutt.smartaurant.adapter.OrderMenuOnlyAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
+import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
-import org.w3c.dom.Text;
+import java.util.ArrayList;
+import java.util.Locale;
 
 
 @SuppressWarnings("unused")
-public class CashierFragment extends Fragment {
-    String table;
-    TextView tvText;
+public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
+    int table;
+    TextView tvTotal;
+    ListView lvOrderMenu;
+    String posText="";
+    OrderItemDao orderItem;
+    OrderMenuItemDao orderMenuItem;
+    ArrayList<OrderMenuItemDao> orderList;
+    int countDatabase;
+    float total;
+    long posNum;
+    Button bt0,bt1,bt2,bt3,bt4,bt5,bt6,bt7,bt8,bt9;
+    Button btPay;
+    Button btBack;
+    TextView tvCashierDisplay;
     android.support.v7.widget.Toolbar toolbar;
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
+    OrderMenuOnlyManager orderMenuManager;
+    CustomerOrderListAdapter orderMenuAdapter;
 
     public CashierFragment() {
         super();
     }
 
     @SuppressWarnings("unused")
-    public static CashierFragment newInstance(String table) {
+    public static CashierFragment newInstance(Bundle bundle) {
         CashierFragment fragment = new CashierFragment();
         Bundle args = new Bundle();
-        args.putString("table",table);
+        args.putBundle("bundle",bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -45,7 +72,9 @@ public class CashierFragment extends Fragment {
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
-        setTable(getArguments().getString("table"));
+        Bundle bundle = getArguments().getBundle("bundle");
+        table = bundle.getInt("table");
+
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -65,12 +94,57 @@ public class CashierFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar = (android.support.v7.widget.Toolbar) rootView.findViewById(R.id.toolbar);
-        toolbar.setTitle("Cashier");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        tvText = (TextView)rootView.findViewById(R.id.tvText);
-        tvText.setText(getTable());
+        initToolbar(rootView);
+        initButton(rootView);
+        initTextView(rootView);
+        initListViewOrderMenu(rootView);
+    }
 
+    private void initListViewOrderMenu(View rootView) {
+        lvOrderMenu = rootView.findViewById(R.id.lvOrderMenu);
+        orderMenuAdapter = new CustomerOrderListAdapter();
+        orderMenuManager = new OrderMenuOnlyManager();
+        lvOrderMenu.setAdapter(orderMenuAdapter);
+        readOrder();
+    }
+
+    private void initTextView(View rootView) {
+        tvTotal = rootView.findViewById(R.id.tvTotal);
+        tvCashierDisplay = rootView.findViewById(R.id.tvCashierDisplay);
+    }
+
+    private void initButton(View rootView) {
+        bt0 = rootView.findViewById(R.id.bt0);
+        bt1 = rootView.findViewById(R.id.bt1);
+        bt2 = rootView.findViewById(R.id.bt2);
+        bt3 = rootView.findViewById(R.id.bt3);
+        bt4 = rootView.findViewById(R.id.bt4);
+        bt5 = rootView.findViewById(R.id.bt5);
+        bt6 = rootView.findViewById(R.id.bt6);
+        bt7 = rootView.findViewById(R.id.bt7);
+        bt8 = rootView.findViewById(R.id.bt8);
+        bt9 = rootView.findViewById(R.id.bt9);
+        btBack = rootView.findViewById(R.id.btBack);
+        btPay = rootView.findViewById(R.id.btPay);
+
+        bt0.setOnClickListener(onCashierButtonClick);
+        bt1.setOnClickListener(onCashierButtonClick);
+        bt2.setOnClickListener(onCashierButtonClick);
+        bt3.setOnClickListener(onCashierButtonClick);
+        bt4.setOnClickListener(onCashierButtonClick);
+        bt5.setOnClickListener(onCashierButtonClick);
+        bt6.setOnClickListener(onCashierButtonClick);
+        bt7.setOnClickListener(onCashierButtonClick);
+        bt8.setOnClickListener(onCashierButtonClick);
+        bt9 .setOnClickListener(onCashierButtonClick);
+        btBack.setOnClickListener(onCashierButtonClick);
+        btPay.setOnClickListener(onCashierButtonClick);
+    }
+
+    private void initToolbar(View rootView) {
+        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.setTitle("Cashier > table"+table);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
     }
 
     @Override
@@ -100,4 +174,186 @@ public class CashierFragment extends Fragment {
         // Restore Instance State here
     }
 
+    void showCashierDisplay(long num){
+        tvCashierDisplay.setText(String.valueOf(num));
+    }
+
+    void setPosNum(String posText){
+        posNum= Integer.parseInt(posText);
+    }
+
+    void readOrder(){
+        orderItem = new OrderItemDao();
+        String tableID = String.format(Locale.ENGLISH,"TB%03d",table);
+        DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/"+tableID+"/orderId");
+        tableDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                orderItem.setOrderId(dataSnapshot.getValue(String.class));
+//                    Log.e("123",dataSnapshot.toString());
+//                    MyUtil.showText(dataSnapshot.toString());
+//                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
+                DatabaseReference orderListDatabase = UtilDatabase.getDatabase().child("order/"+orderItem.getOrderId()+"/orderList");
+                orderListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        countDatabase=0;
+                        orderList = new ArrayList<>();
+                        for(DataSnapshot order:dataSnapshot.getChildren()){
+                            Log.e("check bill",dataSnapshot.getChildrenCount()+"");
+                            orderMenuItem = new OrderMenuItemDao();
+                            orderMenuItem.setName(order.child("name").getValue(String.class));
+                            orderMenuItem.setQuantity(order.child("quantity").getValue(Integer.class));
+                            orderList.add(orderMenuItem);
+
+//                        Log.e("123",order.toString()+"    "+orderItem.getName()+ orderItem.getQuantity());
+
+                            DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
+                                    .child(orderMenuItem.getName())
+                                    .child("price");
+
+//                        Log.e("123",priceMenuDatabase.toString());
+                            priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot price) {
+                                    orderList.get(countDatabase).setPrice(orderList.get(countDatabase).getQuantity()*price.getValue(Float.class));
+
+                                    Log.e("123",orderList.get(countDatabase).getName()+" จำนวน "+orderList.get(countDatabase).getQuantity()+" ราคา "+orderList.get(countDatabase).getPrice());
+
+                                    total+=orderList.get(countDatabase).getPrice();
+                                    String textTotal = String.format(Locale.ENGLISH,"%.2f",total);
+                                    tvTotal.setText(textTotal);
+                                    orderItem.setTotal(total);
+                                    countDatabase++;
+                                    OrderMenuListDao orderMenuListDao = new OrderMenuListDao();
+                                    orderMenuListDao.setOrderList(orderList);
+                                    orderMenuManager.setOrderMenuDao(orderMenuListDao);
+                                    orderMenuAdapter.setOrderMenuOnlyManager(orderMenuManager);
+                                    orderMenuAdapter.notifyDataSetChanged();
+                                    DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItem.getOrderId()+"/total");
+                                    orderDatabase.setValue(total);
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+                                }
+                            });
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    void startCashierActivity(){
+        Intent intent = new Intent(getActivity(), CashierTableActivity.class);
+        startActivity(intent);
+    }
+
+    View.OnClickListener onCashierButtonClick = new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            if(v==bt0){
+                posText+="0";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt1){
+                posText+="1";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt2){
+                posText+="2";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt3){
+                posText+="3";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt4){
+                posText+="4";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt5){
+                posText+="5";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt6){
+                posText+="6";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt7){
+                posText+="7";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt8){
+                posText+="8";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==bt9){
+                posText+="9";
+                setPosNum(posText);
+                showCashierDisplay(posNum);
+            }
+            else if(v==btBack){
+                int posTextLength = posText.length();
+                if(posTextLength>1){
+                    posText = posText.substring(0,posTextLength-1);
+                    setPosNum(posText);
+                    showCashierDisplay(posNum);
+                }else {
+                    posText="0";
+                    setPosNum(posText);
+                    showCashierDisplay(posNum);
+//                    MyUtil.showText(posNum+"");
+                }
+//                MyUtil.showText(posTextLength+"");
+            }
+            else if(btPay==v){
+                String tableId = String.format(Locale.ENGLISH,"TB%03d",table);
+                DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/"+tableId+"/availableTable");
+                tableDatabase.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if(task.isSuccessful()){
+                            float change = posNum - total;
+                            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Exchange","Change "+change+" bath");
+                            yesNoDialog.setTargetFragment(CashierFragment.this,1234);
+                            yesNoDialog.show(getFragmentManager(),"exchange");
+                        }
+                    }
+                });
+            }
+        }
+    };
+
+    @Override
+    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+        startCashierActivity();
+        getActivity().finish();
+    }
+
+    @Override
+    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+
+    }
 }

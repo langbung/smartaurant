@@ -3,6 +3,7 @@ package com.smartaurant_kmutt.smartaurant.adapter;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
+import com.smartaurant_kmutt.smartaurant.fragment.staff.StaffCallWaiter;
 import com.smartaurant_kmutt.smartaurant.fragment.staff.StaffMenuSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.staff.StaffTableCheckOrderFragment;
 
@@ -17,16 +18,20 @@ public class StaffPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 3;
     }
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
         switch (position){
             case 0:{
-                return StaffTableCheckOrderFragment.newInstance();
+                return StaffCallWaiter.newInstance();
             }
             case 1:{
+
+                return StaffTableCheckOrderFragment.newInstance();
+            }
+            case 2:{
                 return StaffMenuSettingFragment.newInstance();
             }
             default:

@@ -13,6 +13,7 @@ import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
 public class OrderMenuOnlyAdapter extends BaseAdapter {
     OrderMenuOnlyManager orderMenuOnlyManager;
+
     @Override
     public int getCount() {
         if(orderMenuOnlyManager ==null)

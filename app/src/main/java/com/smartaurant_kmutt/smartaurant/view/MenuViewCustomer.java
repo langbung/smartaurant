@@ -13,16 +13,18 @@ import com.bumptech.glide.request.RequestOptions;
 import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
 import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 
 
 /**
  * Created by nuuneoi on 11/16/2014.
  */
 public class MenuViewCustomer extends BaseCustomViewGroup {
-
+    ImageView ivDisable;
     ImageView ivMenuPicture;
     TextView tvMenuName;
     TextView tvMenuPrice;
+
     public MenuViewCustomer(Context context) {
         super(context);
         initInflate();
@@ -60,6 +62,7 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
         ivMenuPicture = findViewById(R.id.ivMenuPicture);
         tvMenuName = findViewById(R.id.tvMenuName);
         tvMenuPrice = findViewById(R.id.tvMenuPrice);
+        ivDisable = findViewById(R.id.ivDisable);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -98,7 +101,7 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
         // Restore State from bundle here
     }
 
-    public void setImage(String uri){
+    public void setImage(String uri) {
         RequestOptions requestOptions = RequestOptions
                 .placeholderOf(R.drawable.loading)
                 .error(android.R.drawable.ic_menu_gallery);
@@ -108,20 +111,28 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
                 .into(ivMenuPicture);
     }
 
-    public void setName(String name){
+
+    public void setName(String name) {
         tvMenuName.setText(name);
     }
 
-    public void setPrice(float price){
+    public void setPrice(float price) {
         String priceTemp = String.valueOf(price);
         tvMenuPrice.setText(priceTemp);
     }
 
+    public void setEnable(boolean enable) {
+        if(enable)
+            ivDisable.setVisibility(INVISIBLE);
+        else
+            ivDisable.setVisibility(VISIBLE);
+    }
+
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = width*3/4;
-        int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height,MeasureSpec.EXACTLY);
+        int height = width * 3 / 4;
+        int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);
-        setMeasuredDimension(width,height);
+        setMeasuredDimension(width, height);
     }
 }

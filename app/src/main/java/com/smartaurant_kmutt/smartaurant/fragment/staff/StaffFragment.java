@@ -65,7 +65,7 @@ public class StaffFragment extends Fragment {
         // Init 'View' instance(s) with rootView.findViewById here
         initViewPager(rootView);
         if(title.equals("no title"))
-            getActivity().setTitle("Check order");
+            getActivity().setTitle("Customer call");
         else
             getActivity().setTitle(title);
     }
@@ -85,8 +85,10 @@ public class StaffFragment extends Fragment {
             @Override
             public void onPageSelected(int position) {
                 if(position==0)
+                    getActivity().setTitle("Customer call");
+                else if(position==1)
                     getActivity().setTitle("Check order");
-                else
+                else if(position==2)
                     getActivity().setTitle("Menu setting");
             }
 

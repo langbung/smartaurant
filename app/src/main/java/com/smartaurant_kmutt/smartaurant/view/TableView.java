@@ -104,15 +104,18 @@ public class TableView extends BaseCustomViewGroup {
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);
         setMeasuredDimension(width,height);
     }
-    public void setText(String text){
-        tvTableText.setText(text);
+    public void setTable(int table){
+        tvTableText.setText("Table "+table);
     }
+
     public void setImage(int idDrawableResource){
         imageView.setImageResource(idDrawableResource);
     }
+
     public void setBackground(int resId){
         imageView.setBackgroundResource(resId);
     }
+
     public void setBackground(String color){
         imageView.setBackgroundColor(Color.parseColor(color));
     }

@@ -17,6 +17,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierActivity;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.activity.kitchen.KitchenActivity;
 import com.smartaurant_kmutt.smartaurant.activity.owner.OwnerActivity;
 import com.smartaurant_kmutt.smartaurant.activity.staff.StaffActivity;
 import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
@@ -73,10 +76,10 @@ public class StaffLoginFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        etEmail = (EditText) rootView.findViewById(R.id.etEmail);
-        etPassword = (EditText) rootView.findViewById(R.id.etPassword);
-        btSubmit = (Button) rootView.findViewById(R.id.btSubmit);
-        tvWrongPassord = (TextView) rootView.findViewById(R.id.tvWrongPassword);
+        etEmail = rootView.findViewById(R.id.etEmail);
+        etPassword = rootView.findViewById(R.id.etPassword);
+        btSubmit = rootView.findViewById(R.id.btSubmit);
+        tvWrongPassord = rootView.findViewById(R.id.tvWrongPassword);
         btSubmit.setOnClickListener(onClickListener);
         mAuth = FirebaseAuth.getInstance();
     }
@@ -91,16 +94,34 @@ public class StaffLoginFragment extends Fragment {
 
     private void updateUI(String role) {
         switch (role){
-            case "owner":{
+            case "Owner":{
                 Intent intent = new Intent(getActivity(), OwnerActivity.class);
-                FragmentListener fragmentListener = (FragmentListener) getActivity();
-                fragmentListener.onSubmitClicked(intent);
+                StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
+                staffLoginFragmentListener.onSubmitClicked(intent);
                 break;
             }
-            case "staff":{
+            case "Staff":{
                 Intent intent = new Intent(getActivity(), StaffActivity.class);
-                FragmentListener fragmentListener = (FragmentListener) getActivity();
-                fragmentListener.onSubmitClicked(intent);
+                StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
+                staffLoginFragmentListener.onSubmitClicked(intent);
+                break;
+            }
+            case "Cashier":{
+                Intent intent = new Intent(getActivity(), CashierTableActivity.class);
+                StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
+                staffLoginFragmentListener.onSubmitClicked(intent);
+                break;
+            }
+            case "Kitchen":{
+                Intent intent = new Intent(getActivity(), KitchenActivity.class);
+                StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
+                staffLoginFragmentListener.onSubmitClicked(intent);
+                break;
+            }
+            case "Manager":{
+                Intent intent = new Intent(getActivity(), StaffActivity.class);
+                StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
+                staffLoginFragmentListener.onSubmitClicked(intent);
                 break;
             }
             default:{
@@ -133,16 +154,16 @@ public class StaffLoginFragment extends Fragment {
         // Restore Instance State here
     }
 
-    private void signIn(final String email, String password) {
+    private void signIn(final String email, final String password) {
         DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff");
-        staffDatabase.orderByChild("email").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
+        staffDatabase.orderByChild("email").equalTo(email).limitToFirst(1).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 StaffItemDao staff = new StaffItemDao();
                 for (DataSnapshot staffChild : dataSnapshot.getChildren()) {
                   staff = staffChild.getValue(StaffItemDao.class);
                 }
-                if (staff.getRole()!=null) {
+                if (staff.getRole()!=null&& password.equals(staff.getPassword())) {
                     tvWrongPassord.setVisibility(View.INVISIBLE);
                     MyUtil.showText(staff.getEmail());
                     updateUI(staff.getRole());
@@ -154,14 +175,20 @@ public class StaffLoginFragment extends Fragment {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                MyUtil.showText("can select this");
+                MyUtil.showText("can't select this");
             }
         });
         if(email.equals("owner")){
-            updateUI("owner");
+            updateUI("Owner");
         }
         else if(email.equals("staff")){
-            updateUI("staff");
+            updateUI("Staff");
+        }
+        else if(email.equals("cashier")){
+            updateUI("Cashier");
+        }
+        else if(email.equals("kitchen")){
+            updateUI("Kitchen");
         }
     }
 
@@ -170,7 +197,7 @@ public class StaffLoginFragment extends Fragment {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            FragmentListener fragmentListener = (FragmentListener) getActivity();
+            StaffLoginFragmentListener staffLoginFragmentListener = (StaffLoginFragmentListener) getActivity();
             Intent intent;
             String email = etEmail.getText().toString().trim();
             String password = etPassword.getText().toString().trim();
@@ -183,11 +210,11 @@ public class StaffLoginFragment extends Fragment {
 //            if(etEmail.getText().toString().trim().equals("cashier")){
 //                tvWrongPassord.setVisibility(View.INVISIBLE);
 //                intent = new Intent(getActivity(), CashierTableActivity.class);
-//                fragmentListener.onSubmitClicked(intent);
+//                staffLoginFragmentListener.onSubmitClicked(intent);
 //            }else if(etEmail.getText().toString().trim().equals("owner")){
 //                tvWrongPassord.setVisibility(View.INVISIBLE);
 //                intent = new Intent(getActivity(), OwnerActivity.class);
-//                fragmentListener.onSubmitClicked(intent);
+//                staffLoginFragmentListener.onSubmitClicked(intent);
 //            }else{
 //                tvWrongPassord.setVisibility(View.VISIBLE);
 //            }
@@ -196,7 +223,7 @@ public class StaffLoginFragment extends Fragment {
     };
 
 
-    public interface FragmentListener {
+    public interface StaffLoginFragmentListener {
         void onSubmitClicked(Intent intent);
     }
 

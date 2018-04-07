@@ -5,10 +5,12 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -18,12 +20,18 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
-import com.smartaurant_kmutt.smartaurant.activity.customer.CustomerActivity;
+import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
+import java.util.ArrayList;
 import java.util.Locale;
 
 
@@ -31,8 +39,17 @@ import java.util.Locale;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
-    Button btCheckBill;
+public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener,OrderDialogFragment.OnOrderDialogListener {
+    OrderItemDao orderItemDao;
+    ListView lvOrder;
+    TextView tvTotal;
+    OrderMenuOnlyManager orderMenuOnlyManager;
+    CustomerOrderListAdapter customerOrderListAdapter;
+    DatabaseReference orderListDatabase;
+    OrderMenuItemDao orderItem;
+    ArrayList<OrderMenuItemDao> orderList;
+    int countDatabase;
+    float total;
     int table;
     DatabaseReference tableDatabase;
     public CustomerCheckBillFragment() {
@@ -43,7 +60,7 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
     public static CustomerCheckBillFragment newInstance(Bundle bundle) {
         CustomerCheckBillFragment fragment = new CustomerCheckBillFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle", bundle);
+        args.putBundle("bundle",bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -52,7 +69,7 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
-        table = getArguments().getBundle("bundle").getInt("table");
+        orderItemDao = getArguments().getBundle("bundle").getParcelable("orderItemDao");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -62,7 +79,6 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_customer_check_bill, container, false);
         initInstances(rootView, savedInstanceState);
-        setListener();
         return rootView;
     }
 
@@ -74,22 +90,78 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        btCheckBill = rootView.findViewById(R.id.btCheckBill);
+        tvTotal=rootView.findViewById(R.id.tvTotal);
+        lvOrder= rootView.findViewById(R.id.lvOrder);
+        customerOrderListAdapter = new CustomerOrderListAdapter();
+        orderMenuOnlyManager = new OrderMenuOnlyManager();
+        setOrderRealTime();
+        lvOrder.setAdapter(customerOrderListAdapter);
     }
 
-    private void setListener() {
-        btCheckBill.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Bundle bundle = new Bundle();
-                bundle.putString("title", "Check bill");
-                bundle.putString("detail", "Do you want check bill?");
-                YesNoDialog yesNoDialog = YesNoDialog.newInstance(bundle);
-                yesNoDialog.setTargetFragment(CustomerCheckBillFragment.this, 12);
-                yesNoDialog.show(getFragmentManager(), "yesNoDialog");
-            }
-        });
+    void initial(){
+        orderList = new ArrayList<>();
+        countDatabase = 0;
+        total = 0;
     }
+
+    void setOrderRealTime(){
+        if(orderItemDao!=null) {
+//            MyUtil.showText(orderItemDao.getOrderId());
+            orderListDatabase = UtilDatabase.getDatabase().child("order/" + orderItemDao.getOrderId())
+                    .child("orderList");
+            orderListDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+//                    Log.e("123",dataSnapshot.toString());
+//                    MyUtil.showText(dataSnapshot.toString());
+
+//                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
+                    initial();
+                    for(DataSnapshot order:dataSnapshot.getChildren()){
+                        Log.e("check bill",dataSnapshot.getChildrenCount()+"");
+                        orderItem = new OrderMenuItemDao();
+                        orderItem.setName(order.child("name").getValue(String.class));
+                        orderItem.setQuantity(order.child("quantity").getValue(Integer.class));
+                        orderList.add(orderItem);
+//                        Log.e("123",order.toString()+"    "+orderItem.getName()+ orderItem.getQuantity());
+                        DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
+                                .child(orderItem.getName())
+                                .child("price");
+//                        Log.e("123",priceMenuDatabase.toString());
+                        priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot price) {
+                                orderList.get(countDatabase).setPrice(orderList.get(countDatabase).getQuantity()*price.getValue(Float.class));
+                                Log.e("123",orderList.get(countDatabase).getName()+" จำนวน "+orderList.get(countDatabase).getQuantity()+" ราคา "+orderList.get(countDatabase).getPrice());
+                                total+=orderList.get(countDatabase).getPrice();
+                                String textTotal = String.format(Locale.ENGLISH,"%.2f",total);
+                                tvTotal.setText(textTotal);
+                                orderItemDao.setTotal(total);
+                                countDatabase++;
+                                OrderMenuListDao orderMenuListDao = new OrderMenuListDao();
+                                orderMenuListDao.setOrderList(orderList);
+                                orderMenuOnlyManager.setOrderMenuDao(orderMenuListDao);
+                                customerOrderListAdapter.setOrderMenuOnlyManager(orderMenuOnlyManager);
+                                customerOrderListAdapter.notifyDataSetChanged();
+                                DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId()+"/total");
+                                orderDatabase.setValue(total);
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
+    }
+
+
 
     @Override
     public void onStart() {
@@ -185,5 +257,10 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
     @Override
     public void onNoButtonClickInYesNODialog(Bundle bundle) {
         MyUtil.showText("Cancel check bill");
+    }
+
+    @Override
+    public void onOrderClick(Bundle bundle) {
+
     }
 }
