@@ -150,6 +150,7 @@ public class CustomerCheckBillFragment extends Fragment implements YesNoDialog.O
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
+
                     }
                 }
 
