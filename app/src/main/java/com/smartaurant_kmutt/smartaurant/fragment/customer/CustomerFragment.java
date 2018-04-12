@@ -97,14 +97,17 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         toolbar = rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Table: "+numTable);
         ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        initViewPager(rootView);
+    }
 
+    private void initViewPager(View rootView) {
         customerPagerAdapter=new CustomerPagerAdapter(getChildFragmentManager());
         customerPagerAdapter.setTable(numTable);
-
         viewPager = rootView.findViewById(R.id.viewPager);
         viewPager.setAdapter(customerPagerAdapter);
         slidingTab = rootView.findViewById(R.id.slidingTab);
         setSlidingTab(slidingTab,rootView);
+        viewPager.setCurrentItem(1);
     }
 
     private void setSlidingTab(SlidingTabLayout slidingTab,View rootView){
@@ -183,6 +186,17 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         }
     }
 
+    public void setOrderItemDao(OrderItemDao orderItemDao) {
+        this.orderItemDao = orderItemDao;
+        if(!countRefresh){
+            customerPagerAdapter.setOrderItemDao(orderItemDao);
+            int page = viewPager.getCurrentItem();
+            viewPager.setAdapter(customerPagerAdapter);
+            viewPager.setCurrentItem(page);
+            countRefresh=true;
+        }
+    }
+
     @Override
     public void onYesButtonClickInYesNODialog(Bundle bundle) {
         String tableId = String.format(Locale.ENGLISH,"TB%03d",numTable);
@@ -195,7 +209,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
                 }
             }
         });
-        MyUtil.showText("Already call waiter");
+//        MyUtil.showText("Already call waiter");
     }
 
     @Override

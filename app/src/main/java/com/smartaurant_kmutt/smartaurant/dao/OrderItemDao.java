@@ -14,14 +14,14 @@ public class OrderItemDao implements Parcelable ,Serializable{
     private String orderId;
     private int table;
     private boolean beginOrder;
-    private Map<String,OrderMenuItemDao> orderList;
+    private Map<String,OrderMenuKitchenItemDao> orderList;
     private float total;
 
     public OrderItemDao() {
 
     }
 
-    public OrderItemDao(String orderId, int table, boolean beginOrder, Map<String, OrderMenuItemDao> orderList, float total) {
+    public OrderItemDao(String orderId, int table, boolean beginOrder, Map<String, OrderMenuKitchenItemDao> orderList, float total) {
         this.orderId = orderId;
         this.table = table;
         this.orderList = orderList;
@@ -84,11 +84,11 @@ public class OrderItemDao implements Parcelable ,Serializable{
         this.beginOrder = beginOrder;
     }
 
-    public Map<String, OrderMenuItemDao> getOrderList() {
+    public Map<String, OrderMenuKitchenItemDao> getOrderList() {
         return orderList;
     }
 
-    public void setOrderList(Map<String, OrderMenuItemDao> orderList) {
+    public void setOrderList(Map<String, OrderMenuKitchenItemDao> orderList) {
         this.orderList = orderList;
     }
 

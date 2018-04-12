@@ -4,6 +4,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
@@ -12,15 +13,15 @@ import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
  */
 
 public class OrderMenuOnlyAdapter extends BaseAdapter {
-    OrderMenuOnlyManager orderMenuOnlyManager;
+    OrderMenuKitchenManager orderMenuKitchenManager;
 
     @Override
     public int getCount() {
-        if(orderMenuOnlyManager ==null)
+        if(orderMenuKitchenManager ==null)
             return 0;
-        if(orderMenuOnlyManager.getOrderMenuDao().getOrderList().size()<=0)
+        if(orderMenuKitchenManager.getOrderMenuKitchenDao().size()<=0)
             return 0;
-        return orderMenuOnlyManager.getOrderMenuDao().getOrderList().size();
+        return orderMenuKitchenManager.getOrderMenuKitchenDao().size();
 
     }
 
@@ -42,13 +43,13 @@ public class OrderMenuOnlyAdapter extends BaseAdapter {
         else
             item = new OrderMenuViewCustomer(parent.getContext());
 
-        item.setName(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getName());
-        item.setQuantity(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getQuantity());
-        item.setPrice(orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position).getPrice());
+        item.setName(orderMenuKitchenManager.getOrderMenuKitchenDao().get(position).getMenuName());
+        item.setQuantity(orderMenuKitchenManager.getOrderMenuKitchenDao().get(position).getQuantity());
+        item.setPrice(orderMenuKitchenManager.getOrderMenuKitchenDao().get(position).getPrice());
         return item;
     }
 
-    public void setOrderMenuOnlyManager(OrderMenuOnlyManager orderMenuOnlyManager) {
-        this.orderMenuOnlyManager = orderMenuOnlyManager;
+    public void setOrderMenuKitchenManager(OrderMenuKitchenManager orderMenuKitchenManager) {
+        this.orderMenuKitchenManager = orderMenuKitchenManager;
     }
 }

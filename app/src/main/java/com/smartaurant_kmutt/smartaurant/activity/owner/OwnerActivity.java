@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
@@ -19,6 +20,7 @@ import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsSt
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
 
 public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
@@ -31,8 +33,10 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     Button btMenuSetting;
     Button btStaffManagement;
     Button btLogout;
+    Button btSetting;
     android.support.v7.widget.Toolbar toolbar;
     ActionBarDrawerToggle actionBarDrawerToggle;
+    FrameLayout loading;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,15 +47,16 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     }
 
     private void initInstance() {
-        btRevenue = findViewById(R.id.btRevenue);
-        btMenuSetting = findViewById(R.id.btMenuSetting);
-        btStaffManagement = findViewById(R.id.btStaffManagement);
-        btLogout = findViewById(R.id.btLogOut);
-        btLogout.setOnClickListener(onClickListener);
-        btRevenue.setOnClickListener(onClickListener);
-        btMenuSetting.setOnClickListener(onClickListener);
-        btStaffManagement.setOnClickListener(onClickListener);
+        initToolbar();
+        initButton();
+        initFrameLayout();
+    }
 
+    private void initFrameLayout() {
+        loading=findViewById(R.id.loading);
+    }
+
+    private void initToolbar() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         drawerLayout = findViewById(R.id.drawerLayout);
@@ -64,6 +69,20 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void initButton() {
+        btRevenue = findViewById(R.id.btRevenue);
+        btMenuSetting = findViewById(R.id.btMenuSetting);
+        btStaffManagement = findViewById(R.id.btStaffManagement);
+        btLogout = findViewById(R.id.btLogOut);
+        btSetting = findViewById(R.id.btSetting);
+
+        btLogout.setOnClickListener(onClickListener);
+        btRevenue.setOnClickListener(onClickListener);
+        btMenuSetting.setOnClickListener(onClickListener);
+        btStaffManagement.setOnClickListener(onClickListener);
+        btSetting.setOnClickListener(onClickListener);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener()  {
@@ -83,7 +102,12 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerStaffManagementFragment.newInstance()).commit();
                 drawerLayout.closeDrawers();
 
-            }if(v==btLogout){
+            }else if(v==btSetting){
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerSettingFragment.newInstance()).commit();
+                drawerLayout.closeDrawers();
+
+            }
+            if(v==btLogout){
                 PopupLogout popupLogout = new PopupLogout();
                 popupLogout.show(getSupportFragmentManager(),"popup");
             }
@@ -107,7 +131,6 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         if(actionBarDrawerToggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);
-
     }
 
     @Override
@@ -143,5 +166,11 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         Intent intent = new Intent(OwnerActivity.this,OwnerEditStaffActivity.class);
         intent.putExtra("bundle",bundle);
         startActivity(intent);
+    }
+    public void setLoading(boolean enabled){
+        if(enabled)
+            loading.setVisibility(View.VISIBLE);
+        else
+            loading.setVisibility(View.INVISIBLE);
     }
 }

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    android:gravity="top"
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
+    android:layout_height="110dp">
+    <LinearLayout
+        android:id="@+id/backGround"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tvName"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/text_view_height_order_kitchen"
+            android:layout_weight="2"
+            android:ellipsize="end"
+            android:gravity="center_vertical"
+            android:maxLines="2"
+            android:paddingLeft="15dp"
+            android:text="name"
+            android:textSize="@dimen/text_size_kitchen" />
+        <TextView
+            android:text="x1"
+            android:gravity="center_vertical"
+            android:id="@+id/tvQuantity"
+            android:layout_weight="1"
+            android:textSize="@dimen/text_size_kitchen"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/text_view_height_order_kitchen" />
+        <TextView
+            android:layout_gravity="top"
+            android:gravity="center_vertical"
+            android:text="1"
+            android:id="@+id/tvNote"
+            android:textSize="@dimen/listview_text_size"
+            android:layout_weight="3"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/text_view_height_order_kitchen" />
+        <TextView
+            android:paddingRight="15dp"
+            android:gravity="center_vertical|end"
+            android:text="0.00"
+            android:id="@+id/tvStatus"
+            android:textSize="@dimen/text_size_kitchen"
+            android:layout_weight="2"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/text_view_height_order_kitchen" />
+    </LinearLayout>
+
+
+</LinearLayout>

@@ -67,7 +67,10 @@ public class OptionsStaffDialog extends DialogFragment {
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById
         listMenu = rootView.findViewById(R.id.lvListMenu);
-        optionsList = new ArrayList<>(Arrays.asList("Edit","Delete"));
+        if(staffItemDao.getRole().equals("Owner"))
+            optionsList = new ArrayList<>(Arrays.asList("Edit"));
+        else
+            optionsList = new ArrayList<>(Arrays.asList("Edit","Delete"));
         ArrayAdapter arrayAdapter = new ArrayAdapter(getActivity(),android.R.layout.simple_list_item_1, optionsList);
         listMenu.setAdapter(arrayAdapter);
         tvTitle = rootView.findViewById(R.id.tvTitle);

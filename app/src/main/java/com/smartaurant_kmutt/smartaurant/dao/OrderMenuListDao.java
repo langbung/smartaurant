@@ -10,17 +10,17 @@ import java.util.ArrayList;
  */
 
 public class OrderMenuListDao implements Parcelable {
-    ArrayList<OrderMenuItemDao> orderList = new ArrayList<>();
+    ArrayList<OrderMenuKitchenItemDao> orderList = new ArrayList<>();
 
     public OrderMenuListDao() {
     }
 
-    public OrderMenuListDao(ArrayList<OrderMenuItemDao> orderList) {
+    public OrderMenuListDao(ArrayList<OrderMenuKitchenItemDao> orderList) {
         this.orderList = orderList;
     }
 
     protected OrderMenuListDao(Parcel in) {
-        orderList = in.createTypedArrayList(OrderMenuItemDao.CREATOR);
+        orderList = in.createTypedArrayList(OrderMenuKitchenItemDao.CREATOR);
     }
 
     @Override
@@ -45,11 +45,11 @@ public class OrderMenuListDao implements Parcelable {
         }
     };
 
-    public ArrayList<OrderMenuItemDao> getOrderList() {
+    public ArrayList<OrderMenuKitchenItemDao> getOrderList() {
         return orderList;
     }
 
-    public void setOrderList(ArrayList<OrderMenuItemDao> orderList) {
+    public void setOrderList(ArrayList<OrderMenuKitchenItemDao> orderList) {
         this.orderList = orderList;
     }
 }

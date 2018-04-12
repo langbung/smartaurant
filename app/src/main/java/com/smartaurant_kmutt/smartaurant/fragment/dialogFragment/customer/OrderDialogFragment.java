@@ -1,6 +1,8 @@
 package com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
@@ -47,6 +49,7 @@ public class OrderDialogFragment extends DialogFragment {
     Button btOrder;
     ImageView imageView;
     EditText etQuantity;
+    EditText etNote;
     int quantity;
     int table;
     int maxOrKit;
@@ -56,8 +59,9 @@ public class OrderDialogFragment extends DialogFragment {
     OrderMenuKitchenItemDao orderMenuKitchenItemDao;
     TableItemDao tableItem;
     ArrayList<OrderMenuKitchenItemDao> menuListKitchenDao;
-
+    Activity activity;
     String textMaxOrderId;
+    String note;
 
     OnOrderDialogListener onOrderDialogListener;
 
@@ -115,7 +119,9 @@ public class OrderDialogFragment extends DialogFragment {
         btOrder = rootView.findViewById(R.id.btOrder);
         imageView = rootView.findViewById(R.id.imageView);
         etQuantity = rootView.findViewById(R.id.etQuantity);
+        etNote = rootView.findViewById(R.id.etNote);
         tvTitle = rootView.findViewById(R.id.tvTitle);
+        activity = getActivity();
     }
 
     private void setListener() {
@@ -190,6 +196,8 @@ public class OrderDialogFragment extends DialogFragment {
                 String textQuantity = String.valueOf(quantity);
                 etQuantity.setText(textQuantity);
             } else if (v == btOrder) {
+                note = etNote.getText().toString();
+
                 if (orderItemDao == null) {
                     DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
                     maxOrderDatabase.addListenerForSingleValueEvent(maxOrderListener);
@@ -207,24 +215,23 @@ public class OrderDialogFragment extends DialogFragment {
                             maxOrKit = dataSnapshot.getValue(Integer.class);
                             maxOrKit++;
 
-                            OrderMenuItemDao orderMenuItemDao = new OrderMenuItemDao();
+                            OrderMenuKitchenItemDao orderMenuItemDao = new OrderMenuKitchenItemDao();
+                            orderMenuItemDao.setStatus("in queue");
                             orderMenuItemDao.setQuantity(quantity);
-                            orderMenuItemDao.setName(menu.getName());
+                            orderMenuItemDao.setMenuName(menu.getName());
+                            orderMenuItemDao.setOrderId(orderItemDao.getOrderId());
+                            orderMenuItemDao.setNote(note);
 
-                            Map<String, OrderMenuItemDao> orderList = orderItemDao.getOrderList();
+                            Map<String, OrderMenuKitchenItemDao> orderList = orderItemDao.getOrderList();
                             orderList.put(maxOrKit + "", orderMenuItemDao);
                             orderItemDao.setOrderList(orderList);
 
-                            orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
-                            orderMenuKitchenItemDao.setStatus("in queue");
-                            orderMenuKitchenItemDao.setQuantity(quantity);
-                            orderMenuKitchenItemDao.setMenuName(menu.getName());
-                            orderMenuKitchenItemDao.setOrderId(orderItemDao.getOrderId());
+
 
 
                             Map<String, Object> updateChild = new HashMap<>();
                             updateChild.put("order/" + orderItemDao.getOrderId(), orderItemDao);
-                            updateChild.put("order_kitchen/" + maxOrKit, orderMenuKitchenItemDao);
+                            updateChild.put("order_kitchen/" + maxOrKit, orderMenuItemDao);
 //                                        updateChild.put("table/"+String.format(Locale.ENGLISH,"TB%03d",table),tableItem);
 
                             DatabaseReference databaseReference = UtilDatabase.getDatabase();
@@ -236,11 +243,11 @@ public class OrderDialogFragment extends DialogFragment {
                                         maxOrderKitchen.setValue(maxOrKit);
                                         Bundle bundle = new Bundle();
                                         bundle.putParcelable("orderItemDao", orderItemDao);
-                                        onOrderDialogListener = (OnOrderDialogListener) getActivity()
-                                                .getSupportFragmentManager()
-                                                .findFragmentById(R.id.contentContainer);
-                                        onOrderDialogListener.onOrderClick(bundle);
-                                        dismiss();
+//                                        onOrderDialogListener = (OnOrderDialogListener) getActivity()
+//                                                .getSupportFragmentManager()
+//                                                .findFragmentById(R.id.contentContainer);
+//                                        onOrderDialogListener.onOrderClick(bundle);
+                                        activity.finish();
                                     }
                                 }
                             });
@@ -270,11 +277,14 @@ public class OrderDialogFragment extends DialogFragment {
                     maxOrKit = dataSnapshot.getValue(Integer.class);
                     maxOrKit++;
 
-                    OrderMenuItemDao orderMenuItemDao = new OrderMenuItemDao();
-                    orderMenuItemDao.setName(menu.getName());
+                    OrderMenuKitchenItemDao orderMenuItemDao = new OrderMenuKitchenItemDao();
+                    orderMenuItemDao.setMenuName(menu.getName());
                     orderMenuItemDao.setQuantity(quantity);
+                    orderMenuItemDao.setStatus("in queue");
+                    orderMenuItemDao.setOrderId(textMaxOrderId);
+                    orderMenuItemDao.setNote(note);
 
-                    Map<String, OrderMenuItemDao> orderList = new HashMap<>();
+                    Map<String, OrderMenuKitchenItemDao> orderList = new HashMap<>();
                     orderList.put(maxOrKit + "", orderMenuItemDao);
 
                     orderItemDao = new OrderItemDao();
@@ -284,14 +294,8 @@ public class OrderDialogFragment extends DialogFragment {
                     orderItemDao.setTable(table);
                     orderItemDao.setTotal(0);
 
-                    orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
-                    orderMenuKitchenItemDao.setMenuName(menu.getName());
-                    orderMenuKitchenItemDao.setQuantity(quantity);
-                    orderMenuKitchenItemDao.setStatus("in queue");
-                    orderMenuKitchenItemDao.setOrderId(textMaxOrderId);
-
                     menuListKitchenDao = new ArrayList<>();
-                    menuListKitchenDao.add(orderMenuKitchenItemDao);
+                    menuListKitchenDao.add(orderMenuItemDao);
 
                     tableItem = new TableItemDao();
                     tableItem.setAvailableTable(false);
@@ -301,7 +305,7 @@ public class OrderDialogFragment extends DialogFragment {
 
                     Map<String, Object> updateChild = new HashMap<>();
                     updateChild.put("order/" + orderItemDao.getOrderId(), orderItemDao);
-                    updateChild.put("order_kitchen/" + maxOrKit, orderMenuKitchenItemDao);
+                    updateChild.put("order_kitchen/" + maxOrKit, orderMenuItemDao);
                     updateChild.put("table/" + String.format(Locale.ENGLISH, "TB%03d", table), tableItem);
                     updateChild.put("util/maxOrderKitchen", maxOrKit);
                     updateChild.put("util/maxOrderId", maxOrderId);
@@ -313,10 +317,10 @@ public class OrderDialogFragment extends DialogFragment {
                             if (task.isSuccessful()) {
                                 Bundle bundle = new Bundle();
                                 bundle.putParcelable("orderItemDao", orderItemDao);
-                                onOrderDialogListener = (OnOrderDialogListener) getActivity().getSupportFragmentManager()
-                                        .findFragmentById(R.id.contentContainer);
-                                onOrderDialogListener.onOrderClick(bundle);
-                                dismiss();
+                                Intent intent = new Intent();
+                                intent.putExtra("bundle",bundle);
+                                activity.setResult(activity.RESULT_OK,intent);
+                                activity.finish();
                             }
                         }
                     });

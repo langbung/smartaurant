@@ -1,6 +1,7 @@
 package com.smartaurant_kmutt.smartaurant.fragment.staff;
 
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -20,12 +21,15 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.MenuAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 
 @SuppressWarnings("unused")
@@ -34,6 +38,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
     MenuManager menuManager;
     GridView gridViewMenu;
     int pos;
+
     public StaffMenuSettingFragment() {
         super();
     }
@@ -86,11 +91,11 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
                 pos = position;
                 MenuItemDao menuItemDao = menuManager.getMenuDao().getMenuList().get(position);
                 String title = menuItemDao.getName();
-                String enable = (menuItemDao.isEnable())?"DISABLE":"ENABLE";
-                String detail = "Do you want to set "+enable+" to "+menuItemDao.getName()+" ?";
-                YesNoDialog yesNoDialog = YesNoDialog.newInstance(title,detail);
-                yesNoDialog.setTargetFragment(StaffMenuSettingFragment.this,01);
-                yesNoDialog.show(getFragmentManager(),"setEnableMenuDialog");
+                String enable = (menuItemDao.isEnable()) ? "DISABLE" : "ENABLE";
+                String detail = "Do you want to set " + enable + " to " + menuItemDao.getName() + " ?";
+                YesNoDialog yesNoDialog = YesNoDialog.newInstance(title, detail);
+                yesNoDialog.setTargetFragment(StaffMenuSettingFragment.this, 01);
+                yesNoDialog.show(getFragmentManager(), "setEnableMenuDialog");
             }
         });
     }
@@ -101,7 +106,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<MenuItemDao> menuList = new ArrayList<>();
-                for(DataSnapshot menuItem:dataSnapshot.getChildren()){
+                for (DataSnapshot menuItem : dataSnapshot.getChildren()) {
                     MenuItemDao menuItemDao = menuItem.getValue(MenuItemDao.class);
                     menuList.add(menuItemDao);
                 }
@@ -149,7 +154,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
 
     @Override
     public void onYesButtonClickInYesNODialog(Bundle bundle) {
-              setEnableMenu();
+        setEnableMenu();
     }
 
     @Override
@@ -157,16 +162,58 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
 
     }
 
-    private void setEnableMenu(){
+    private void setEnableMenu() {
         MenuItemDao menuItem = menuManager.getMenuDao().getMenuList().get(pos);
         menuItem.setEnable(!menuItem.isEnable());
-        DatabaseReference menuDatabase = UtilDatabase.getMenu().child(menuItem.getName()+"/enable");
-        menuDatabase.setValue(menuItem.isEnable()).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(!task.isSuccessful())
-                    MyUtil.showText("can't set enable menu");
+        if (menuItem.isEnable()) {
+            menuItem.setEnableRecommended(menuItem.isRecommended());
+            if (menuItem.getPromotion() > 0 )
+                menuItem.setEnablePromotion(true);
+            else
+                menuItem.setEnablePromotion(false);
+            switch (menuItem.getType()) {
+                case "Appetizer": {
+                    menuItem.setEnableAppetizer(true);
+                    menuItem.setEnableMainDish(false);
+                    menuItem.setEnableDessert(false);
+                    menuItem.setEnableDrinks(false);
+                    break;
+                }
+                case "Main dish": {
+                    menuItem.setEnableAppetizer(false);
+                    menuItem.setEnableMainDish(true);
+                    menuItem.setEnableDessert(false);
+                    menuItem.setEnableDrinks(false);
+                    break;
+                }
+                case "Dessert": {
+                    menuItem.setEnableAppetizer(false);
+                    menuItem.setEnableMainDish(false);
+                    menuItem.setEnableDessert(true);
+                    menuItem.setEnableDrinks(false);
+                    break;
+                }
+                case "Drinks": {
+                    menuItem.setEnableAppetizer(false);
+                    menuItem.setEnableMainDish(false);
+                    menuItem.setEnableDessert(false);
+                    menuItem.setEnableDrinks(true);
+                    break;
+                }
             }
-        });
+        } else {
+            menuItem.setEnableRecommended(false);
+            menuItem.setEnablePromotion(false);
+            menuItem.setEnableAppetizer(false);
+            menuItem.setEnableMainDish(false);
+            menuItem.setEnableDessert(false);
+            menuItem.setEnableDrinks(false);
+        }
+
+        Map<String, Object> menuItemUpdate = new HashMap<>();
+        menuItemUpdate.put("menu/" + menuItem.getName(), menuItem);
+        DatabaseReference menuDatabase = UtilDatabase.getDatabase();
+        menuDatabase.updateChildren(menuItemUpdate);
+
     }
 }

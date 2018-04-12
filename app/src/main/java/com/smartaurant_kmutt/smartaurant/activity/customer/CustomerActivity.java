@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,6 +19,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerCategoryFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
@@ -25,7 +27,8 @@ import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
-        ,OrderDialogFragment.OnOrderDialogListener {
+        , OrderDialogFragment.OnOrderDialogListener
+        ,CustomerCategoryFragment.CustomerCategoryFragmentListener {
     int numTable;
     Button btLogOut;
     private OrderItemDao orderItemDao;
@@ -46,7 +49,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     private void initInstance() {
         btLogOut = findViewById(R.id.btLogOut);
         btLogOut.setOnClickListener(onClickListener);
-        btTest =findViewById(R.id.btTest);
+        btTest = findViewById(R.id.btTest);
         btTest.setOnClickListener(onClickListener);
     }
 
@@ -71,10 +74,9 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
         public void onClick(View v) {
             if (v == btLogOut) {
                 PopupLogout popupLogout = new PopupLogout();
-                popupLogout.show(getSupportFragmentManager(),"ok");
-            }
-            else if(v==btTest){
-                if(orderItemDao==null)
+                popupLogout.show(getSupportFragmentManager(), "ok");
+            } else if (v == btTest) {
+                if (orderItemDao == null)
                     MyUtil.showText("NO ORDERITEMDAO");
                 else
                     MyUtil.showText(orderItemDao.getOrderId());
@@ -86,23 +88,24 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     @Override
     public void onPopupLogoutClick(String email, String password) {
         writUserOut(false);
-        if(orderItemDao!=null){
+        if (orderItemDao != null) {
             increaseMaxOrderId();
-        }else{
+        } else {
             exitToMenuActivity();
         }
     }
-    void increaseMaxOrderId(){
-        DatabaseReference maxOrderDatabase =  UtilDatabase.getUtilDatabase().child("maxOrderId");
+
+    void increaseMaxOrderId() {
+        DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
         maxOrderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 int maxOrderId = dataSnapshot.getValue(Integer.class);
-                DatabaseReference maxOrderDatabase =  UtilDatabase.getUtilDatabase().child("maxOrderId");
-                maxOrderDatabase.setValue(maxOrderId+1).addOnCompleteListener(new OnCompleteListener<Void>() {
+                DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
+                maxOrderDatabase.setValue(maxOrderId + 1).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()){
+                        if (task.isSuccessful()) {
                             Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
                             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                             startActivity(intent);
@@ -110,6 +113,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
                     }
                 });
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -117,7 +121,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
         });
     }
 
-    void exitToMenuActivity(){
+    void exitToMenuActivity() {
         Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
@@ -129,5 +133,26 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
 
     @Override
     public void onOrderClick(Bundle bundle) {
+    }
+
+    @Override
+    public void onClickCategoryButtonCustomerCategoryFragment(Bundle bundle) {
+        Intent intent = new Intent(CustomerActivity.this,CustomerMenuActivity.class);
+        intent.putExtra("bundle",bundle);
+        startActivityForResult(intent,1);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode==1){
+            if(resultCode==RESULT_OK){
+                Bundle bundle = data.getBundleExtra("bundle");
+                OrderItemDao orderItemDao = bundle.getParcelable("orderItemDao");
+                MyUtil.showText(orderItemDao.getOrderId());
+                CustomerFragment customerFragment= (CustomerFragment) getSupportFragmentManager().findFragmentById(R.id.contentContainer);
+                customerFragment.setOrderItemDao(orderItemDao);
+            }
+        }
     }
 }

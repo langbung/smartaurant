@@ -9,6 +9,7 @@ import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
+import com.smartaurant_kmutt.smartaurant.view.OrderAndCheckBillMenuViewCustomer;
 import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
 /**
@@ -20,7 +21,7 @@ public class CustomerOrderListAdapter extends BaseAdapter {
     private OrderMenuKitchenManager orderMenuKitchenManager;
     int mode;
     public static final int MODE_ORDER_KITCHEN_CUSTOMER = 1;
-
+    public static final int MODE_ORDER_KITCHEN_STAFF = 2;
     public CustomerOrderListAdapter() {
 
     }
@@ -38,11 +39,11 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 return 0;
             return orderMenuKitchenManager.getOrderMenuKitchenDao().size();
         }
-        if (orderMenuOnlyManager == null)
+        if (orderMenuKitchenManager == null)
             return 0;
-        if (orderMenuOnlyManager.getOrderMenuDao().getOrderList().size() <= 0)
+        if (orderMenuKitchenManager.getOrderMenuKitchenDao().size() <= 0)
             return 0;
-        return orderMenuOnlyManager.getOrderMenuDao().getOrderList().size();
+        return orderMenuKitchenManager.getOrderMenuKitchenDao().size();
     }
 
     @Override
@@ -57,11 +58,11 @@ public class CustomerOrderListAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        OrderMenuViewCustomer item;
+        OrderAndCheckBillMenuViewCustomer item;
         if (convertView != null)
-            item = (OrderMenuViewCustomer) convertView;
+            item = (OrderAndCheckBillMenuViewCustomer) convertView;
         else
-            item = new OrderMenuViewCustomer(parent.getContext());
+            item = new OrderAndCheckBillMenuViewCustomer(parent.getContext());
 
         if (mode == MODE_ORDER_KITCHEN_CUSTOMER) {
             OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
@@ -69,10 +70,17 @@ public class CustomerOrderListAdapter extends BaseAdapter {
             item.setName(orderMenuKitchenItemDao.getMenuName());
             item.setQuantity(orderMenuKitchenItemDao.getQuantity());
             item.setStatus(orderMenuKitchenItemDao.getStatus());
+            item.setPrice(orderMenuKitchenItemDao.getPrice());
 
-        } else {
-            OrderMenuItemDao orderMenuKitchenItemDao = orderMenuOnlyManager.getOrderMenuDao().getOrderList().get(position);
-            item.setName(orderMenuKitchenItemDao.getName());
+        }else if(mode==MODE_ORDER_KITCHEN_STAFF) {
+            OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+            item.setName(orderMenuKitchenItemDao.getMenuName());
+            item.setQuantity(orderMenuKitchenItemDao.getQuantity());
+            item.setStatusAtRight(orderMenuKitchenItemDao.getStatus());
+        }
+        else {
+            OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+            item.setName(orderMenuKitchenItemDao.getMenuName());
             item.setQuantity(orderMenuKitchenItemDao.getQuantity());
             item.setPrice(orderMenuKitchenItemDao.getPrice());
         }

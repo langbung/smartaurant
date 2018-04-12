@@ -163,7 +163,7 @@ public class StaffLoginFragment extends Fragment {
                 break;
             }
             case "cashier":{
-                updateUI("cashier");
+                updateUI("Cashier");
                 break;
             }
             default:{

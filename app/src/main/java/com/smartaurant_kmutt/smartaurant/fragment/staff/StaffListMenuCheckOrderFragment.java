@@ -89,7 +89,7 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
     private void initListView(View rootView) {
         lvListMenu = rootView.findViewById(R.id.lvListMenu);
         orderMenuManager = new OrderMenuKitchenManager();
-        orderMenuOnlyAdapter = new CustomerOrderListAdapter(CustomerOrderListAdapter.MODE_ORDER_KITCHEN_CUSTOMER);
+        orderMenuOnlyAdapter = new CustomerOrderListAdapter(CustomerOrderListAdapter.MODE_ORDER_KITCHEN_STAFF);
         lvListMenu.setAdapter(orderMenuOnlyAdapter);
         setOrderRealTime();
     }

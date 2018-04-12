@@ -7,7 +7,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
-import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerCheckBillFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerCategoryFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerOrderListFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.customer.CustomerPromotionFragment;
@@ -27,7 +27,7 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 4;
+        return 3;
     }
 
     @Override
@@ -40,21 +40,20 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
             case 1:{
                 Bundle bundle = new Bundle();
                 bundle.putInt("table",table);
-                bundle.putParcelable("orderItemDao",orderItemDao);
-                bundle.putParcelable("orderKitchenItemDao",orderKitchenItemDao);
-                return CustomerMenuFragment.newInstance(bundle);
+                if(orderItemDao!=null)
+                    bundle.putParcelable("orderItemDao",orderItemDao);
+                return CustomerCategoryFragment.newInstance(bundle);
+//                Bundle bundle = new Bundle();
+//                bundle.putInt("table",table);
+//                bundle.putParcelable("orderItemDao",orderItemDao);
+//                bundle.putParcelable("orderKitchenItemDao",orderKitchenItemDao);
+//                return CustomerMenuFragment.newInstance(bundle);
             }
             case 2:{
                 Bundle bundle = new Bundle();
                 bundle.putInt("table",table);
                 bundle.putParcelable("orderItemDao",orderItemDao);
                 return CustomerOrderListFragment.newInstance(bundle);
-            }
-            case 3:{
-                Bundle bundle = new Bundle();
-                bundle.putInt("table",table);
-                bundle.putParcelable("orderItemDao",orderItemDao);
-                return CustomerCheckBillFragment.newInstance(bundle);
             }
             default:
                 return null;
@@ -74,9 +73,6 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
             }
             case 2:{
                 return "Order list";
-            }
-            case 3:{
-                return "Check bill";
             }
             default:{
                 return "";

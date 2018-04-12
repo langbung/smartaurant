@@ -152,14 +152,20 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
             public void onDataChange(DataSnapshot dataSnapshot) {
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
+                ArrayList<MenuItemDao> menuList = new ArrayList<>();
+                MenuListDao menuListDao = new MenuListDao();
                 if(dataSnapshot.getChildrenCount()>0) {
-                    MenuListDao menuListDao = new MenuListDao();
-                    ArrayList<MenuItemDao> menuList = new ArrayList<>();
                     for (DataSnapshot menuChild : dataSnapshot.getChildren()) {
                         MenuItemDao menuItemDao = menuChild.getValue(MenuItemDao.class);
                         menuList.add(menuItemDao);
                     }
 //                    showText(String.valueOf(menuList.size()));
+                    menuListDao.setMenuList(menuList);
+                    menuManager.setMenuDao(menuListDao);
+                    menuAdapter.setMenuManager(menuManager);
+                    menuAdapter.notifyDataSetChanged();
+                }
+                else{
                     menuListDao.setMenuList(menuList);
                     menuManager.setMenuDao(menuListDao);
                     menuAdapter.setMenuManager(menuManager);
@@ -175,40 +181,8 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
         });
     }
 
-    void setTableDatabase(){
-        DatabaseReference maxTableDatabase = UtilDatabase.getUtilDatabase().child("maxTable");
-        maxTableDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                int table = dataSnapshot.getValue(Integer.class);
-                MyUtil.showText(table+" โต๊ะ");
-                Map<String,TableItemDao> listTable = createListTable(table);
-                DatabaseReference tableDatabase =UtilDatabase.getDatabase().child("table");
-                tableDatabase.setValue(listTable).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful())
-                            MyUtil.showText("it set table why");
-                    }
-                });
-            }
 
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
 
-            }
-        });
-    }
-
-    Map<String,TableItemDao> createListTable(int numberOfTable){
-        Map<String,TableItemDao> listTable = new HashMap<>();
-        for(int i =1;i<=numberOfTable;i++){
-            String tableId = String.format(Locale.ENGLISH,"TB%03d",i);
-            TableItemDao tableItem = new TableItemDao(i,true,true,"none");
-            listTable.put(tableId,tableItem);
-        }
-        return listTable;
-    }
 
     AdapterView.OnItemClickListener onItemClickListener= new AdapterView.OnItemClickListener() {
         @Override
@@ -227,8 +201,8 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
                 bundle.putString("title","Add menu");
                 onOwnerListMenuFragmentListener.onBtAddMenuFloatClick(bundle);
 //                menuName = etMenuName.getText().toString().trim();
-//                menuPriceCheck = etMenuPrice.getText().toString().trim();
-//                if(checkText(menuName)&& checkText(menuPriceCheck)){
+//                menuPriceText = etMenuPrice.getText().toString().trim();
+//                if(checkText(menuName)&& checkText(menuPriceText)){
 //                    DatabaseReference util = database.child("util").child("maxMenuId");
 //                    util.addListenerForSingleValueEvent(onSaveMenu);
 //                }

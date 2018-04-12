@@ -22,8 +22,11 @@ import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
@@ -45,6 +48,8 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
     OrderKitchenItemDao orderKitchenItemDao;
     int table;
     int pos;
+    String title;
+    String menuType;
     public CustomerMenuFragment() {
         super();
     }
@@ -63,6 +68,8 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
         Bundle bundle = getArguments().getBundle("bundle");
+        menuType = bundle.getString("menuType");
+        title = bundle.getString("title");
         table = bundle.getInt("table");
         orderItemDao=bundle.getParcelable("orderItemDao");
         orderKitchenItemDao = bundle.getParcelable("orderKitchenItemDao");
@@ -91,7 +98,7 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
         gvMenu = rootView.findViewById(R.id.gvMenuCustomer);
         menuManager = new MenuManager();
         menuAdapter = new MenuAdapter(MenuAdapter.CUSTOMER_MODE);
-
+        getActivity().setTitle(title);
     }
 
     private void setListener() {
@@ -102,7 +109,8 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
 
     private void menuRealTime() {
         DatabaseReference menuDatabase = UtilDatabase.getMenu();
-        Query menuQuery = menuDatabase.orderByChild("enable").equalTo(true);
+        Log.e("customer",menuType);
+        Query menuQuery = menuDatabase.orderByChild(menuType).equalTo(true);
         menuQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -156,6 +164,7 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
     @Override
     public void onOrderClick(Bundle bundle) {
         orderItemDao = bundle.getParcelable("orderItemDao");
+
 //        orderKitchenItemDao = bundle.getParcelable("orderKitchenItemDao");
 //        Log.e("OrderDialogClick",orderItemDao.getOrderList().size()+"");
 //        try {
@@ -174,9 +183,9 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
                 orderItemDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Map<String,OrderMenuItemDao> orderList = new HashMap<>();
+                        Map<String,OrderMenuKitchenItemDao> orderList = new HashMap<>();
                         for(DataSnapshot orderItem:dataSnapshot.getChildren()){
-                            orderList.put(orderItem.getKey(),orderItem.getValue(OrderMenuItemDao.class));
+                            orderList.put(orderItem.getKey(),orderItem.getValue(OrderMenuKitchenItemDao.class));
                         }
                         orderItemDao.setOrderList(orderList);
                         Bundle bundle = new Bundle();
@@ -207,5 +216,4 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
 
         }
     };
-
 }

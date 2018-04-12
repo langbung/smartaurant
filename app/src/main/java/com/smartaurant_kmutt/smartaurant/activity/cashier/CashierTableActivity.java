@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.StaffLoginActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.cashier.CashierTableFragment;
 
 public class CashierTableActivity extends AppCompatActivity implements CashierTableFragment.CashierTableFragmentListener {
@@ -24,6 +25,12 @@ public class CashierTableActivity extends AppCompatActivity implements CashierTa
         Intent intent = new Intent(CashierTableActivity.this,CashierActivity.class);
         intent.putExtra("bundle",bundle);
         startActivity(intent);
-        finish();
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(CashierTableActivity.this, StaffLoginActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

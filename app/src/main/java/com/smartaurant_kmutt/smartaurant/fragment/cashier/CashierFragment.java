@@ -19,15 +19,19 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.adapter.OrderMenuOnlyAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -41,9 +45,10 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     TextView tvTotal;
     ListView lvOrderMenu;
     String posText="";
+    String orderId;
     OrderItemDao orderItem;
-    OrderMenuItemDao orderMenuItem;
-    ArrayList<OrderMenuItemDao> orderList;
+    OrderMenuKitchenItemDao orderMenuItem;
+    ArrayList<OrderMenuKitchenItemDao> orderKitchenList;
     int countDatabase;
     float total;
     long posNum;
@@ -52,7 +57,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     Button btBack;
     TextView tvCashierDisplay;
     android.support.v7.widget.Toolbar toolbar;
-    OrderMenuOnlyManager orderMenuManager;
+    OrderMenuKitchenManager orderMenuManager;
     CustomerOrderListAdapter orderMenuAdapter;
 
     public CashierFragment() {
@@ -103,7 +108,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     private void initListViewOrderMenu(View rootView) {
         lvOrderMenu = rootView.findViewById(R.id.lvOrderMenu);
         orderMenuAdapter = new CustomerOrderListAdapter();
-        orderMenuManager = new OrderMenuOnlyManager();
+        orderMenuManager = new OrderMenuKitchenManager();
         lvOrderMenu.setAdapter(orderMenuAdapter);
         readOrder();
     }
@@ -189,54 +194,66 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
         tableDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                orderItem.setOrderId(dataSnapshot.getValue(String.class));
+                orderId = dataSnapshot.getValue(String.class);
+                DatabaseReference orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
+                Query orderListQuery = orderMenuKitchenDatabase.orderByChild("orderId").equalTo(orderId);
+
+                orderListQuery.addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
 //                    Log.e("123",dataSnapshot.toString());
 //                    MyUtil.showText(dataSnapshot.toString());
 //                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
-                DatabaseReference orderListDatabase = UtilDatabase.getDatabase().child("order/"+orderItem.getOrderId()+"/orderList");
-                orderListDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        countDatabase=0;
-                        orderList = new ArrayList<>();
-                        for(DataSnapshot order:dataSnapshot.getChildren()){
-                            Log.e("check bill",dataSnapshot.getChildrenCount()+"");
-                            orderMenuItem = new OrderMenuItemDao();
-                            orderMenuItem.setName(order.child("name").getValue(String.class));
-                            orderMenuItem.setQuantity(order.child("quantity").getValue(Integer.class));
-                            orderList.add(orderMenuItem);
+//                    if(dataSnapshot.exists()){
 
-//                        Log.e("123",order.toString()+"    "+orderItem.getName()+ orderItem.getQuantity());
+                        if (dataSnapshot.exists()) {
+                            Log.e("OrderListFragment","data exist");
+                            countDatabase = 0;
+                            total = 0;
+                            orderKitchenList = new ArrayList<>();
+                            for (DataSnapshot test : dataSnapshot.getChildren()) {
+                                OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
+                                orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
+                                orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
+                                orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
+                                orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
+                                orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
+                                orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
+                                orderKitchenList.add(orderMenuKitchenItemDao);
 
-                            DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
-                                    .child(orderMenuItem.getName())
-                                    .child("price");
-
+                                DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
+                                        .child(orderMenuKitchenItemDao.getMenuName());
 //                        Log.e("123",priceMenuDatabase.toString());
-                            priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                @Override
-                                public void onDataChange(DataSnapshot price) {
-                                    orderList.get(countDatabase).setPrice(orderList.get(countDatabase).getQuantity()*price.getValue(Float.class));
+                                priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot menuItemDatabase) {
+                                        MenuItemDao menuItem = menuItemDatabase.getValue(MenuItemDao.class);
+                                        float price = menuItem.getPrice()*(1-menuItem.getPromotion()/100);
+                                        orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
 
-                                    Log.e("123",orderList.get(countDatabase).getName()+" จำนวน "+orderList.get(countDatabase).getQuantity()+" ราคา "+orderList.get(countDatabase).getPrice());
+//                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
+                                        total += orderKitchenList.get(countDatabase).getPrice();
+                                        String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                        tvTotal.setText(textTotal);
+                                        countDatabase++;
+                                        orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                                        orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                                        orderMenuAdapter.notifyDataSetChanged();
+                                        Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
+                                    }
 
-                                    total+=orderList.get(countDatabase).getPrice();
-                                    String textTotal = String.format(Locale.ENGLISH,"%.2f",total);
-                                    tvTotal.setText(textTotal);
-                                    orderItem.setTotal(total);
-                                    countDatabase++;
-                                    OrderMenuListDao orderMenuListDao = new OrderMenuListDao();
-                                    orderMenuListDao.setOrderList(orderList);
-                                    orderMenuManager.setOrderMenuDao(orderMenuListDao);
-                                    orderMenuAdapter.setOrderMenuOnlyManager(orderMenuManager);
-                                    orderMenuAdapter.notifyDataSetChanged();
-                                    DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/"+orderItem.getOrderId()+"/total");
-                                    orderDatabase.setValue(total);
-                                }
-                                @Override
-                                public void onCancelled(DatabaseError databaseError) {
-                                }
-                            });
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                    }
+                                });
+                            }
+                        }
+                        else{
+                            Log.e("OrderListFragment","data not exist");
+                            orderKitchenList = new ArrayList<>();
+                            orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                            orderMenuAdapter.notifyDataSetChanged();
                         }
                     }
 
@@ -245,8 +262,6 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
 
                     }
                 });
-
-
             }
 
             @Override
@@ -259,6 +274,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     void startCashierActivity(){
         Intent intent = new Intent(getActivity(), CashierTableActivity.class);
         startActivity(intent);
+        getActivity().finish();
     }
 
     View.OnClickListener onCashierButtonClick = new View.OnClickListener() {

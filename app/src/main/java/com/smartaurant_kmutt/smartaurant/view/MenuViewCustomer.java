@@ -15,6 +15,8 @@ import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 
+import java.util.ArrayList;
+
 
 /**
  * Created by nuuneoi on 11/16/2014.
@@ -22,6 +24,10 @@ import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 public class MenuViewCustomer extends BaseCustomViewGroup {
     ImageView ivDisable;
     ImageView ivMenuPicture;
+    ImageView iv1;
+    ImageView iv2;
+    ImageView iv3;
+    ImageView iv4;
     TextView tvMenuName;
     TextView tvMenuPrice;
 
@@ -63,6 +69,10 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
         tvMenuName = findViewById(R.id.tvMenuName);
         tvMenuPrice = findViewById(R.id.tvMenuPrice);
         ivDisable = findViewById(R.id.ivDisable);
+        iv1 = findViewById(R.id.iv1);
+        iv2 = findViewById(R.id.iv2);
+        iv3 = findViewById(R.id.iv3);
+        iv4 = findViewById(R.id.iv4);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -134,5 +144,43 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
         int newHeightMeasureSpec = MeasureSpec.makeMeasureSpec(height, MeasureSpec.EXACTLY);
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);
         setMeasuredDimension(width, height);
+    }
+    public void setAllergen(ArrayList<Integer> resList)  {
+        int size = resList.size();
+//        MyUtil.showText(size+"");
+        switch (size){
+            case 1:{
+                iv1.setImageResource(resList.get(0));
+                iv1.setVisibility(VISIBLE);
+                break;
+            }
+            case 2:{
+                iv1.setImageResource(resList.get(0));
+                iv1.setVisibility(VISIBLE);
+                iv2.setImageResource(resList.get(1));
+                iv2.setVisibility(VISIBLE);
+                break;
+            }
+            case 3:{
+                iv1.setImageResource(resList.get(0));
+                iv1.setVisibility(VISIBLE);
+                iv2.setImageResource(resList.get(1));
+                iv2.setVisibility(VISIBLE);
+                iv3.setImageResource(resList.get(2));
+                iv3.setVisibility(VISIBLE);
+                break;
+            }
+            case 4:{
+                iv1.setImageResource(resList.get(0));
+                iv1.setVisibility(VISIBLE);
+                iv2.setImageResource(resList.get(1));
+                iv2.setVisibility(VISIBLE);
+                iv3.setImageResource(resList.get(2));
+                iv3.setVisibility(VISIBLE);
+                iv4.setImageResource(resList.get(3));
+                iv4.setVisibility(VISIBLE);
+                break;
+            }
+        }
     }
 }

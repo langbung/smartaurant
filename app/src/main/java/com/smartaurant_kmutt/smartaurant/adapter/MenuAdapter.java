@@ -4,9 +4,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
 import com.smartaurant_kmutt.smartaurant.view.MenuViewCustomer;
+
+import java.util.ArrayList;
 
 /**
  * Created by LB on 4/3/2561.
@@ -51,10 +54,21 @@ public class MenuAdapter extends BaseAdapter {
         else
             item = (MenuViewCustomer) convertView;
         MenuItemDao menuItemDao = menuManager.getMenuDao().getMenuList().get(position);
+        String allergen = menuItemDao.getAllergen();
         item.setImage(menuItemDao.getImageUri());
         item.setName(menuItemDao.getName());
         item.setPrice(menuItemDao.getPrice());
 
+        ArrayList<Integer> resIdList = new ArrayList<>();
+        if(allergen.contains("egg"))
+            resIdList.add(R.drawable.ic_allergens_eggs);
+        if(allergen.contains("milk"))
+            resIdList.add(R.drawable.ic_allergens_milk);
+        if(allergen.contains("bean"))
+            resIdList.add(R.drawable.ic_allergens_pea);
+        if(allergen.contains("seafood"))
+            resIdList.add(R.drawable.ic_allergens_mollusc);
+        item.setAllergen(resIdList);
         if (mode == STAFF_MODE){
 //            MyUtil.showText("in staff");
             item.setEnable(menuItemDao.isEnable());

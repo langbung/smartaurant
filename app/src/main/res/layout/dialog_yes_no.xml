@@ -5,13 +5,14 @@
     android:orientation="vertical">
 
     <TextView
+        android:theme="@style/ThemeOverlay.AppCompat.Dark"
         android:id="@+id/tvTitle"
         android:layout_width="match_parent"
         android:layout_height="40dp"
         android:background="@color/colorPrimary"
         android:gravity="center_vertical"
         android:paddingLeft="16dp"
-        android:textSize="20sp"
+        android:textSize="@dimen/listview_text_size"
         android:textStyle="bold" />
 
     <LinearLayout
@@ -21,6 +22,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <TextView
+            android:textSize="@dimen/listview_text_size"
             android:id="@+id/tvDetail"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
@@ -33,6 +35,9 @@
         android:padding="10dp">
 
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:text="Yes"
             android:id="@+id/btYes"
             android:layout_width="wrap_content"
@@ -44,6 +49,9 @@
             android:layout_height="0dp"
             />
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:text="No"
             android:id="@+id/btNo"
             android:layout_width="wrap_content"

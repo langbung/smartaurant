@@ -5,14 +5,19 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -24,10 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
@@ -36,20 +38,41 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+import com.weiwangcn.betterspinner.library.BetterSpinner;
 
 import java.io.IOException;
-import java.util.Locale;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import okhttp3.internal.Util;
 
 
 @SuppressWarnings("unused")
 public class OwnerEditMenuFragment extends Fragment {
+    ArrayList<String> typeList = new ArrayList<>();
     String title;
+    String type;
+    String menuName;
+    String menuPriceText;
+    String menuPromotion;
+    String menuType;
+    String allergen;
+    boolean recommended;
+    boolean checkSetImageView = false;
     int maxMenuId;
     MenuItemDao menuItemDao;
-    String menuName;
-    String menuPriceCheck;
     EditText etName;
     EditText etPrice;
+    EditText etPromotion;
+    EditText etTest1, etTest2;
+    CheckBox cbRecommended;
+    CheckBox cbBean;
+    CheckBox cbEgg;
+    CheckBox cbMilk;
+    CheckBox cbSeaFood;
+    BetterSpinner snType;
     Button btSave;
     Activity activity;
     ImageView imageView;
@@ -57,7 +80,7 @@ public class OwnerEditMenuFragment extends Fragment {
     FrameLayout frameLayout;
     Uri imageUriLocal;
     Uri imageUriWeb;
-    EditText etTest1,etTest2;
+
     public OwnerEditMenuFragment() {
         super();
     }
@@ -66,7 +89,7 @@ public class OwnerEditMenuFragment extends Fragment {
     public static OwnerEditMenuFragment newInstance(Bundle bundle) {
         OwnerEditMenuFragment fragment = new OwnerEditMenuFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -98,41 +121,96 @@ public class OwnerEditMenuFragment extends Fragment {
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        etName = rootView.findViewById(R.id.etName);
-        etPrice = rootView.findViewById(R.id.etPrice);
+        initEditText(rootView);
+        initCheckBox(rootView);
+        initSpinner(rootView);
+        initImageView(rootView);
         btSave = rootView.findViewById(R.id.btSave);
-        imageView = rootView.findViewById(R.id.imageView);
         frameLayout = rootView.findViewById(R.id.frameLayout);
-        etTest1 = rootView.findViewById(R.id.etTest1);
-        etTest2 = rootView.findViewById(R.id.etTest2);
-
         btSave.setOnClickListener(onClickListener);
         activity = getActivity();
 
-        if(menuItemDao != null){
-            getActivity().setTitle(title+": "+menuItemDao.getName());
-            etPrice.setText(String.valueOf(menuItemDao.getPrice()));
-            etName.setText(menuItemDao.getName());
-            btSave.setText("Save");
-            setImage(menuItemDao.getImageUri());
-            etTest1.setText(menuItemDao.getImageUri());
+        if (menuItemDao != null) {
+            initForm();
 
-        }else{
-            activity.setTitle(title);
+        } else {
+            activity.setTitle("Add menu");
             btSave.setText("Add");
         }
 
+        activity = getActivity();
+    }
+
+    private void initImageView(View rootView) {
+        imageView = rootView.findViewById(R.id.imageView);
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-// Show only images, no videos or anything else
                 intent.setType("image/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-// Always show the chooser (if there are multiple options available)
                 startActivityForResult(Intent.createChooser(intent, "Select Picture"), 1);
             }
         });
+    }
+
+    private void initForm() {
+        title = title + ": " + menuItemDao.getName();
+        String imageUri = menuItemDao.getImageUri();
+        String name = menuItemDao.getName();
+        String price = menuItemDao.getPrice() + "";
+        String promotion = menuItemDao.getPromotion() + "";
+        String type = menuItemDao.getType() + "";
+        boolean recommended = menuItemDao.isRecommended();
+        String allergen = menuItemDao.getAllergen();
+
+        getActivity().setTitle(title);
+        setImage(imageUri);
+        etName.setText(name);
+        etName.setEnabled(false);
+        etPrice.setText(price);
+        etPromotion.setText(promotion);
+        snType.setText(type);
+        cbRecommended.setChecked(recommended);
+        if (allergen.contains("bean"))
+            cbBean.setChecked(true);
+        if (allergen.contains("egg"))
+            cbEgg.setChecked(true);
+        if (allergen.contains("seafood"))
+            cbSeaFood.setChecked(true);
+        if (allergen.contains("milk"))
+            cbMilk.setChecked(true);
+        btSave.setText("Save");
+        checkSetImageView = true;
+    }
+
+    private void initSpinner(View rootView) {
+        snType = rootView.findViewById(R.id.snType);
+        typeList = new ArrayList<>(Arrays.asList("Appetizer", "Main dish", "Dessert", "Drinks"));
+        ArrayAdapter roleAdapter = new ArrayAdapter(getActivity(), android.R.layout.simple_list_item_1, typeList);
+        snType.setAdapter(roleAdapter);
+        snType.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                menuType = typeList.get(position);
+            }
+        });
+    }
+
+    private void initCheckBox(View rootView) {
+        cbBean = rootView.findViewById(R.id.cbBean);
+        cbEgg = rootView.findViewById(R.id.cbEgg);
+        cbMilk = rootView.findViewById(R.id.cbMilk);
+        cbSeaFood = rootView.findViewById(R.id.cbSeaFood);
+        cbRecommended = rootView.findViewById(R.id.cbRecommended);
+    }
+
+    private void initEditText(View rootView) {
+        etTest1 = rootView.findViewById(R.id.etTest1);
+        etTest2 = rootView.findViewById(R.id.etTest2);
+        etName = rootView.findViewById(R.id.etName);
+        etPrice = rootView.findViewById(R.id.etPrice);
+        etPromotion = rootView.findViewById(R.id.etPromotion);
     }
 
     @Override
@@ -154,8 +232,8 @@ public class OwnerEditMenuFragment extends Fragment {
         // Save Instance State here
     }
 
-    boolean checkText(String text){
-        if(!text.equals("")){
+    boolean checkText(String text) {
+        if (!text.equals("")) {
             return true;
         }
         return false;
@@ -169,11 +247,11 @@ public class OwnerEditMenuFragment extends Fragment {
         // Restore Instance State here
     }
 
-    void showText(String text){
-        Toast.makeText(Contextor.getInstance().getContext(),text,Toast.LENGTH_LONG).show();
+    void showText(String text) {
+        Toast.makeText(Contextor.getInstance().getContext(), text, Toast.LENGTH_LONG).show();
     }
 
-    public void setImage(String url){
+    public void setImage(String url) {
 
         RequestOptions requestOptions = RequestOptions
                 .placeholderOf(R.drawable.loading)
@@ -188,8 +266,8 @@ public class OwnerEditMenuFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == 1 && resultCode == Activity.RESULT_OK && data != null && data.getData() != null) {
-
             imageUriLocal = data.getData();
+            checkSetImageView = true;
             try {
                 Bitmap bitmap = MediaStore.Images.Media.getBitmap(activity.getContentResolver(), imageUriLocal);
                 // Log.d(TAG, String.valueOf(bitmap));
@@ -200,44 +278,39 @@ public class OwnerEditMenuFragment extends Fragment {
         }
     }
 
-    void uploadImageAndSetDatabase(Uri imageUriLocal){
-        StorageReference riversRef = storageReference.child("images/"+imageUriLocal.getLastPathSegment());
-        UploadTask uploadTask = riversRef.putFile(imageUriLocal);
-
-// Register observers to listen for when the download is done or if it fails
+    void uploadImageAndSetDatabase(Uri imageUriLocal) {
+        StorageReference imageRef = storageReference.child("images/" + imageUriLocal.getLastPathSegment());
+        UploadTask uploadTask = imageRef.putFile(imageUriLocal);
         uploadTask.addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle unsuccessful uploads
                 MyUtil.showText("on failure");
             }
         }).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                // taskSnapshot.getMetadata() contains file metadata such as size, content-type, and download URL.
                 imageUriWeb = taskSnapshot.getDownloadUrl();
-
-                if(menuItemDao == null){
-                    float menuPrice = Float.parseFloat(menuPriceCheck);
-                    String imageUri = imageUriWeb.toString();
-                    MenuItemDao menuItemDao = new MenuItemDao(menuName,menuPrice,imageUri,true);
-                    DatabaseReference menuDatabase = UtilDatabase.getMenu();
-                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(onCompleteListener);
-                }else{
-                    DatabaseReference menuDatabase = UtilDatabase.getMenu();
-                    menuItemDao.setName(menuName);
-                    menuItemDao.setPrice(Float.parseFloat(menuPriceCheck));
+                if (menuItemDao == null) {
+                    MenuItemDao menuItemDaoOnSuccessUpdate = new MenuItemDao();
+                    menuItemDaoOnSuccessUpdate.setEnable(true);
+                    menuItemDaoOnSuccessUpdate = getMenuItemDaoFormInput(menuItemDaoOnSuccessUpdate);
+                    menuItemDaoOnSuccessUpdate.setImageUri(imageUriWeb.toString());
+                    menuItemDao = menuItemDaoOnSuccessUpdate;
+                } else {
+                    menuItemDao = getMenuItemDaoFormInput(menuItemDao);
                     menuItemDao.setImageUri(imageUriWeb.toString());
-                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if(task.isSuccessful()){
-//                                activity.finish();
-                                etTest2.setText(String.valueOf(imageUriWeb));
-                            }
-                        }
-                    });
                 }
+                Map<String, Object> updateMenu = new HashMap<>();
+                updateMenu.put("menu/" + menuItemDao.getName(), menuItemDao);
+                DatabaseReference databaseReference = UtilDatabase.getDatabase();
+                databaseReference.updateChildren(updateMenu).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            activity.finish();
+                        }
+                    }
+                });
             }
         });
     }
@@ -245,44 +318,132 @@ public class OwnerEditMenuFragment extends Fragment {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(v==btSave){
-                menuName = etName.getText().toString().trim();
-                menuPriceCheck = etPrice.getText().toString().trim();
-                if(checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal!=null){
-                    boolean b = checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal!=null;
-                    MyUtil.showText(String.valueOf(b));
-                    frameLayout.setVisibility(View.VISIBLE);
-                    uploadImageAndSetDatabase(imageUriLocal);
+            if (v == btSave) {
+                if (checkRequireInput()) {
+//                    Log.e("menu edit", "name = " + menuName + " price = " + menuPriceText + " promotion = " + menuPromotion + " type = " + menuType + " allergen = " + allergen);
+                    if (imageUriLocal != null) {
+                        frameLayout.setVisibility(View.VISIBLE);
+                        uploadImageAndSetDatabase(imageUriLocal);
+                    } else if (imageUriLocal == null) {
+                        frameLayout.setVisibility(View.VISIBLE);
+                        menuItemDao = getMenuItemDaoFormInput(menuItemDao);
+                        Map<String, Object> updateMenu = new HashMap<>();
+                        updateMenu.put("menu/" + menuItemDao.getName(), menuItemDao);
+                        DatabaseReference databaseReference = UtilDatabase.getDatabase();
+                        databaseReference.updateChildren(updateMenu).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
+                                if (task.isSuccessful()) {
+                                    activity.finish();
+                                }
+                            }
+                        });
+                    }
                 }
-
-                else if(checkText(menuName)&& checkText(menuPriceCheck)&&imageUriLocal==null){
-                    frameLayout.setVisibility(View.VISIBLE);
-                    DatabaseReference menuDatabase = UtilDatabase.getMenu();
-                    menuItemDao.setName(menuName);
-                    menuItemDao.setPrice(Float.parseFloat(menuPriceCheck));
-                    menuDatabase.child(menuItemDao.getName()).setValue(menuItemDao).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            activity.finish();
-                        }
-                    });
-                }
-            }
-            else if (v==imageView){
-
             }
         }
     };
+
+    private boolean checkRequireInput() {
+        menuName = etName.getText().toString().trim();
+        menuPriceText = etPrice.getText().toString().trim();
+        menuPromotion = etPromotion.getText().toString().trim();
+        menuType = snType.getText().toString().trim();
+        if (menuName.equals(""))
+            return false;
+        if (menuPriceText.equals(""))
+            return false;
+        if (menuPromotion.equals(""))
+            return false;
+        if (menuType.equals(""))
+            return false;
+        if (!checkSetImageView)
+            return false;
+        return true;
+    }
+
+    @NonNull
+    private MenuItemDao getMenuItemDaoFormInput(MenuItemDao menuItemDao) {
+        menuName = etName.getText().toString().trim();
+        menuPriceText = etPrice.getText().toString().trim();
+        menuPromotion = etPromotion.getText().toString().trim();
+        menuType = snType.getText().toString().trim();
+        recommended = cbRecommended.isChecked();
+        String allergen = "";
+        if (cbBean.isChecked())
+            allergen += "bean ";
+        if (cbEgg.isChecked())
+            allergen += "egg ";
+        if (cbMilk.isChecked())
+            allergen += "milk ";
+        if (cbSeaFood.isChecked())
+            allergen += "seafood ";
+
+        menuItemDao.setName(menuName);
+        menuItemDao.setPrice(Float.parseFloat(menuPriceText));
+        menuItemDao.setPromotion(Float.parseFloat(menuPromotion));
+        menuItemDao.setType(menuType);
+        menuItemDao.setRecommended(recommended);
+        if (menuItemDao.isEnable())
+            menuItemDao.setEnableRecommended(recommended);
+        else
+            menuItemDao.setEnableRecommended(false);
+
+        if (Float.parseFloat(menuPromotion) > 0 && menuItemDao.isEnable())
+            menuItemDao.setEnablePromotion(true);
+        else
+            menuItemDao.setEnablePromotion(false);
+
+        if (menuItemDao.isEnable()) {
+            switch (menuType) {
+                case "Appetizer": {
+                    menuItemDao.setEnableAppetizer(true);
+                    menuItemDao.setEnableMainDish(false);
+                    menuItemDao.setEnableDessert(false);
+                    menuItemDao.setEnableDrinks(false);
+                    break;
+                }
+                case "Main dish": {
+                    menuItemDao.setEnableAppetizer(false);
+                    menuItemDao.setEnableMainDish(true);
+                    menuItemDao.setEnableDessert(false);
+                    menuItemDao.setEnableDrinks(false);
+                    break;
+                }
+                case "Dessert": {
+                    menuItemDao.setEnableAppetizer(false);
+                    menuItemDao.setEnableMainDish(false);
+                    menuItemDao.setEnableDessert(true);
+                    menuItemDao.setEnableDrinks(false);
+                    break;
+                }
+                case "Drinks": {
+                    menuItemDao.setEnableAppetizer(false);
+                    menuItemDao.setEnableMainDish(false);
+                    menuItemDao.setEnableDessert(false);
+                    menuItemDao.setEnableDrinks(true);
+                    break;
+                }
+            }
+        }
+        else{
+            menuItemDao.setEnableAppetizer(false);
+            menuItemDao.setEnableMainDish(false);
+            menuItemDao.setEnableDessert(false);
+            menuItemDao.setEnableDrinks(false);
+        }
+        menuItemDao.setAllergen(allergen);
+        return menuItemDao;
+    }
 
     OnCompleteListener onCompleteListener = new OnCompleteListener() {
         @Override
         public void onComplete(@NonNull Task task) {
-            if(task.isSuccessful()){
+            if (task.isSuccessful()) {
                 activity.finish();
             }
         }
     };
-
 
 
 }

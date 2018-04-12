@@ -9,5 +9,38 @@
         android:layout_width="match_parent"
         android:layout_height="0dp">
     </ListView>
-
+    <LinearLayout
+        android:background="@android:color/holo_blue_bright"
+        android:paddingStart="15dp"
+        android:paddingEnd="15dp"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/height_listView_one_row">
+        <Button
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textAllCaps="false"
+            android:textSize="@dimen/listview_text_size"
+            android:background="@android:color/holo_orange_light"
+            android:layout_marginRight="15dp"
+            android:text="Pay"
+            android:id="@+id/btPay"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"/>
+        <TextView
+            android:textAllCaps="false"
+            android:textSize="@dimen/listview_text_size"
+            android:gravity="center_vertical"
+            android:text="Total"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent" />
+        <TextView
+            android:gravity="center_vertical|end"
+            android:textSize="@dimen/listview_text_size"
+            android:text="0.00"
+            android:layout_gravity="end|center_vertical"
+            android:id="@+id/tvTotal"
+            android:layout_width="100dp"
+            android:layout_height="match_parent" />
+    </LinearLayout>
 </LinearLayout>
