@@ -7,6 +7,7 @@ import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -25,6 +26,8 @@ import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+
+import java.util.Map;
 
 public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
         , OrderDialogFragment.OnOrderDialogListener
@@ -132,7 +135,7 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     }
 
     @Override
-    public void onOrderClick(Bundle bundle) {
+    public void onOrderClick(Bundle bundle,int requestCode) {
     }
 
     @Override
@@ -149,7 +152,9 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
             if(resultCode==RESULT_OK){
                 Bundle bundle = data.getBundleExtra("bundle");
                 OrderItemDao orderItemDao = bundle.getParcelable("orderItemDao");
-                MyUtil.showText(orderItemDao.getOrderId());
+//                Log.e("CustomerAct",orderItemDao.getDateTime().toString());
+                Map<String,String> date = orderItemDao.getDateTime();
+//                Log.e("CustomerAct",date.toString());
                 CustomerFragment customerFragment= (CustomerFragment) getSupportFragmentManager().findFragmentById(R.id.contentContainer);
                 customerFragment.setOrderItemDao(orderItemDao);
             }

@@ -145,6 +145,13 @@ public class MenuViewCustomer extends BaseCustomViewGroup {
         super.onMeasure(widthMeasureSpec, newHeightMeasureSpec);
         setMeasuredDimension(width, height);
     }
+    public void unsetVisibility(){
+        iv1.setVisibility(INVISIBLE);
+        iv2.setVisibility(INVISIBLE);
+        iv3.setVisibility(INVISIBLE);
+        iv4.setVisibility(INVISIBLE);
+    }
+
     public void setAllergen(ArrayList<Integer> resList)  {
         int size = resList.size();
 //        MyUtil.showText(size+"");

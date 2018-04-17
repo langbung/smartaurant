@@ -24,6 +24,7 @@ import com.smartaurant_kmutt.smartaurant.dao.MenuListDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -38,7 +39,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
     MenuManager menuManager;
     GridView gridViewMenu;
     int pos;
-
+    Loading loading = Loading.newInstance();
     public StaffMenuSettingFragment() {
         super();
     }
@@ -91,7 +92,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
                 pos = position;
                 MenuItemDao menuItemDao = menuManager.getMenuDao().getMenuList().get(position);
                 String title = menuItemDao.getName();
-                String enable = (menuItemDao.isEnable()) ? "DISABLE" : "ENABLE";
+                String enable = (menuItemDao.isEnable()) ? "disable" : "enable";
                 String detail = "Do you want to set " + enable + " to " + menuItemDao.getName() + " ?";
                 YesNoDialog yesNoDialog = YesNoDialog.newInstance(title, detail);
                 yesNoDialog.setTargetFragment(StaffMenuSettingFragment.this, 01);
@@ -101,6 +102,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
     }
 
     private void menuRealTime() {
+        loading.show(getFragmentManager(),"loading");
         DatabaseReference menuDatabase = UtilDatabase.getMenu();
         menuDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -116,6 +118,7 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
                 menuManager.setMenuDao(menuListDao);
                 menuAdapter.setMenuManager(menuManager);
                 menuAdapter.notifyDataSetChanged();
+                loading.dismiss();
             }
 
             @Override
@@ -153,12 +156,12 @@ public class StaffMenuSettingFragment extends Fragment implements YesNoDialog.On
     }
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+    public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
         setEnableMenu();
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode) {
 
     }
 

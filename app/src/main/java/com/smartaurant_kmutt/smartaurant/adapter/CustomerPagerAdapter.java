@@ -33,15 +33,15 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
 
-        switch (position){
-            case 0:{
+        switch (position) {
+            case 0: {
                 return CustomerPromotionFragment.newInstance();
             }
-            case 1:{
+            case 1: {
                 Bundle bundle = new Bundle();
-                bundle.putInt("table",table);
-                if(orderItemDao!=null)
-                    bundle.putParcelable("orderItemDao",orderItemDao);
+                bundle.putInt("table", table);
+
+                bundle.putParcelable("orderItemDao", orderItemDao);
                 return CustomerCategoryFragment.newInstance(bundle);
 //                Bundle bundle = new Bundle();
 //                bundle.putInt("table",table);
@@ -49,10 +49,10 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
 //                bundle.putParcelable("orderKitchenItemDao",orderKitchenItemDao);
 //                return CustomerMenuFragment.newInstance(bundle);
             }
-            case 2:{
+            case 2: {
                 Bundle bundle = new Bundle();
-                bundle.putInt("table",table);
-                bundle.putParcelable("orderItemDao",orderItemDao);
+                bundle.putInt("table", table);
+                bundle.putParcelable("orderItemDao", orderItemDao);
                 return CustomerOrderListFragment.newInstance(bundle);
             }
             default:
@@ -64,17 +64,17 @@ public class CustomerPagerAdapter extends FragmentStatePagerAdapter {
     @Nullable
     @Override
     public CharSequence getPageTitle(int position) {
-        switch (position){
-            case 0:{
+        switch (position) {
+            case 0: {
                 return "Promotion";
             }
-            case 1:{
+            case 1: {
                 return "Menu";
             }
-            case 2:{
+            case 2: {
                 return "Order list";
             }
-            default:{
+            default: {
                 return "";
             }
 

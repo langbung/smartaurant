@@ -11,23 +11,41 @@ public class TableItemDao implements Parcelable {
     private int table;
     private boolean availableToCallWaiter;
     private boolean availableTable;
+    private boolean availableCheckBill;
     private String orderId;
 
     public TableItemDao() {
     }
 
-    public TableItemDao(int table, boolean availableToCallWaiter, boolean availableTable, String orderId) {
+    public TableItemDao(int table, boolean availableToCallWaiter, boolean availableTable, String orderId, boolean availableCheckBill) {
         this.table = table;
         this.availableToCallWaiter = availableToCallWaiter;
         this.availableTable = availableTable;
         this.orderId = orderId;
+        this.availableCheckBill = availableCheckBill;
     }
+
 
     protected TableItemDao(Parcel in) {
         table = in.readInt();
         availableToCallWaiter = in.readByte() != 0;
         availableTable = in.readByte() != 0;
+        availableCheckBill = in.readByte() != 0;
         orderId = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeInt(table);
+        dest.writeByte((byte) (availableToCallWaiter ? 1 : 0));
+        dest.writeByte((byte) (availableTable ? 1 : 0));
+        dest.writeByte((byte) (availableCheckBill ? 1 : 0));
+        dest.writeString(orderId);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     public static final Creator<TableItemDao> CREATOR = new Creator<TableItemDao>() {
@@ -74,16 +92,12 @@ public class TableItemDao implements Parcelable {
         this.orderId = orderId;
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
+    public boolean isAvailableCheckBill() {
+        return availableCheckBill;
     }
 
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeInt(table);
-        dest.writeByte((byte) (availableToCallWaiter ? 1 : 0));
-        dest.writeByte((byte) (availableTable ? 1 : 0));
-        dest.writeString(orderId);
+    public void setAvailableCheckBill(boolean availableCheckBill) {
+        this.availableCheckBill = availableCheckBill;
     }
+
 }

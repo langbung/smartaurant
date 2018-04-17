@@ -58,7 +58,7 @@ public class MenuAdapter extends BaseAdapter {
         item.setImage(menuItemDao.getImageUri());
         item.setName(menuItemDao.getName());
         item.setPrice(menuItemDao.getPrice());
-
+        item.unsetVisibility();
         ArrayList<Integer> resIdList = new ArrayList<>();
         if(allergen.contains("egg"))
             resIdList.add(R.drawable.ic_allergens_eggs);

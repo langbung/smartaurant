@@ -25,8 +25,14 @@ public class StaffLoginActivity extends AppCompatActivity implements StaffLoginF
         finish();
     }
 
-
-//        Toast.makeText(StaffLoginActivity.this,
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+        Intent intent = new Intent(StaffLoginActivity.this,MenuActivity.class);
+        startActivity(intent);
+        finish();
+    }
+    //        Toast.makeText(StaffLoginActivity.this,
 //                this.cashierEmail +" == "+ email +"\n" +this.password +" == " +password,
 //                Toast.LENGTH_LONG ).show();
 

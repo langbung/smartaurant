@@ -1,0 +1,275 @@
+package com.smartaurant_kmutt.smartaurant.fragment.owner;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ListView;
+import android.widget.TextView;
+
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
+import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
+import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
+import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
+import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
+
+@SuppressWarnings("unused")
+public class OwnerRevenueOrderListFragment extends Fragment {
+    TextView tvOrderId;
+    TextView tvTime;
+    TextView tvTable;
+    TextView tvTotal;
+    ListView lvOrderList;
+    String posText = "";
+    OrderItemDao orderItemDao;
+    OrderMenuKitchenItemDao orderMenuItem;
+    ArrayList<OrderMenuKitchenItemDao> orderKitchenList;
+    double vat;
+    int countDatabase;
+    float total;
+    long posNum;
+    Loading loading = Loading.newInstance();
+    android.support.v7.widget.Toolbar toolbar;
+    OrderMenuKitchenManager orderMenuManager;
+    CustomerOrderListAdapter orderMenuAdapter;
+
+
+    public OwnerRevenueOrderListFragment() {
+        super();
+    }
+
+    @SuppressWarnings("unused")
+    public static OwnerRevenueOrderListFragment newInstance(Bundle bundle) {
+        OwnerRevenueOrderListFragment fragment = new OwnerRevenueOrderListFragment();
+        Bundle args = new Bundle();
+        args.putBundle("bundle", bundle);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        init(savedInstanceState);
+        Bundle bundle = getArguments().getBundle("bundle");
+        orderItemDao = bundle.getParcelable("orderItemDao");
+        if (savedInstanceState != null)
+            onRestoreInstanceState(savedInstanceState);
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_owner_revenue_order, container, false);
+        initInstances(rootView, savedInstanceState);
+        return rootView;
+    }
+
+    private void init(Bundle savedInstanceState) {
+        // Init Fragment level's variable(s) here
+    }
+
+    @SuppressWarnings("UnusedParameters")
+    private void initInstances(View rootView, Bundle savedInstanceState) {
+        // Init 'View' instance(s) with rootView.findViewById here
+        initToolbar(rootView);
+        initTextView(rootView);
+        initListViewOrderMenu(rootView);
+    }
+
+    private void initListViewOrderMenu(View rootView) {
+        lvOrderList = rootView.findViewById(R.id.lvOrderList);
+        orderMenuAdapter = new CustomerOrderListAdapter();
+        orderMenuManager = new OrderMenuKitchenManager();
+        lvOrderList.setAdapter(orderMenuAdapter);
+        readOrder();
+    }
+
+    private void initTextView(View rootView) {
+        tvTotal = rootView.findViewById(R.id.tvTotal);
+        tvOrderId = rootView.findViewById(R.id.tvOrderId);
+        tvTable = rootView.findViewById(R.id.tvTable);
+        tvTime = rootView.findViewById(R.id.tvTime);
+
+        DatabaseReference databaseReference = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId()+"/dateTime");
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                loading.show(getFragmentManager(),"l");
+                tvOrderId.setText(orderItemDao.getOrderId());
+                String tableText = "Table "+orderItemDao.getTable();
+                tvTable.setText(tableText);
+                Map<String,String> date = (Map)dataSnapshot.getValue();
+                String dateText = date.get("day") + "/"+ date.get("month") + "/" + date.get("year")+" "+date.get("time");
+                tvTime.setText(dateText);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
+    }
+
+
+    private void initToolbar(View rootView) {
+        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.setTitle(orderItemDao.getOrderId());
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+    }
+
+    /*
+     * Save Instance State Here
+     */
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        // Save Instance State here
+    }
+
+    /*
+     * Restore Instance State Here
+     */
+    @SuppressWarnings("UnusedParameters")
+    private void onRestoreInstanceState(Bundle savedInstanceState) {
+        // Restore Instance State here
+    }
+
+    void readOrder() {
+        DatabaseReference orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
+        Query orderListQuery = orderMenuKitchenDatabase.orderByChild("orderId").equalTo(orderItemDao.getOrderId());
+
+        orderListQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+//                    Log.e("123",dataSnapshot.toString());
+//                    MyUtil.showText(dataSnapshot.toString());
+//                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
+//                    if(dataSnapshot.exists()){
+
+                if (dataSnapshot.exists()) {
+                    Log.e("OrderListFragment", "data exist");
+                    countDatabase = 0;
+                    total = 0;
+                    orderKitchenList = new ArrayList<>();
+                    for (DataSnapshot test : dataSnapshot.getChildren()) {
+                        OrderMenuKitchenItemDao orderMenuKitchenItemDao = test.getValue(OrderMenuKitchenItemDao.class);
+                        orderKitchenList.add(orderMenuKitchenItemDao);
+
+                        DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
+                                .child(orderMenuKitchenItemDao.getMenuName());
+//                        Log.e("123",priceMenuDatabase.toString());
+                        priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                            @Override
+                            public void onDataChange(DataSnapshot menuItemDatabase) {
+                                MenuItemDao menuItem = menuItemDatabase.getValue(MenuItemDao.class);
+                                String size = orderKitchenList.get(countDatabase).getSize();
+                                float price = getRealPrice(menuItem.getPrice(), size);
+                                price = price * (1 - menuItem.getPromotion() / 100);
+                                orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
+
+//                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
+                                total += orderKitchenList.get(countDatabase).getPrice();
+                                String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                tvTotal.setText(textTotal);
+                                countDatabase++;
+                                orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                                orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                                orderMenuAdapter.notifyDataSetChanged();
+                                Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
+                                DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase().child("vat");
+                                vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                    @Override
+                                    public void onDataChange(DataSnapshot dataSnapshot) {
+                                        vat = dataSnapshot.getValue(double.class);
+                                        vat = total * (1 + vat / 100.0);
+                                        String textTotal = String.format(Locale.ENGLISH, "%.2f", vat);
+                                        tvTotal.setText(textTotal);
+                                    }
+                                    @Override
+                                    public void onCancelled(DatabaseError databaseError) {
+                                        MyUtil.showText("can't get vat.");
+                                    }
+                                });
+                            }
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+                    }
+                } else {
+                    Log.e("OrderListFragment", "data not exist");
+                    orderKitchenList = new ArrayList<>();
+                    orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                    orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                    orderMenuAdapter.notifyDataSetChanged();
+                }
+                loading.dismiss();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private float getRealPrice(float price, String size) {
+        float test = 0;
+        switch (size) {
+            case "S": {
+                test = price;
+                break;
+            }
+            case "M": {
+                test = price + 10;
+                break;
+            }
+            case "L": {
+                test = price + 15;
+                break;
+            }
+        }
+        return test;
+    }
+
+
+}

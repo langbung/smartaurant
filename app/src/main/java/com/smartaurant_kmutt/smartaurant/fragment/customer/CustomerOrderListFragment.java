@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,18 +29,22 @@ import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
+import com.smartaurant_kmutt.smartaurant.util.Voucher;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerOrderListFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
+public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
     OrderItemDao orderItemDao;
     ListView lvOrder;
     TextView tvTotal;
@@ -49,10 +54,16 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
     ArrayList<OrderMenuKitchenItemDao> orderKitchenList;
     MenuItemDao menuItem;
     ValueEventListener valueEventListener;
+    Loading loading;
+    boolean payStatus = false;
     int countQuery;
     int pos;
     int countDatabase;
+    int table;
     float total;
+    Button btPay;
+    final int DELETE_MENU_REQUEST_CODE = 1;
+    final int CALL_PAY_REQUEST_CODE = 2;
 
     public CustomerOrderListFragment() {
         super();
@@ -72,6 +83,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
         super.onCreate(savedInstanceState);
         init(savedInstanceState);
         orderItemDao = getArguments().getBundle("bundle").getParcelable("orderItemDao");
+        table = getArguments().getBundle("bundle").getInt("table");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
     }
@@ -87,14 +99,14 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
     @Override
     public void onStart() {
         super.onStart();
-        Log.e("set order real time","on start");
+        Log.e("set order real time", "on start");
 //        setOrderRealTime();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.e("set order real time","on stop");
+        Log.e("set order real time", "on stop");
 //        if(valueEventListener !=null)
 //            UtilDatabase.getDatabase().child("order_kitchen").orderByChild("orderId").equalTo(orderItemDao.getOrderId()).removeEventListener(valueEventListener);
 //        Log.e("set order real time","on stop removed listener");
@@ -126,6 +138,37 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
         // Init 'View' instance(s) with rootView.findViewById here
         initListViewOrder(rootView);
         initTextView(rootView);
+        initButton(rootView);
+        initLoading();
+        Voucher voucher = new Voucher();
+        String voucherCode=voucher.getVoucher(100,7);
+        MyUtil.print("voucherCode = "+voucherCode);
+        String sale = voucher.decryptVoucher(voucherCode)+"";
+        MyUtil.print("sale = "+sale);
+
+    }
+
+    private void initLoading() {
+        loading = Loading.newInstance();
+    }
+
+    private void initButton(View rootView) {
+        btPay = rootView.findViewById(R.id.btPay);
+        btPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                YesNoDialog yesNoDialog;
+                if (!payStatus) {
+                    payStatus = true;
+                    yesNoDialog = YesNoDialog.newInstance("Check bill", "Do you want to check bill?");
+                } else {
+                    payStatus = false;
+                    yesNoDialog = YesNoDialog.newInstance("Check bill", "Do you want to cancel check bill?");
+                }
+                yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, CALL_PAY_REQUEST_CODE);
+                yesNoDialog.show(getFragmentManager(), "customerCheckbill");
+            }
+        });
     }
 
     private void initTextView(View rootView) {
@@ -144,8 +187,8 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                 pos = position;
                 OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                 if (orderMenuKitchenItemDao.getStatus().equals("in queue")) {
-                    YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to CANCLE " + orderMenuKitchenItemDao.getMenuName());
-                    yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, 128);
+                    YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName());
+                    yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, DELETE_MENU_REQUEST_CODE);
                     yesNoDialog.show(getFragmentManager(), "cancelMenu");
                 }
             }
@@ -156,7 +199,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
     void setOrderRealTime() {
 
         if (orderItemDao != null) {
-            countQuery =0;
+            countQuery = 0;
             orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
             final Query orderListQuery = orderMenuKitchenDatabase.orderByChild("orderId").equalTo(orderItemDao.getOrderId());
             valueEventListener = orderListQuery.addValueEventListener(new ValueEventListener() {
@@ -182,6 +225,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                             orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
                             orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
                             orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
+                            orderMenuKitchenItemDao.setSize(test.child("size").getValue(String.class));
                             orderKitchenList.add(orderMenuKitchenItemDao);
 
                             DatabaseReference priceMenuDatabase = UtilDatabase.getMenu()
@@ -194,11 +238,12 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                     menuItem = menuItemDatabase.getValue(MenuItemDao.class);
 //                                    String show= "menu = " +menuItem.getName() +" price = "+menuItem.getPrice() + " promotion = "+menuItem.getPromotion();
 //                                    Log.e("customer order",show);
-                                    float price = menuItem.getPrice() * (1 - menuItem.getPromotion() / 100);
-//                                    Log.e("customer order",price+"");
-                                    Log.e("set order real time", "countDatabase = "+countDatabase );
+                                    String size = orderKitchenList.get(countDatabase).getSize();
+                                    float price = getRealPrice(menuItem.getPrice(), size);
+//                                    Log.e("CustomerOrderListFrag","price = "+price);
+                                    price = price * (1 - menuItem.getPromotion() / 100);
+//                                    Log.e("set order real time", "countDatabase = "+countDatabase );
                                     orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
-                                    Log.e("set order real time", orderKitchenList.get(countDatabase).getPrice()+"");
 //                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
                                     total += orderKitchenList.get(countDatabase).getPrice();
 //                                    double vat = dataSnapshot.getValue(Double.class);
@@ -212,7 +257,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                     orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
                                     customerOrderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
                                     customerOrderListAdapter.notifyDataSetChanged();
-                                    setTotalToDatabase(total);
+
                                     DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase().child("vat");
                                     vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
@@ -221,6 +266,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                             vat = total * (1 + vat / 100.0);
                                             String textTotal = String.format(Locale.ENGLISH, "%.2f", vat);
                                             tvTotal.setText(textTotal);
+                                            setTotalToDatabase(vat);
                                         }
 
                                         @Override
@@ -254,45 +300,83 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
 
                 }
             });
-        }
-        else{
-            Log.e("set order real time","not queried ");
+        } else {
+            Log.e("set order real time", "not queried ");
         }
     }
 
-    private void setTotalToDatabase(final float total) {
+    private void setTotalToDatabase(double total) {
         DatabaseReference orderDatabase = UtilDatabase.getDatabase().child("order/" + orderItemDao.getOrderId() + "/total");
         orderDatabase.setValue(total).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(!task.isSuccessful()){
+                if (!task.isSuccessful()) {
                     MyUtil.showText("not success on save total to database");
                 }
             }
         });
     }
 
+    private float getRealPrice(float price, String size) {
+        float test = 0;
+        switch (size) {
+            case "S": {
+                test = price;
+                break;
+            }
+            case "M": {
+                test = price + 10;
+                break;
+            }
+            case "L": {
+                test = price + 15;
+                break;
+            }
+        }
+        return test;
+    }
+
     @Override
     public void onPause() {
         super.onPause();
-        Log.e("set order real time","on pause");
+        Log.e("set order real time", "on pause");
 
     }
 
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle) {
-        OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(pos);
+    public void onYesButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        if (requestCode == DELETE_MENU_REQUEST_CODE) {
+            OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(pos);
 //        MyUtil.showText(orderMenuKitchenItemDao.getOrderId()+" "+orderMenuKitchenItemDao.getOrderKitchenId());
-        DatabaseReference orderDatabase = UtilDatabase.getDatabase()
-                .child("order/" + orderMenuKitchenItemDao.getOrderId() + "/orderList/" + orderMenuKitchenItemDao.getOrderKitchenId());
-        orderDatabase.removeValue();
-        DatabaseReference orderKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen/" + orderMenuKitchenItemDao.getOrderKitchenId());
-        orderKitchenDatabase.removeValue();
+            DatabaseReference orderDatabase = UtilDatabase.getDatabase()
+                    .child("order/" + orderMenuKitchenItemDao.getOrderId() + "/orderList/" + orderMenuKitchenItemDao.getOrderKitchenId());
+            orderDatabase.removeValue();
+            DatabaseReference orderKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen/" + orderMenuKitchenItemDao.getOrderKitchenId());
+            orderKitchenDatabase.removeValue();
+        } else if (requestCode == CALL_PAY_REQUEST_CODE) {
+            loading.show(getFragmentManager(), "load");
+            String tableId = String.format(Locale.ENGLISH, "TB%03d", table);
+            Log.e("CustomerOrderList", "tableId = " + tableId);
+            String path = "table/" + tableId + "/availableCheckBill";
+            Map<String, Object> update = new HashMap<>();
+            update.put(path, !payStatus);
+            DatabaseReference databaseReference = UtilDatabase.getDatabase();
+            databaseReference.updateChildren(update).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        String btPayText = (payStatus)?"Cancel pay":"Pay";
+                        btPay.setText(btPayText);
+                        loading.dismiss();
+                    }
+                }
+            });
+        }
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle, int requestCode) {
 
     }
 

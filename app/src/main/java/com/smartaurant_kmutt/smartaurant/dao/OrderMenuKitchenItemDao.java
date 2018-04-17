@@ -11,19 +11,11 @@ public class OrderMenuKitchenItemDao implements Parcelable {
     private String orderKitchenId;
     private String note;
     private float price;
+    private String size;
 
     public OrderMenuKitchenItemDao() {
     }
 
-    public OrderMenuKitchenItemDao(String menuName, int quantity, String status, String orderId,String orderKitchenId,String note,float price) {
-        this.menuName = menuName;
-        this.quantity = quantity;
-        this.status = status;
-        this.orderId = orderId;
-        this.orderKitchenId = orderKitchenId;
-        this.note = note;
-        this.price=price;
-    }
 
     protected OrderMenuKitchenItemDao(Parcel in) {
         menuName = in.readString();
@@ -33,6 +25,7 @@ public class OrderMenuKitchenItemDao implements Parcelable {
         orderKitchenId = in.readString();
         note = in.readString();
         price = in.readFloat();
+        size = in.readString();
     }
 
     @Override
@@ -44,6 +37,7 @@ public class OrderMenuKitchenItemDao implements Parcelable {
         dest.writeString(orderKitchenId);
         dest.writeString(note);
         dest.writeFloat(price);
+        dest.writeString(size);
     }
 
     @Override
@@ -117,5 +111,13 @@ public class OrderMenuKitchenItemDao implements Parcelable {
 
     public void setPrice(float price) {
         this.price = price;
+    }
+
+    public String getSize() {
+        return size;
+    }
+
+    public void setSize(String size) {
+        this.size = size;
     }
 }

@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.fragment.customer;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -26,12 +27,21 @@ import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer.OrderDialogFragment;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Timer;
 
 import okhttp3.internal.Util;
 
@@ -40,7 +50,7 @@ import okhttp3.internal.Util;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerMenuFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener {
+public class CustomerMenuFragment extends Fragment  {
     GridView gvMenu;
     MenuManager menuManager;
     MenuAdapter menuAdapter;
@@ -50,6 +60,9 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
     int pos;
     String title;
     String menuType;
+    Loading loading = Loading.newInstance();
+    final int NEW_ORDER_REQUEST_CODE = 1;
+    final int ADD_ORDER_REQUEST_CODE = 2;
     public CustomerMenuFragment() {
         super();
     }
@@ -58,7 +71,7 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
     public static CustomerMenuFragment newInstance(Bundle bundle) {
         CustomerMenuFragment fragment = new CustomerMenuFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -71,7 +84,7 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
         menuType = bundle.getString("menuType");
         title = bundle.getString("title");
         table = bundle.getInt("table");
-        orderItemDao=bundle.getParcelable("orderItemDao");
+        orderItemDao = bundle.getParcelable("orderItemDao");
         orderKitchenItemDao = bundle.getParcelable("orderKitchenItemDao");
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
@@ -85,7 +98,6 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
         setListener();
         return rootView;
     }
-
 
 
     private void init(Bundle savedInstanceState) {
@@ -108,14 +120,15 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
     }
 
     private void menuRealTime() {
+        loading.show(getFragmentManager(), "load");
         DatabaseReference menuDatabase = UtilDatabase.getMenu();
-        Log.e("customer",menuType);
+        Log.e("customer", menuType);
         Query menuQuery = menuDatabase.orderByChild(menuType).equalTo(true);
         menuQuery.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 ArrayList<MenuItemDao> menuList = new ArrayList<>();
-                for(DataSnapshot menuItem:dataSnapshot.getChildren()){
+                for (DataSnapshot menuItem : dataSnapshot.getChildren()) {
                     MenuItemDao menuItemDao = menuItem.getValue(MenuItemDao.class);
                     menuList.add(menuItemDao);
                 }
@@ -125,6 +138,7 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
                 menuManager.setMenuDao(menuListDao);
                 menuAdapter.setMenuManager(menuManager);
                 menuAdapter.notifyDataSetChanged();
+                loading.dismiss();
             }
 
             @Override
@@ -161,42 +175,31 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
         // Restore Instance State here
     }
 
-    @Override
-    public void onOrderClick(Bundle bundle) {
-        orderItemDao = bundle.getParcelable("orderItemDao");
 
-//        orderKitchenItemDao = bundle.getParcelable("orderKitchenItemDao");
-//        Log.e("OrderDialogClick",orderItemDao.getOrderList().size()+"");
-//        try {
-//            InternalStorage.writeObject(getActivity(),"orderItemDao",orderItemDao);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-    }
 
     AdapterView.OnItemClickListener onItemMenuClick = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             pos = position;
-            if(orderItemDao!=null){
-                DatabaseReference orderItemDatabase = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId()+"/orderList");
+            if (orderItemDao != null) {
+                DatabaseReference orderItemDatabase = UtilDatabase.getDatabase().child("order/" + orderItemDao.getOrderId() + "/orderList");
                 orderItemDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        Map<String,OrderMenuKitchenItemDao> orderList = new HashMap<>();
-                        for(DataSnapshot orderItem:dataSnapshot.getChildren()){
-                            orderList.put(orderItem.getKey(),orderItem.getValue(OrderMenuKitchenItemDao.class));
+                        Map<String, OrderMenuKitchenItemDao> orderList = new HashMap<>();
+                        for (DataSnapshot orderItem : dataSnapshot.getChildren()) {
+                            orderList.put(orderItem.getKey(), orderItem.getValue(OrderMenuKitchenItemDao.class));
                         }
                         orderItemDao.setOrderList(orderList);
                         Bundle bundle = new Bundle();
                         MenuItemDao menu = menuManager.getMenuDao().getMenuList().get(pos);
-                        bundle.putParcelable("menu",menu);
-                        bundle.putParcelable("orderItemDao",orderItemDao);
-                        bundle.putInt("table",table);
+                        bundle.putParcelable("menu", menu);
+                        bundle.putParcelable("orderItemDao", orderItemDao);
+                        bundle.putInt("table", table);
 
                         OrderDialogFragment orderDialogFragment = OrderDialogFragment.newInstance(bundle);
-                        orderDialogFragment.setTargetFragment(CustomerMenuFragment.this,1);
-                        orderDialogFragment.show(getFragmentManager(),"orderDialogFragment");
+                        orderDialogFragment.setTargetFragment(CustomerMenuFragment.this, ADD_ORDER_REQUEST_CODE);
+                        orderDialogFragment.show(getFragmentManager(), "orderDialogFragment");
                     }
 
                     @Override
@@ -204,14 +207,15 @@ public class CustomerMenuFragment extends Fragment implements OrderDialogFragmen
 
                     }
                 });
-            }else{
+            } else {
+
                 Bundle bundle = new Bundle();
                 MenuItemDao menu = menuManager.getMenuDao().getMenuList().get(pos);
-                bundle.putParcelable("menu",menu);
-                bundle.putInt("table",table);
+                bundle.putParcelable("menu", menu);
+                bundle.putInt("table", table);
                 OrderDialogFragment orderDialogFragment = OrderDialogFragment.newInstance(bundle);
-                orderDialogFragment.setTargetFragment(CustomerMenuFragment.this,1);
-                orderDialogFragment.show(getFragmentManager(),"orderDialogFragment");
+                orderDialogFragment.setTargetFragment(CustomerMenuFragment.this, NEW_ORDER_REQUEST_CODE);
+                orderDialogFragment.show(getFragmentManager(), "orderDialogFragment");
             }
 
         }

@@ -40,7 +40,8 @@ import java.util.Locale;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener,YesNoDialog.OnYesNoDialogListener {
+public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener
+        ,YesNoDialog.OnYesNoDialogListener {
     boolean userOut;
     CustomerPagerAdapter customerPagerAdapter;
     int numTable;
@@ -164,7 +165,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
         if(item.getItemId() == R.id.waiterCalling ){
             Bundle bundle = new Bundle();
             bundle.putString("title","Call waiter");
-            bundle.putString("detail","Do you want to call Waiter");
+            bundle.putString("detail","Do you want to call waiter?");
             YesNoDialog yesNoDialog = YesNoDialog.newInstance(bundle);
             yesNoDialog.setTargetFragment(CustomerFragment.this,2);
             yesNoDialog.show(getFragmentManager(),"yesNoDialog");
@@ -174,7 +175,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     }
 
     @Override
-    public void onOrderClick(Bundle bundle) {
+    public void onOrderClick(Bundle bundle,int requestCode) {
         orderItemDao = bundle.getParcelable("orderItemDao");
 //         ((CustomerActivity)getActivity()).setOrderItemDao(orderItemDao);
         if(!countRefresh){
@@ -198,7 +199,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     }
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+    public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
         String tableId = String.format(Locale.ENGLISH,"TB%03d",numTable);
         DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/").child(tableId+"/availableToCallWaiter");
         tableDatabase.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -213,7 +214,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode) {
         MyUtil.showText("cancel call waiter");
     }
 }

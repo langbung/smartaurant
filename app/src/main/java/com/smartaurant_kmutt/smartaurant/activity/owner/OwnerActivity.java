@@ -14,12 +14,11 @@ import android.widget.FrameLayout;
 
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
-import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsOwnerMenuDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
-import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueListFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
 
@@ -43,7 +42,7 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         setContentView(R.layout.activity_owner);
         initInstance();
         if(savedInstanceState==null)
-            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, OwnerRevenueFragment.newInstance()).commit();
+            getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, OwnerRevenueListFragment.newInstance()).commit();
     }
 
     private void initInstance() {
@@ -90,7 +89,7 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         public void onClick(View v) {
 
             if(v==btRevenue){
-                getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerRevenueFragment.newInstance()).commit();
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerRevenueListFragment.newInstance()).commit();
                 drawerLayout.closeDrawers();
 
             }else if(v== btMenuSetting){

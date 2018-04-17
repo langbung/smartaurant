@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.adapter;
 
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -15,9 +16,10 @@ import com.smartaurant_kmutt.smartaurant.view.TableView;
 
 public class TableAdapter extends BaseAdapter {
     private TableManager tableManager;
-    public static final int MODE_STAFF=1;
-    public static final int MODE_CUSTOMER=2;
-    public static final int MODE_STAFF_CALL_WAITER=3;
+    public static final int MODE_STAFF = 1;
+    public static final int MODE_CASHIER = 4;
+    public static final int MODE_CUSTOMER = 2;
+    public static final int MODE_STAFF_CALL_WAITER = 3;
     int mode;
 
     public TableAdapter(int mode) {
@@ -26,9 +28,9 @@ public class TableAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if(tableManager==null)
+        if (tableManager == null)
             return 0;
-        if(tableManager.getTableDao().getTableList().size()<=0)
+        if (tableManager.getTableDao().getTableList().size() <= 0)
             return 0;
         return tableManager.getTableDao().getTableList().size();
     }
@@ -44,31 +46,41 @@ public class TableAdapter extends BaseAdapter {
     }
 
     @Override
-    public View getView( int position, View convertView,  ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent) {
         TableView item;
-        if(convertView==null) {
+        if (convertView == null) {
             item = new TableView(parent.getContext());
-        }else{
+        } else {
             item = (TableView) convertView;
         }
 
-        int tableNumber=position+1;
+        int tableNumber = position + 1;
         item.setTable(tableNumber);
-        TableItemDao tableItemDao =(TableItemDao)getItem(position);
-        if(mode==MODE_CUSTOMER){
-            if(tableItemDao.isAvailableTable())
+        TableItemDao tableItemDao = (TableItemDao) getItem(position);
+        if (mode == MODE_CUSTOMER) {
+            if (tableItemDao.isAvailableTable())
                 item.setBackground(R.drawable.selector_button);
             else
                 item.setBackground("#55555555");
 
-        }else if(mode==MODE_STAFF){
-            if(tableItemDao.isAvailableTable())
+        } else if (mode == MODE_STAFF) {
+            if (tableItemDao.isAvailableTable())
                 item.setBackground("#55555555");
             else
                 item.setBackground(R.drawable.selector_button);
 
-        }else if(mode==MODE_STAFF_CALL_WAITER){
-            if(tableItemDao.isAvailableToCallWaiter())
+        } else if (mode == MODE_CASHIER) {
+            if (!tableItemDao.isAvailableCheckBill()) {
+                item.setBackground(android.R.color.holo_red_light);
+            } else if (tableItemDao.isAvailableTable())
+                item.setBackground("#55555555");
+            else {
+                item.setBackground(R.drawable.selector_button);
+
+            }
+
+        } else if (mode == MODE_STAFF_CALL_WAITER) {
+            if (tableItemDao.isAvailableToCallWaiter())
                 item.setBackground("#55555555");
             else
                 item.setBackground(android.R.color.holo_red_light);

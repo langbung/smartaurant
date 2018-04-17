@@ -4,7 +4,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
-import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueListFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
 
@@ -28,7 +28,7 @@ public class OwnerPagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position){
             case 0:{
-                return OwnerRevenueFragment.newInstance();
+                return OwnerRevenueListFragment.newInstance();
             }
             case 1:{
                 return OwnerListMenuFragment.newInstance();

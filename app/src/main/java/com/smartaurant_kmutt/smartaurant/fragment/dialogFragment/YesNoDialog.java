@@ -75,6 +75,7 @@ public class YesNoDialog extends android.support.v4.app.DialogFragment{
     public void onAttach(Context context) {
         super.onAttach(context);
         onYesNoDialogListener = (OnYesNoDialogListener)getTargetFragment();
+
     }
 
     private void setListener() {
@@ -87,6 +88,7 @@ public class YesNoDialog extends android.support.v4.app.DialogFragment{
         btYes = view.findViewById(R.id.btYes);
         btNo = view.findViewById(R.id.btNo);
         tvDetail=view.findViewById(R.id.tvDetail);
+
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -94,11 +96,11 @@ public class YesNoDialog extends android.support.v4.app.DialogFragment{
         public void onClick(View v) {
             if(v==btYes){
                 Bundle bundle = new Bundle();
-                onYesNoDialogListener.onYesButtonClickInYesNODialog(bundle);
+                onYesNoDialogListener.onYesButtonClickInYesNODialog(bundle,getTargetRequestCode());
                 dismiss();
             }else if(v==btNo){
                 Bundle bundle = new Bundle();
-                onYesNoDialogListener.onNoButtonClickInYesNODialog(bundle);
+                onYesNoDialogListener.onNoButtonClickInYesNODialog(bundle,getTargetRequestCode());
                 dismiss();
             }
         }
@@ -122,7 +124,7 @@ public class YesNoDialog extends android.support.v4.app.DialogFragment{
     }
 
     public interface OnYesNoDialogListener{
-        void onYesButtonClickInYesNODialog(Bundle bundle);
-        void onNoButtonClickInYesNODialog(Bundle bundle);
+        void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode);
+        void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode);
     }
 }

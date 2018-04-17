@@ -20,7 +20,7 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
             android:textAllCaps="false"
             android:textSize="@dimen/listview_text_size"
-            android:background="@android:color/holo_orange_light"
+            android:background="@drawable/selector_orange_button"
             android:layout_marginRight="15dp"
             android:text="Pay"
             android:id="@+id/btPay"

@@ -8,6 +8,8 @@ import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.manager.OrderListManager;
 import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
+import java.util.Map;
+
 public class OrderListAdapter extends BaseAdapter {
     OrderListManager orderListManager;
     @Override
@@ -40,6 +42,9 @@ public class OrderListAdapter extends BaseAdapter {
         item.setName(orderItemDao.getOrderId());
         item.setTable(orderItemDao.getTable());
         item.setTotal(orderItemDao.getTotal());
+        Map<String,String> dateMap = orderItemDao.getDateTime();
+        String date = dateMap.get("day") + "/"+ dateMap.get("month") + "/" + dateMap.get("year");
+        item.setDate(date);
         return item;
     }
 

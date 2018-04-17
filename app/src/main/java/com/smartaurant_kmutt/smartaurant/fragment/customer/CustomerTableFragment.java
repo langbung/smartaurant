@@ -19,6 +19,7 @@ import com.smartaurant_kmutt.smartaurant.adapter.TableAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableListDao;
 import com.smartaurant_kmutt.smartaurant.manager.TableManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -31,7 +32,7 @@ public class CustomerTableFragment extends Fragment {
     TableAdapter tableAdapter;
     android.support.v7.widget.Toolbar toolbar;
     TableManager tableManager;
-
+    Loading loading = Loading.newInstance();
     public CustomerTableFragment() {
         super();
     }
@@ -88,6 +89,7 @@ public class CustomerTableFragment extends Fragment {
     }
 
     private void setTableDatabaseRealTime() {
+        loading.show(getFragmentManager(),"load");
         final DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table");
         tableDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -104,6 +106,7 @@ public class CustomerTableFragment extends Fragment {
                 tableManager.setTableDao(tableList);
                 tableAdapter.setTableManager(tableManager);
                 tableAdapter.notifyDataSetChanged();
+                loading.dismiss();
             }
 
             @Override

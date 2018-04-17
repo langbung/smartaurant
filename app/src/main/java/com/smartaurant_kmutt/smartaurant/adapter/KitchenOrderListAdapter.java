@@ -64,7 +64,7 @@ public class KitchenOrderListAdapter extends BaseAdapter {
         else
             item = new OrderKitchenView(parent.getContext());
         OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
-        item.setName(orderMenuKitchenItemDao.getMenuName());
+        item.setName(orderMenuKitchenItemDao.getMenuName()+" "+orderMenuKitchenItemDao.getSize());
         item.setQuantity(orderMenuKitchenItemDao.getQuantity());
         item.setNote(orderMenuKitchenItemDao.getNote());
         item.setStatus(orderMenuKitchenItemDao.getStatus());

@@ -12,190 +12,215 @@
         android:orientation="horizontal">
 
         <LinearLayout
-            android:padding="5dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="5dp">
 
             <ListView
                 android:id="@+id/lvOrderMenu"
-                android:layout_weight="1"
                 android:layout_width="match_parent"
-                android:layout_height="0dp">
+                android:layout_height="0dp"
+                android:layout_weight="1">
 
             </ListView>
+
             <LinearLayout
-                android:background="@android:color/holo_blue_bright"
-                android:orientation="horizontal"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/height_listView_one_row">
+                android:layout_height="@dimen/height_listView_one_row"
+                android:background="@android:color/holo_blue_bright"
+                android:orientation="horizontal">
+
                 <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
                     android:gravity="left|center_vertical"
-                    android:textSize="@dimen/listview_text_size"
                     android:paddingStart="15dp"
                     android:text="Total"
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent" />
+                    android:textSize="@dimen/listview_text_size" />
+
                 <TextView
-                    android:gravity="left|center_vertical"
-                    android:textSize="@dimen/listview_text_size"
                     android:id="@+id/tvTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="left|center_vertical"
                     android:paddingEnd="15dp"
                     android:text="0.00"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent" />
+                    android:textSize="@dimen/listview_text_size" />
             </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
-            android:paddingTop="10dp"
-            android:paddingRight="10dp"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp">
 
             <TextView
                 android:id="@+id/tvCashierDisplay"
-                android:paddingRight="15dp"
                 android:layout_width="match_parent"
                 android:layout_height="50dp"
                 android:background="@color/colorPrimary"
                 android:gravity="right|center_vertical"
+                android:paddingRight="15dp"
                 android:text="0"
                 android:textSize="@dimen/button_cashier_text_size" />
 
             <android.support.v7.widget.GridLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 xmlns:grid="http://schemas.android.com/apk/res-auto"
                 android:id="@+id/choice_grid"
-                android:layout_weight="1"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
+                android:layout_weight="1"
                 grid:alignmentMode="alignBounds"
                 grid:columnCount="3"
                 grid:rowCount="4">
 
                 <Button
                     android:id="@+id/bt7"
-                    android:text="7"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="7"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt8"
-                    android:text="8"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="8"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt9"
-                    android:text="9"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="9"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt4"
-                    android:text="4"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="4"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt5"
-                    android:text="5"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="5"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt6"
-                    android:text="6"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="6"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt1"
-                    android:text="1"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="1"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt2"
-                    android:text="2"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="2"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt3"
-                    android:text="3"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:text="3"
+                    android:textSize="@dimen/button_cashier_text_size"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
                 <Button
                     android:id="@+id/bt0"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
                     android:text="0"
                     android:textSize="@dimen/button_cashier_text_size"
-                    android:layout_width="0dp"
-                    android:layout_height="0dp"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
-
+                <Button
+                    android:backgroundTint="@color/material_blue_500"
+                    android:id="@+id/btVoucher"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:shadowRadius="0.5"
+                    android:text="Voucher"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/button_cashier_text_size"
+                    grid:layout_columnWeight="1"
+                    grid:layout_gravity="fill_horizontal"
+                    grid:layout_rowWeight="1" />
                 <Button
                     android:id="@+id/btBack"
-                    android:text="back"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:backgroundTint="@color/colorPrimary"
+                    android:text="back"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/button_cashier_text_size"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
 
+
+
                 <Button
+                    grid:layout_columnSpan="3"
                     android:id="@+id/btPay"
-                    android:text="PAY"
-                    android:textSize="@dimen/button_cashier_text_size"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:backgroundTint="@android:color/holo_orange_light"
+                    android:text="PAY"
+                    android:textAllCaps="false"
+                    android:textSize="@dimen/button_cashier_text_size"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
                     grid:layout_columnWeight="1"
                     grid:layout_gravity="fill_horizontal"
-                    grid:layout_rowWeight="1" />
+                    grid:layout_rowWeight="1"
+
+                    />
             </android.support.v7.widget.GridLayout>
         </LinearLayout>
     </LinearLayout>

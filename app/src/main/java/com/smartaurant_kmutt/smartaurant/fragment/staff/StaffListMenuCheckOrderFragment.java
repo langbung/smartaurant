@@ -19,12 +19,10 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
-import com.smartaurant_kmutt.smartaurant.adapter.OrderMenuOnlyAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
-import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
@@ -43,6 +41,7 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
     ArrayList<OrderMenuItemDao> orderList;
     int countDatabase;
     float total;
+    Loading loading = Loading.newInstance();
 
     public StaffListMenuCheckOrderFragment() {
         super();
@@ -120,6 +119,7 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
     }
 
     void setOrderRealTime() {
+        loading.show(getFragmentManager(),"load");
         String tableID = String.format(Locale.ENGLISH,"TB%03d",table);
         Log.e("setOrderRealTime",tableID);
         DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/"+tableID+"/orderId");
@@ -139,6 +139,7 @@ public class StaffListMenuCheckOrderFragment extends Fragment {
                         orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
                         orderMenuOnlyAdapter.setOrderMenuKitchenManager(orderMenuManager);
                         orderMenuOnlyAdapter.notifyDataSetChanged();
+                        loading.dismiss();
                     }
 
                     @Override

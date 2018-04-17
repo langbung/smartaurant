@@ -167,7 +167,7 @@ public class OwnerSettingFragment extends Fragment implements YesNoDialog.OnYesN
         Map<String, TableItemDao> listTable = new HashMap<>();
         for (int i = 1; i <= numberOfTable; i++) {
             String tableId = String.format(Locale.ENGLISH, "TB%03d", i);
-            TableItemDao tableItem = new TableItemDao(i, true, true, "none");
+            TableItemDao tableItem = new TableItemDao(i, true, true, "none",true);
             listTable.put( tableId, tableItem);
         }
         return listTable;
@@ -221,12 +221,12 @@ public class OwnerSettingFragment extends Fragment implements YesNoDialog.OnYesN
     }
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+    public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
 
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode) {
 
     }
 }

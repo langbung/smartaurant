@@ -143,6 +143,7 @@ public class KitchenFragment extends Fragment implements KitchenOrderDialog.Kitc
                         orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
                         orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
                         orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
+                        orderMenuKitchenItemDao.setSize(test.child("size").getValue(String.class));
 
                         orderKitchenList.add(orderMenuKitchenItemDao);
                     }

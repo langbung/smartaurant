@@ -24,6 +24,7 @@ import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.TableManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -38,6 +39,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
     TableManager tableManager;
     DatabaseReference tableDatabase;
     int pos;
+    Loading loading = Loading.newInstance();
 
     public StaffCallWaiter() {
         super();
@@ -78,7 +80,10 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
 //        getActivity().setTitle("Check order");
         initTableGridView(rootView);
         setTableDatabaseRealTime();
+
     }
+
+
 
     private void initTableGridView(View rootView) {
         gridViewTable = rootView.findViewById(R.id.listViewTable);
@@ -98,6 +103,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
     }
 
     private void setTableDatabaseRealTime(){
+        loading.show(getFragmentManager(),"load");
         tableDatabase = UtilDatabase.getDatabase().child("table");
         tableDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -112,6 +118,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
                 tableManager.setTableDao(tableList);
                 tableAdapter.setTableManager(tableManager);
                 tableAdapter.notifyDataSetChanged();
+                loading.dismiss();
             }
 
             @Override
@@ -157,7 +164,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
     }
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle) {
+    public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
         TableItemDao tableItemDao = tableManager.getTableDao().getTableList().get(pos);
         String tableId= String.format(Locale.ENGLISH,"TB%03d",tableItemDao.getTable());
         DatabaseReference table = UtilDatabase.getDatabase().child("table/"+tableId+"/availableToCallWaiter");
@@ -172,7 +179,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode) {
 
     }
 }

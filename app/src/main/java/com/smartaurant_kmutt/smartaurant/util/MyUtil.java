@@ -19,6 +19,9 @@ public class MyUtil {
         Toast.makeText(Contextor.getInstance().getContext(),text,Toast.LENGTH_LONG).show();
     }
 
+    public static void print(String string){
+        System.out.println(string);
+    }
 
     /**************
      *  String menuID = String.format(Locale.ENGLISH,"MN%03d",maxMenuId+1);

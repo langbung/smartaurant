@@ -33,7 +33,7 @@ public class CustomerCategoryFragment extends Fragment {
     public static CustomerCategoryFragment newInstance(Bundle bundle) {
         CustomerCategoryFragment fragment = new CustomerCategoryFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -114,28 +114,28 @@ public class CustomerCategoryFragment extends Fragment {
         @Override
         public void onClick(View v) {
             Bundle bundle = new Bundle();
-            if(orderItemDao!=null)
-                bundle.putParcelable("orderItemDao",orderItemDao);
+            bundle.putInt("table", table);
+            bundle.putParcelable("orderItemDao", orderItemDao);
             if (v == btAppetizer) {
                 bundle.putString("menuType", "enableAppetizer");
-                bundle.putString("title","Appetizer menu");
+                bundle.putString("title", "Appetizer menu");
             } else if (v == btDessert) {
                 bundle.putString("menuType", "enableDessert");
-                bundle.putString("title","Dessert menu");
+                bundle.putString("title", "Dessert menu");
             } else if (v == btDrinks) {
                 bundle.putString("menuType", "enableDrinks");
-                bundle.putString("title","Drinks menu");
+                bundle.putString("title", "Drinks menu");
             } else if (v == btMainDish) {
                 bundle.putString("menuType", "enableMainDish");
-                bundle.putString("title","Main dish menu");
+                bundle.putString("title", "Main dish menu");
             } else if (v == btPromotion) {
                 bundle.putString("menuType", "enablePromotion");
-                bundle.putString("title","Promotion menu");
+                bundle.putString("title", "Promotion menu");
             } else if (v == btRecommended) {
                 bundle.putString("menuType", "enableRecommended");
-                bundle.putString("title","Recommended menu");
+                bundle.putString("title", "Recommended menu");
             }
-            bundle.putInt("table", table);
+
             CustomerCategoryFragmentListener categoryFragmentListener = (CustomerCategoryFragmentListener) getActivity();
             categoryFragmentListener.onClickCategoryButtonCustomerCategoryFragment(bundle);
         }

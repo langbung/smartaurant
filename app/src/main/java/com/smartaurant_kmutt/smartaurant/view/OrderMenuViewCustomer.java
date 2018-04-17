@@ -5,7 +5,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
-import android.view.Gravity;
 import android.widget.TextView;
 
 import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
@@ -19,9 +18,10 @@ import java.util.Locale;
  * Created by nuuneoi on 11/16/2014.
  */
 public class OrderMenuViewCustomer extends BaseCustomViewGroup {
-    TextView tvName;
+    TextView tvOrderId;
     TextView tvPrice;
-    TextView tvQuantity;
+    TextView tvDate;
+    TextView tvTable;
 
     public OrderMenuViewCustomer(Context context) {
         super(context);
@@ -78,9 +78,10 @@ public class OrderMenuViewCustomer extends BaseCustomViewGroup {
 
     private void initInstances() {
         // findViewById here
-        tvName=findViewById(R.id.tvName);
+        tvOrderId =findViewById(R.id.tvName);
         tvPrice=findViewById(R.id.tvPrice);
-        tvQuantity=findViewById(R.id.tvQuantity);
+        tvDate =findViewById(R.id.tvQuantity);
+        tvTable = findViewById(R.id.tvTable);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -98,8 +99,13 @@ public class OrderMenuViewCustomer extends BaseCustomViewGroup {
         */
     }
     public void setName(String name){
-        tvName.setText(name);
+        tvOrderId.setText(name);
     }
+
+    public void setOrderId(String orderId){
+        tvOrderId.setText(orderId);
+    }
+
     public void setPrice(float price){
         String textPrice=String.format(Locale.ENGLISH,"%.2f",price);
         tvPrice.setText(textPrice);
@@ -111,14 +117,20 @@ public class OrderMenuViewCustomer extends BaseCustomViewGroup {
 
     public void setTable(int table){
        String tableText="table "+table;
-        tvQuantity.setText(tableText);
+        tvTable.setText(tableText);
     }
 
 
     public void setQuantity(int quantity){
         String quantityText = "x "+quantity;
-        tvQuantity.setText(quantityText);
+        tvDate.setText(quantityText);
     }
+
+    public void setDate(String date){
+        tvDate.setText(date);
+    }
+
+
 
     public void setStatus(String status){
         tvPrice.setText(status);

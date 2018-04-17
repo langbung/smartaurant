@@ -78,7 +78,7 @@ public class CashierTableFragment extends Fragment {
     }
 
     private void initGridViewTable(View rootView) {
-        tableAdapter = new TableAdapter(TableAdapter.MODE_STAFF);
+        tableAdapter = new TableAdapter(TableAdapter.MODE_CASHIER);
         tableManager = new TableManager();
         gvTable = rootView.findViewById(R.id.gvTable);
         gvTable.setAdapter(tableAdapter);

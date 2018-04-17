@@ -20,6 +20,7 @@ import com.smartaurant_kmutt.smartaurant.dao.StaffItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.StaffListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsStaffDialog;
 import com.smartaurant_kmutt.smartaurant.manager.StaffManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
 import java.util.ArrayList;
@@ -31,7 +32,7 @@ public class OwnerStaffManagementFragment extends Fragment {
     ListView listViewStaff;
     StaffManager staffManager;
     OwnerStaffListAdapter ownerStaffListAdapter;
-
+    Loading loading = Loading.newInstance();
     public OwnerStaffManagementFragment() {
         super();
     }
@@ -117,6 +118,7 @@ public class OwnerStaffManagementFragment extends Fragment {
     }
 
     void setRealTime(){
+        loading.show(getFragmentManager(),"l");
         DatabaseReference staffDatabase = UtilDatabase.getDatabase().child("staff");
         staffDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -130,11 +132,12 @@ public class OwnerStaffManagementFragment extends Fragment {
                 staffManager.setStaffDao(staffListDao);
                 ownerStaffListAdapter.setStaffManager(staffManager);
                 ownerStaffListAdapter.notifyDataSetChanged();
+                loading.dismiss();
             }
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
+                loading.dismiss();
             }
         });
     }

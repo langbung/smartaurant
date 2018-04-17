@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
-    android:paddingLeft="15dp"
-    android:paddingRight="15dp"
     android:orientation="horizontal"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
     <TextView
+        android:paddingLeft="15dp"
         android:gravity="center_vertical"
         android:id="@+id/tvName"
         android:textSize="@dimen/listview_text_size"
@@ -15,16 +14,25 @@
     <TextView
         android:gravity="center_vertical"
         android:id="@+id/tvQuantity"
-        android:layout_weight="2"
+        android:layout_weight="1"
         android:textSize="@dimen/listview_text_size"
         android:layout_width="0dp"
         android:layout_height="@dimen/height_listView_one_row" />
     <TextView
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="0.00"
+        android:id="@+id/tvTable"
+        android:textSize="@dimen/listview_text_size"
+        android:layout_width="0dp"
+        android:layout_height="@dimen/height_listView_one_row" />
+    <TextView
+        android:paddingRight="15dp"
+        android:layout_weight="1"
         android:gravity="center_vertical|end"
         android:text="0.00"
         android:id="@+id/tvPrice"
         android:textSize="@dimen/listview_text_size"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="@dimen/height_listView_one_row" />
-
 </LinearLayout>

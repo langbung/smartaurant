@@ -14,6 +14,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -33,9 +35,14 @@ import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
+import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -53,6 +60,9 @@ public class OrderDialogFragment extends DialogFragment {
     int quantity;
     int table;
     int maxOrKit;
+    CheckBox cbS;
+    CheckBox cbM;
+    CheckBox cbL;
     MenuItemDao menu;
     OrderItemDao orderItemDao;
     OrderKitchenItemDao orderKitchenItemDao;
@@ -62,7 +72,8 @@ public class OrderDialogFragment extends DialogFragment {
     Activity activity;
     String textMaxOrderId;
     String note;
-
+    String size="";
+    Loading loading = Loading.newInstance();
     OnOrderDialogListener onOrderDialogListener;
 
     int maxOrderId;
@@ -118,10 +129,58 @@ public class OrderDialogFragment extends DialogFragment {
         btPlus = rootView.findViewById(R.id.btPlus);
         btOrder = rootView.findViewById(R.id.btOrder);
         imageView = rootView.findViewById(R.id.imageView);
-        etQuantity = rootView.findViewById(R.id.etQuantity);
+
         etNote = rootView.findViewById(R.id.etNote);
         tvTitle = rootView.findViewById(R.id.tvTitle);
         activity = getActivity();
+        initEditText(rootView);
+        initCheckbox(rootView);
+    }
+
+    private void initCheckbox(View rootView) {
+        cbL = rootView.findViewById(R.id.cbL);
+        cbS = rootView.findViewById(R.id.cbS);
+        cbM = rootView.findViewById(R.id.cbM);
+
+        cbL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    cbS.setChecked(false);
+                    cbM.setChecked(false);
+                    size="L";
+//                    MyUtil.showText(size);
+                }
+            }
+        });
+        cbM.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    cbS.setChecked(false);
+                    cbL.setChecked(false);
+                    size="M";
+//                    MyUtil.showText(size);
+                }
+            }
+        });
+        cbS.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    cbM.setChecked(false);
+                    cbL.setChecked(false);
+                    size="S";
+//                    MyUtil.showText(size);
+                }
+            }
+        });
+        cbS.setChecked(true);
+    }
+
+    private void initEditText(View rootView) {
+        etQuantity = rootView.findViewById(R.id.etQuantity);
+        etQuantity.setFocusableInTouchMode(false);
     }
 
     private void setListener() {
@@ -192,10 +251,13 @@ public class OrderDialogFragment extends DialogFragment {
                 String textQuantity = String.valueOf(quantity);
                 etQuantity.setText(textQuantity);
             } else if (v == btMinus) {
-                quantity--;
-                String textQuantity = String.valueOf(quantity);
-                etQuantity.setText(textQuantity);
+                if (quantity > 1) {
+                    quantity--;
+                    String textQuantity = String.valueOf(quantity);
+                    etQuantity.setText(textQuantity);
+                }
             } else if (v == btOrder) {
+                loading.show(getFragmentManager(),"l");
                 note = etNote.getText().toString();
 
                 if (orderItemDao == null) {
@@ -203,10 +265,8 @@ public class OrderDialogFragment extends DialogFragment {
                     maxOrderDatabase.addListenerForSingleValueEvent(maxOrderListener);
 
                 } else if (orderItemDao.getOrderList() != null) {
-                    Log.e("orderDialog", "into second if");
 
-//                    Log.e("123",orderList.toString());
-
+//                    Log.e("orderDialog", orderItemDao.getDateTime().toString());
 
                     DatabaseReference maxOrderKitchen = UtilDatabase.getDatabase().child("util/maxOrderKitchen");
                     maxOrderKitchen.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -221,18 +281,17 @@ public class OrderDialogFragment extends DialogFragment {
                             orderMenuItemDao.setMenuName(menu.getName());
                             orderMenuItemDao.setOrderId(orderItemDao.getOrderId());
                             orderMenuItemDao.setNote(note);
+                            orderMenuItemDao.setSize(size);
+                            orderMenuItemDao.setOrderKitchenId(maxOrKit+"");
 
                             Map<String, OrderMenuKitchenItemDao> orderList = orderItemDao.getOrderList();
                             orderList.put(maxOrKit + "", orderMenuItemDao);
                             orderItemDao.setOrderList(orderList);
 
 
-
-
                             Map<String, Object> updateChild = new HashMap<>();
-                            updateChild.put("order/" + orderItemDao.getOrderId(), orderItemDao);
+                            updateChild.put("order/" + orderItemDao.getOrderId()+"/orderList", orderItemDao.getOrderList());
                             updateChild.put("order_kitchen/" + maxOrKit, orderMenuItemDao);
-//                                        updateChild.put("table/"+String.format(Locale.ENGLISH,"TB%03d",table),tableItem);
 
                             DatabaseReference databaseReference = UtilDatabase.getDatabase();
                             databaseReference.updateChildren(updateChild).addOnCompleteListener(new OnCompleteListener<Void>() {
@@ -277,53 +336,85 @@ public class OrderDialogFragment extends DialogFragment {
                     maxOrKit = dataSnapshot.getValue(Integer.class);
                     maxOrKit++;
 
-                    OrderMenuKitchenItemDao orderMenuItemDao = new OrderMenuKitchenItemDao();
-                    orderMenuItemDao.setMenuName(menu.getName());
-                    orderMenuItemDao.setQuantity(quantity);
-                    orderMenuItemDao.setStatus("in queue");
-                    orderMenuItemDao.setOrderId(textMaxOrderId);
-                    orderMenuItemDao.setNote(note);
-
-                    Map<String, OrderMenuKitchenItemDao> orderList = new HashMap<>();
-                    orderList.put(maxOrKit + "", orderMenuItemDao);
-
-                    orderItemDao = new OrderItemDao();
-                    orderItemDao.setOrderId(textMaxOrderId);
-                    orderItemDao.setBeginOrder(true);
-                    orderItemDao.setOrderList(orderList);
-                    orderItemDao.setTable(table);
-                    orderItemDao.setTotal(0);
-
-                    menuListKitchenDao = new ArrayList<>();
-                    menuListKitchenDao.add(orderMenuItemDao);
-
-                    tableItem = new TableItemDao();
-                    tableItem.setAvailableTable(false);
-                    tableItem.setAvailableToCallWaiter(true);
-                    tableItem.setOrderId(textMaxOrderId);
-                    tableItem.setTable(table);
-
-                    Map<String, Object> updateChild = new HashMap<>();
-                    updateChild.put("order/" + orderItemDao.getOrderId(), orderItemDao);
-                    updateChild.put("order_kitchen/" + maxOrKit, orderMenuItemDao);
-                    updateChild.put("table/" + String.format(Locale.ENGLISH, "TB%03d", table), tableItem);
-                    updateChild.put("util/maxOrderKitchen", maxOrKit);
-                    updateChild.put("util/maxOrderId", maxOrderId);
-
-                    DatabaseReference databaseReference = UtilDatabase.getDatabase();
-                    databaseReference.updateChildren(updateChild).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    DatabaseReference menuPriceDatabase = UtilDatabase.getMenu().child(menu.getName()+"/price");
+                    menuPriceDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            if (task.isSuccessful()) {
-                                Bundle bundle = new Bundle();
-                                bundle.putParcelable("orderItemDao", orderItemDao);
-                                Intent intent = new Intent();
-                                intent.putExtra("bundle",bundle);
-                                activity.setResult(activity.RESULT_OK,intent);
-                                activity.finish();
-                            }
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+
+                            float price = dataSnapshot.getValue(Float.class);
+
+                            Date date = Calendar.getInstance().getTime();
+                            String day = new SimpleDateFormat("dd").format(date);
+                            String month = new SimpleDateFormat("MM").format(date);
+                            String year = new SimpleDateFormat("yyyy").format(date);
+                            String time = new SimpleDateFormat("HH:mm").format(date);
+
+                            Map<String,String> dateTime = new HashMap<>();
+                            dateTime.put("day",day);
+                            dateTime.put("month",month);
+                            dateTime.put("year",year);
+                            dateTime.put("time",time);
+
+
+                            OrderMenuKitchenItemDao orderMenuItemDao = new OrderMenuKitchenItemDao();
+                            orderMenuItemDao.setStatus("in queue");
+                            orderMenuItemDao.setQuantity(quantity);
+                            orderMenuItemDao.setMenuName(menu.getName());
+                            orderMenuItemDao.setOrderId(textMaxOrderId);
+                            orderMenuItemDao.setNote(note);
+                            orderMenuItemDao.setSize(size);
+                            orderMenuItemDao.setOrderKitchenId(maxOrKit+"");
+
+                            Map<String, OrderMenuKitchenItemDao> orderList = new HashMap<>();
+                            orderList.put(maxOrKit + "", orderMenuItemDao);
+
+                            orderItemDao = new OrderItemDao();
+                            orderItemDao.setOrderId(textMaxOrderId);
+                            orderItemDao.setBeginOrder(true);
+                            orderItemDao.setOrderList(orderList);
+                            orderItemDao.setTable(table);
+                            orderItemDao.setTotal(price);
+                            orderItemDao.setDateTime(dateTime);
+//                    Log.e("OrderDiaFra",orderItemDao.getDateTime().toString());
+
+                            menuListKitchenDao = new ArrayList<>();
+                            menuListKitchenDao.add(orderMenuItemDao);
+
+                            tableItem = new TableItemDao();
+                            tableItem.setAvailableTable(false);
+                            tableItem.setAvailableToCallWaiter(true);
+                            tableItem.setOrderId(textMaxOrderId);
+                            tableItem.setTable(table);
+                            tableItem.setAvailableCheckBill(true);
+
+                            Map<String, Object> updateChild = new HashMap<>();
+                            updateChild.put("order/" + orderItemDao.getOrderId(), orderItemDao);
+                            updateChild.put("order_kitchen/" + maxOrKit, orderMenuItemDao);
+                            updateChild.put("table/" + String.format(Locale.ENGLISH, "TB%03d", table), tableItem);
+                            updateChild.put("util/maxOrderKitchen", maxOrKit);
+                            updateChild.put("util/maxOrderId", maxOrderId);
+
+                            DatabaseReference databaseReference = UtilDatabase.getDatabase();
+                            databaseReference.updateChildren(updateChild).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                @Override
+                                public void onComplete(@NonNull Task<Void> task) {
+                                    if (task.isSuccessful()) {
+                                        Bundle bundle = new Bundle();
+                                        bundle.putParcelable("orderItemDao", orderItemDao);
+                                        OnOrderDialogListener onOrderDialogListener = (OnOrderDialogListener)getActivity();
+                                        onOrderDialogListener.onOrderClick(bundle,12);
+                                    }
+                                }
+                            });
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
                         }
                     });
+
+
                 }
 
                 @Override
@@ -385,8 +476,10 @@ public class OrderDialogFragment extends DialogFragment {
         }
     };
 
+
+
     public interface OnOrderDialogListener {
-        void onOrderClick(Bundle bundle);
+        void onOrderClick(Bundle bundle,int requestCode);
     }
 
 

@@ -29,14 +29,14 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
     public void onBtCustomerClicked() {
         Intent intent = new Intent(MenuActivity.this,CustomerTableActivity.class);
         startActivity(intent);
-
+        finish();
     }
 
     @Override
     public void onBtStaffClicked() {
         Intent intent = new Intent(MenuActivity.this,StaffLoginActivity.class);
         startActivity(intent);
-
+        finish();
 
     }
     private void checkUserOut(){
@@ -49,7 +49,7 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
             bundle.putInt("table",numTable);
             intent.putExtra("bundle",bundle);
             startActivity(intent);
-
+            finish();
         }
     }
 }

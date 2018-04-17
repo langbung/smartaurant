@@ -30,6 +30,7 @@ import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.owner.OptionsOwnerMenuDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.manager.MenuManager;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
@@ -49,7 +50,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     String menuName;
     String menuPriceCheck;
     int maxMenuId;
-
+    Loading loading = Loading.newInstance();
     public OwnerListMenuFragment() {
         super();
     }
@@ -146,10 +147,12 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     }
 
     void setRealTime(){
+        loading.show(getFragmentManager(),"l");
         DatabaseReference menuDatabase = database.child("menu");
         menuDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+
                 // This method is called once with the initial value and again
                 // whenever data at this location is updated.
                 ArrayList<MenuItemDao> menuList = new ArrayList<>();
@@ -171,6 +174,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
                     menuAdapter.setMenuManager(menuManager);
                     menuAdapter.notifyDataSetChanged();
                 }
+                loading.dismiss();
             }
 
             @Override

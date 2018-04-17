@@ -64,7 +64,12 @@
         <activity
             android:name=".activity.kitchen.KitchenActivity"
             android:screenOrientation="landscape" />
-        <activity android:name=".activity.customer.CustomerMenuActivity"
+        <activity
+            android:name=".activity.customer.CustomerMenuActivity"
+            android:screenOrientation="landscape">
+
+        </activity>
+        <activity android:name=".activity.owner.OwnerDetailOrderListActivity"
             android:screenOrientation="landscape">
 
         </activity>
