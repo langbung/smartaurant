@@ -27,6 +27,9 @@
         android:layout_width="@dimen/drawer_menu_width"
         android:layout_height="match_parent">
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:gravity="left|center_vertical"
             android:paddingStart="15dp"
             android:text="Customer call"
@@ -36,6 +39,9 @@
             android:layout_height="wrap_content"
             />
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:gravity="left|center_vertical"
             android:paddingStart="15dp"
             android:text="Check order"
@@ -45,6 +51,9 @@
             android:layout_height="wrap_content"
             />
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:gravity="left|center_vertical"
             android:paddingStart="15dp"
             android:text="Menu setting"
@@ -54,6 +63,9 @@
             android:layout_height="wrap_content"
             />
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:gravity="left|center_vertical"
             android:paddingStart="15dp"
             android:text="Log out"

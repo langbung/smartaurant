@@ -38,6 +38,7 @@ public class CustomerTableActivity extends AppCompatActivity implements Customer
 
         Intent intent = new Intent(CustomerTableActivity.this,CustomerActivity.class);
         intent.putExtra("bundle",bundle);
+
         startActivity(intent);
 
 

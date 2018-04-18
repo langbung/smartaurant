@@ -43,13 +43,6 @@ public class CustomerOrderListAdapter extends BaseAdapter {
 
     @Override
     public int getCount() {
-        if (mode == MODE_ORDER_KITCHEN_CUSTOMER) {
-            if (orderMenuKitchenManager == null)
-                return 0;
-            if (orderMenuKitchenManager.getOrderMenuKitchenDao().size() <= 0)
-                return 0;
-            return orderMenuKitchenManager.getOrderMenuKitchenDao().size();
-        }
         if (orderMenuKitchenManager == null)
             return 0;
         if (orderMenuKitchenManager.getOrderMenuKitchenDao().size() <= 0)
@@ -79,6 +72,7 @@ public class CustomerOrderListAdapter extends BaseAdapter {
             item = (OrderAndCheckBillMenuViewCustomer) convertView;
         else
             item = new OrderAndCheckBillMenuViewCustomer(parent.getContext());
+
         if (checkVoucher && checkDiscount) {
             if (position == orderMenuList.size() + 1) {
                 item.setName("discount when buy " + discountCondition);
@@ -90,14 +84,12 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 item.setQuantity(1);
                 item.setPrice(voucherValue);
                 return item;
-            }else if (position == orderMenuList.size()) {
-//                Log.e("vat in adap", vat + "");
+            } else if (position == orderMenuList.size()) {
                 item.setName("vat " + vat + " %");
                 item.setQuantity(1);
                 item.setPrice(vatValue);
                 return item;
-            }
-            else {
+            } else {
                 OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
@@ -123,21 +115,19 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 item.setPrice(orderMenuKitchenItemDao.getPrice());
                 return item;
             }
-        }
-        else if (checkVoucher) {
+        } else if (checkVoucher) {
             if (position == orderMenuList.size() + 1) {
                 item.setName("discount when buy " + discountCondition);
                 item.setQuantity(1);
                 item.setPrice(discountValue);
                 return item;
-            }else if (position == orderMenuList.size()) {
+            } else if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
                 item.setName("Voucher ");
                 item.setQuantity(1);
                 item.setPrice(voucherValue);
                 return item;
-            }
-            else {
+            } else {
                 OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
@@ -147,12 +137,77 @@ public class CustomerOrderListAdapter extends BaseAdapter {
         }
 
         if (mode == MODE_ORDER_KITCHEN_CUSTOMER) {
-            OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+            if (checkVoucher && checkDiscount) {
+                if (position == orderMenuList.size() + 1) {
+                    item.setName("discount when buy " + discountCondition);
+                    item.setQuantity(1);
+                    item.setPrice(discountValue);
+                    return item;
+                } else if (position == orderMenuList.size() + 2) {
+                    item.setName("voucher");
+                    item.setQuantity(1);
+                    item.setPrice(voucherValue);
+                    return item;
+                } else if (position == orderMenuList.size()) {
+                    item.setName("vat " + vat + " %");
+                    item.setQuantity(1);
+                    item.setPrice(vatValue);
+                    return item;
+                }
+                else {
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
 //            MyUtil.showText(orderMenuKitchenItemDao.getMenuName());
-            item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
-            item.setQuantity(orderMenuKitchenItemDao.getQuantity());
-            item.setStatus(orderMenuKitchenItemDao.getStatus());
-            item.setPrice(orderMenuKitchenItemDao.getPrice());
+                    item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
+                    item.setQuantity(orderMenuKitchenItemDao.getQuantity());
+                    item.setStatus(orderMenuKitchenItemDao.getStatus());
+                    item.setPrice(orderMenuKitchenItemDao.getPrice());
+                }
+            } else if (checkDiscount) {
+                if (position == orderMenuList.size() + 1) {
+                    item.setName("discount when buy " + discountCondition);
+                    item.setQuantity(1);
+                    item.setPrice(discountValue);
+                    return item;
+                }
+                if (position == orderMenuList.size()) {
+//                Log.e("vat in adap", vat + "");
+                    item.setName("vat " + vat + " %");
+                    item.setQuantity(1);
+                    item.setPrice(vatValue);
+                    return item;
+                }
+                else{
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+//            MyUtil.showText(orderMenuKitchenItemDao.getMenuName());
+                    item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
+                    item.setQuantity(orderMenuKitchenItemDao.getQuantity());
+                    item.setStatus(orderMenuKitchenItemDao.getStatus());
+                    item.setPrice(orderMenuKitchenItemDao.getPrice());
+                }
+            } else if (checkVoucher) {
+                if (position == orderMenuList.size() + 1) {
+                    item.setName("discount when buy " + discountCondition);
+                    item.setQuantity(1);
+                    item.setPrice(discountValue);
+                    return item;
+                } else if (position == orderMenuList.size()) {
+//                Log.e("vat in adap", vat + "");
+                    item.setName("Voucher ");
+                    item.setQuantity(1);
+                    item.setPrice(voucherValue);
+                    return item;
+                }
+                else {
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+//            MyUtil.showText(orderMenuKitchenItemDao.getMenuName());
+                    item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
+                    item.setQuantity(orderMenuKitchenItemDao.getQuantity());
+                    item.setStatus(orderMenuKitchenItemDao.getStatus());
+                    item.setPrice(orderMenuKitchenItemDao.getPrice());
+                }
+            }
+
+
 
         } else if (mode == MODE_ORDER_KITCHEN_STAFF) {
             OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
@@ -161,7 +216,6 @@ public class CustomerOrderListAdapter extends BaseAdapter {
             item.setStatusAtRight(orderMenuKitchenItemDao.getStatus());
         } else {
             if (position == orderMenuList.size()) {
-                Log.e("vat in adap", vat + "");
                 item.setName("vat " + vat + " %");
                 item.setQuantity(1);
                 item.setPrice(vatValue);

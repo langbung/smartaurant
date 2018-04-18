@@ -18,12 +18,18 @@
         android:background="@android:color/white"
         android:orientation="vertical">
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:background="@drawable/selector_button"
             android:id="@+id/btLogOut"
             android:text="staff logout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:visibility="gone"
             android:text="test"
             android:id="@+id/btTest"

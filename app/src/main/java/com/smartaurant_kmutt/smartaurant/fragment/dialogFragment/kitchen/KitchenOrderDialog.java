@@ -38,6 +38,7 @@ public class KitchenOrderDialog extends DialogFragment {
     TextView tvMenuName;
     TextView tvNote;
     TextView tvTable;
+    TextView tvSize;
     Button btClose;
     Button btCook;
     OrderMenuKitchenItemDao orderMenuKitchenItemDao;
@@ -98,9 +99,10 @@ public class KitchenOrderDialog extends DialogFragment {
         tvMenuName = rootView.findViewById(R.id.tvMenuName);
         tvNote = rootView.findViewById(R.id.tvNote);
         tvTable = rootView.findViewById(R.id.tvTable);
+        tvSize = rootView.findViewById(R.id.tvSize);
         setMenuName(orderMenuKitchenItemDao.getMenuName());
         setNote(orderMenuKitchenItemDao.getNote());
-
+        setSize(orderMenuKitchenItemDao.getSize());
         DatabaseReference orderKitchenDatabase = UtilDatabase.getDatabase().child("order/" + orderMenuKitchenItemDao.getOrderId() + "/table");
         orderKitchenDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -131,7 +133,7 @@ public class KitchenOrderDialog extends DialogFragment {
         display.getSize(size);
         int width = size.x;
         int height = size.y;
-        getDialog().getWindow().setLayout(width*2/4, height*2/3);
+        getDialog().getWindow().setLayout(width*2/4, height*3/4);
     }
 
     @Override
@@ -176,6 +178,10 @@ public class KitchenOrderDialog extends DialogFragment {
     public void setTable(int table) {
         String tableText = table + "";
         tvTable.setText(tableText);
+    }
+
+    public void setSize(String size) {
+        tvSize.setText(size);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {

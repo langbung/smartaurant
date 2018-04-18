@@ -2,6 +2,7 @@ package com.smartaurant_kmutt.smartaurant.fragment.customer;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -10,6 +11,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -21,9 +23,13 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 import com.inthecheesefactory.thecheeselibrary.view.SlidingTabLayout;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
 import com.smartaurant_kmutt.smartaurant.activity.customer.CustomerActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerPagerAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
@@ -40,8 +46,7 @@ import java.util.Locale;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class CustomerFragment extends Fragment implements OrderDialogFragment.OnOrderDialogListener
-        ,YesNoDialog.OnYesNoDialogListener {
+public class CustomerFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
     boolean userOut;
     CustomerPagerAdapter customerPagerAdapter;
     int numTable;
@@ -54,6 +59,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     OrderKitchenItemDao orderKitchenItemDao;
     boolean countRefresh;
     Menu callWaiter;
+    CustomerActivity activity;
 
     public CustomerFragment() {
         super();
@@ -63,7 +69,7 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     public static CustomerFragment newInstance(Bundle bundle) {
         CustomerFragment fragment = new CustomerFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,23 +101,28 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     @SuppressWarnings("UnusedParameters")
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
-        toolbar = rootView.findViewById(R.id.toolbar);
-        toolbar.setTitle("Table: "+numTable);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        initToolbar(rootView);
         initViewPager(rootView);
+
+    }
+
+    private void initToolbar(View rootView) {
+        toolbar = rootView.findViewById(R.id.toolbar);
+        toolbar.setTitle("Table: " + numTable);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
     private void initViewPager(View rootView) {
-        customerPagerAdapter=new CustomerPagerAdapter(getChildFragmentManager());
+        customerPagerAdapter = new CustomerPagerAdapter(getChildFragmentManager());
         customerPagerAdapter.setTable(numTable);
         viewPager = rootView.findViewById(R.id.viewPager);
         viewPager.setAdapter(customerPagerAdapter);
         slidingTab = rootView.findViewById(R.id.slidingTab);
-        setSlidingTab(slidingTab,rootView);
+        setSlidingTab(slidingTab, rootView);
         viewPager.setCurrentItem(1);
     }
 
-    private void setSlidingTab(SlidingTabLayout slidingTab,View rootView){
+    private void setSlidingTab(SlidingTabLayout slidingTab, View rootView) {
         slidingTab.setSelectedIndicatorColors(Color.parseColor("#ffffffff"));
         slidingTab.setBackgroundColor(getResources().getColor(R.color.colorPrimary));
         slidingTab.setDistributeEvenly(true);
@@ -147,74 +158,96 @@ public class CustomerFragment extends Fragment implements OrderDialogFragment.On
     public void onDestroy() {
         super.onDestroy();
     }
-    public void writUserOut(Boolean result){
-        SharedPreferences prefs=getContext().getSharedPreferences("checkUser", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor= prefs.edit();
-        editor.putBoolean("userOut",result);
-        editor.putInt("numTable",numTable);
+
+    public void writUserOut(Boolean result) {
+        SharedPreferences prefs = getContext().getSharedPreferences("checkUser", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putBoolean("userOut", result);
+        editor.putInt("numTable", numTable);
         editor.apply();
     }
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.customer_menu,menu);
+        inflater.inflate(R.menu.customer_menu, menu);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (CustomerActivity) getActivity();
+    }
+
+    private void checkPay() {
+        if (countRefresh) {
+            String tableId = String.format(Locale.ENGLISH, "TB%03d", numTable);
+            DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/" + tableId + "/availableTable");
+            tableDatabase.addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    boolean checkPay = dataSnapshot.getValue(Boolean.class);
+                    Log.e("checkpay",checkPay+"");
+                    if(checkPay){
+                        CustomerFragmentListener customerFragmentListener = activity;
+                        customerFragmentListener.onPaidInCustomerFragment();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+        }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(item.getItemId() == R.id.waiterCalling ){
+        if (item.getItemId() == R.id.waiterCalling) {
             Bundle bundle = new Bundle();
-            bundle.putString("title","Call waiter");
-            bundle.putString("detail","Do you want to call waiter?");
+            bundle.putString("title", "Call waiter");
+            bundle.putString("detail", "Do you want to call waiter?");
             YesNoDialog yesNoDialog = YesNoDialog.newInstance(bundle);
-            yesNoDialog.setTargetFragment(CustomerFragment.this,2);
-            yesNoDialog.show(getFragmentManager(),"yesNoDialog");
+            yesNoDialog.setTargetFragment(CustomerFragment.this, 2);
+            yesNoDialog.show(getFragmentManager(), "yesNoDialog");
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onOrderClick(Bundle bundle,int requestCode) {
-        orderItemDao = bundle.getParcelable("orderItemDao");
-//         ((CustomerActivity)getActivity()).setOrderItemDao(orderItemDao);
-        if(!countRefresh){
-            customerPagerAdapter.setOrderItemDao(orderItemDao);
-            int page = viewPager.getCurrentItem();
-            viewPager.setAdapter(customerPagerAdapter);
-            viewPager.setCurrentItem(page);
-            countRefresh=true;
-        }
-    }
 
     public void setOrderItemDao(OrderItemDao orderItemDao) {
         this.orderItemDao = orderItemDao;
-        if(!countRefresh){
+        if (!countRefresh) {
             customerPagerAdapter.setOrderItemDao(orderItemDao);
             int page = viewPager.getCurrentItem();
             viewPager.setAdapter(customerPagerAdapter);
             viewPager.setCurrentItem(page);
-            countRefresh=true;
+            countRefresh = true;
+            checkPay();
+//            MyUtil.showText("checkPay run");
         }
     }
 
     @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
-        String tableId = String.format(Locale.ENGLISH,"TB%03d",numTable);
-        DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/").child(tableId+"/availableToCallWaiter");
+    public void onYesButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        String tableId = String.format(Locale.ENGLISH, "TB%03d", numTable);
+        DatabaseReference tableDatabase = UtilDatabase.getDatabase().child("table/").child(tableId + "/availableToCallWaiter");
         tableDatabase.setValue(false).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(task.isSuccessful()){
+                if (task.isSuccessful()) {
                     MyUtil.showText("please wait for waiter.");
                 }
             }
         });
-//        MyUtil.showText("Already call waiter");
     }
 
     @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle,int requestCode) {
+    public void onNoButtonClickInYesNODialog(Bundle bundle, int requestCode) {
         MyUtil.showText("cancel call waiter");
+    }
+    public interface CustomerFragmentListener{
+        void onPaidInCustomerFragment();
     }
 }

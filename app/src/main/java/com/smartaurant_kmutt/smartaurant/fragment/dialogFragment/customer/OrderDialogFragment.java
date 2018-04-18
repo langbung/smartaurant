@@ -74,7 +74,6 @@ public class OrderDialogFragment extends DialogFragment {
     String note;
     String size="";
     Loading loading = Loading.newInstance();
-    OnOrderDialogListener onOrderDialogListener;
 
     int maxOrderId;
 

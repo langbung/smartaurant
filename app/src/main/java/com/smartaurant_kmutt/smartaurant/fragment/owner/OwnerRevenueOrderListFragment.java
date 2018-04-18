@@ -58,7 +58,7 @@ public class OwnerRevenueOrderListFragment extends Fragment {
     android.support.v7.widget.Toolbar toolbar;
     OrderMenuKitchenManager orderMenuManager;
     CustomerOrderListAdapter orderMenuAdapter;
-
+    int countChild;
 
     public OwnerRevenueOrderListFragment() {
         super();
@@ -117,16 +117,16 @@ public class OwnerRevenueOrderListFragment extends Fragment {
         tvTable = rootView.findViewById(R.id.tvTable);
         tvTime = rootView.findViewById(R.id.tvTime);
 
-        DatabaseReference databaseReference = UtilDatabase.getDatabase().child("order/"+orderItemDao.getOrderId()+"/dateTime");
+        DatabaseReference databaseReference = UtilDatabase.getDatabase().child("order/" + orderItemDao.getOrderId() + "/dateTime");
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                loading.show(getFragmentManager(),"l");
+                loading.show(getFragmentManager(), "l");
                 tvOrderId.setText(orderItemDao.getOrderId());
-                String tableText = "Table "+orderItemDao.getTable();
+                String tableText = "Table " + orderItemDao.getTable();
                 tvTable.setText(tableText);
-                Map<String,String> date = (Map)dataSnapshot.getValue();
-                String dateText = date.get("day") + "/"+ date.get("month") + "/" + date.get("year")+" "+date.get("time");
+                Map<String, String> date = (Map) dataSnapshot.getValue();
+                String dateText = date.get("day") + "/" + date.get("month") + "/" + date.get("year") + " " + date.get("time");
                 tvTime.setText(dateText);
             }
 
@@ -186,7 +186,8 @@ public class OwnerRevenueOrderListFragment extends Fragment {
 //                    if(dataSnapshot.exists()){
 
                 if (dataSnapshot.exists()) {
-                    Log.e("OrderListFragment", "data exist");
+                    countChild = (int) dataSnapshot.getChildrenCount();
+//                    Log.e("OrderListFragment", "data exist");
                     countDatabase = 0;
                     total = 0;
                     orderKitchenList = new ArrayList<>();
@@ -211,25 +212,61 @@ public class OwnerRevenueOrderListFragment extends Fragment {
                                 String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
                                 tvTotal.setText(textTotal);
                                 countDatabase++;
-                                orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
-                                orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
-                                orderMenuAdapter.notifyDataSetChanged();
-                                Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
-                                DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase().child("vat");
-                                vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot dataSnapshot) {
-                                        vat = dataSnapshot.getValue(double.class);
-                                        vat = total * (1 + vat / 100.0);
-                                        String textTotal = String.format(Locale.ENGLISH, "%.2f", vat);
-                                        tvTotal.setText(textTotal);
-                                    }
-                                    @Override
-                                    public void onCancelled(DatabaseError databaseError) {
-                                        MyUtil.showText("can't get vat.");
-                                    }
-                                });
+
+//                                Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
+                                if (countDatabase == countChild) {
+                                    DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase();
+                                    vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot dataSnapshot) {
+                                            vat = dataSnapshot.child("vat").getValue(double.class);
+                                            orderMenuAdapter.setVat((float) vat);
+                                            float vatValue = (float) (total * vat / 100.0);
+
+                                            String vatValueText = String.format(Locale.ENGLISH, "%.2f", vatValue);
+                                            orderMenuAdapter.setVatValue(Float.parseFloat(vatValueText));
+                                            total = (float) (total * (1 + vat / 100.0));
+                                            Log.e("total", total + "");
+
+                                            DataSnapshot discounts = dataSnapshot.child("discount");
+                                            ArrayList<Float> keyDiscounts = new ArrayList<>();
+                                            ArrayList<Integer> valueDiscounts = new ArrayList<>();
+
+                                            for (DataSnapshot discount : discounts.getChildren()) {
+                                                keyDiscounts.add(Float.parseFloat(discount.getKey()));
+                                                valueDiscounts.add(discount.getValue(Integer.class));
+                                            }
+
+                                            String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                            tvTotal.setText(textTotal);
+
+                                            for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
+                                                if (total > keyDiscounts.get(i)) {
+                                                    orderMenuAdapter.setCheckDiscount(true);
+                                                    String discountVal = String.format(Locale.ENGLISH, "%.2f", (float) (total * valueDiscounts.get(i) / 100.0));
+                                                    String discountCon = String.format(Locale.ENGLISH, "%.0f", keyDiscounts.get(i));
+                                                    orderMenuAdapter.setDiscountCondition(Integer.parseInt(discountCon));
+                                                    orderMenuAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
+//                                                            Log.e("discountCon",discountCon);
+                                                    total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
+                                                    textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                                    tvTotal.setText(textTotal);
+                                                    break;
+                                                }
+                                            }
+                                            orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                                            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                                            orderMenuAdapter.notifyDataSetChanged();
+                                        }
+
+                                        @Override
+                                        public void onCancelled(DatabaseError databaseError) {
+                                            MyUtil.showText("can't get vat.");
+                                        }
+                                    });
+                                }
                             }
+
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
                             }

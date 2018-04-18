@@ -44,6 +44,9 @@ public class KitchenFragment extends Fragment implements KitchenOrderDialog.Kitc
     ListView lvAllMenuKitchen;
     KitchenOrderListAdapter orderListAdapter;
     ArrayList<OrderMenuKitchenItemDao> orderKitchenList;
+    ArrayList<OrderMenuKitchenItemDao> inQueueList;
+    ArrayList<OrderMenuKitchenItemDao> cookingList;
+
     public KitchenFragment() {
         super();
     }
@@ -87,20 +90,20 @@ public class KitchenFragment extends Fragment implements KitchenOrderDialog.Kitc
     private void initListViewOrderMenuKitchen(View rootView) {
         lvAllMenuKitchen = rootView.findViewById(R.id.lvAllMenuKitchen);
         orderMenuKitchenManager = new OrderMenuKitchenManager();
-        orderListAdapter= new KitchenOrderListAdapter();
+        orderListAdapter = new KitchenOrderListAdapter();
         setOrderRealTime();
         lvAllMenuKitchen.setAdapter(orderListAdapter);
         lvAllMenuKitchen.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                if(position==0){
+                if (position == 0) {
                     OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
-                    Log.e("Kitchen fragment","note = " +orderMenuKitchenItemDao.getNote());
+                    Log.e("Kitchen fragment", "note = " + orderMenuKitchenItemDao.getNote());
                     Bundle bundle = new Bundle();
-                    bundle.putParcelable("orderMenuKitchenItemDao",orderMenuKitchenItemDao);
+                    bundle.putParcelable("orderMenuKitchenItemDao", orderMenuKitchenItemDao);
                     KitchenOrderDialog kitchenOrderDialog = KitchenOrderDialog.newInstance(bundle);
-                    kitchenOrderDialog.setTargetFragment(KitchenFragment.this,123);
-                    kitchenOrderDialog.show(getFragmentManager(),"kitchenOrder");
+                    kitchenOrderDialog.setTargetFragment(KitchenFragment.this, 123);
+                    kitchenOrderDialog.show(getFragmentManager(), "kitchenOrder");
                 }
             }
         });
@@ -108,81 +111,94 @@ public class KitchenFragment extends Fragment implements KitchenOrderDialog.Kitc
     }
 
 
-
     private void updateStatus(String orderKitchenId, String status) {
-        Map<String,Object> updateChild = new HashMap<>();
-        updateChild.put("order_kitchen/"+orderKitchenId+"/status",status);
+        Map<String, Object> updateChild = new HashMap<>();
+        updateChild.put("order_kitchen/" + orderKitchenId + "/status", status);
 
         DatabaseReference databaseReference = UtilDatabase.getDatabase();
         databaseReference.updateChildren(updateChild);
     }
 
     private void initToolbar(View rootView) {
-        toolbar=rootView.findViewById(R.id.toolbar);
+        toolbar = rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Kitchen");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
 
-    void setOrderRealTime(){
-            final DatabaseReference orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
-            Query orderMenuKitchenQuery = orderMenuKitchenDatabase.orderByChild("status").equalTo("cooking");
-            orderMenuKitchenQuery.addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+    void setOrderRealTime() {
+        DatabaseReference orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
+        Query cookingQuery = orderMenuKitchenDatabase.orderByChild("status").equalTo("cooking");
+        cookingQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
 //                    Log.e("123",dataSnapshot.toString());
 //                    MyUtil.showText(dataSnapshot.toString());
 //                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
 //                    MyUtil.showText(dataSnapshot.getChildrenCount()+"");
-                    orderKitchenList = new ArrayList<>();
-                    for (DataSnapshot test : dataSnapshot.getChildren()){
-                        OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
-
-                        orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
-                        orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
-                        orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
-                        orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
-                        orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
-                        orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
-                        orderMenuKitchenItemDao.setSize(test.child("size").getValue(String.class));
-
-                        orderKitchenList.add(orderMenuKitchenItemDao);
-                    }
-                    DatabaseReference orderMenuKitchenDatabase = UtilDatabase.getDatabase().child("order_kitchen");
-                    Query orderMenuKitchenQuery = orderMenuKitchenDatabase.orderByChild("status").equalTo("in queue");
-                    orderMenuKitchenQuery.addValueEventListener(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot test : dataSnapshot.getChildren()){
-                                OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
-                                orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
-                                orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
-                                orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
-                                orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
-                                orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
-                                orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
-
-                                orderKitchenList.add(orderMenuKitchenItemDao);
-                            }
-                            orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
-                            orderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
-                            orderListAdapter.notifyDataSetChanged();
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
-                        }
-                    });
-
+                cookingList = new ArrayList<>();
+                for (DataSnapshot test : dataSnapshot.getChildren()) {
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
+                    orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
+                    orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
+                    orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
+                    orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
+                    orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
+                    orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
+                    orderMenuKitchenItemDao.setSize(test.child("size").getValue(String.class));
+                    cookingList.add(orderMenuKitchenItemDao);
                 }
+                sumListKitchen();
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
+            }
+        });
+
+        Query orderMenuKitchenQuery = orderMenuKitchenDatabase.orderByChild("status").equalTo("in queue");
+        orderMenuKitchenQuery.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                inQueueList = new ArrayList<>();
+                for (DataSnapshot test : dataSnapshot.getChildren()) {
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
+                    orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
+                    orderMenuKitchenItemDao.setSize(test.child("size").getValue(String.class));
+                    orderMenuKitchenItemDao.setOrderId(test.child("orderId").getValue(String.class));
+                    orderMenuKitchenItemDao.setMenuName(test.child("menuName").getValue(String.class));
+                    orderMenuKitchenItemDao.setQuantity(test.child("quantity").getValue(Integer.class));
+                    orderMenuKitchenItemDao.setStatus(test.child("status").getValue(String.class));
+                    orderMenuKitchenItemDao.setOrderKitchenId(test.getKey());
+                    inQueueList.add(orderMenuKitchenItemDao);
                 }
-            });
+                sumListKitchen();
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void sumListKitchen() {
+        orderKitchenList = new ArrayList<>();
+        if (cookingList != null) {
+            for (int i = 0; i <= cookingList.size() - 1; i++)
+                orderKitchenList.add(cookingList.get(i));
         }
-
+        if (inQueueList != null) {
+            for (int i = 0; i <= inQueueList.size() - 1; i++)
+                orderKitchenList.add(inQueueList.get(i));
+        }
+        orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
+        orderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
+        orderListAdapter.notifyDataSetChanged();
+        Log.e("orderKitchenList", orderKitchenList.toString());
+    }
 
     @Override
     public void onStart() {
@@ -203,15 +219,15 @@ public class KitchenFragment extends Fragment implements KitchenOrderDialog.Kitc
         // Save Instance State here
     }
 
-    void setZero(OrderMenuKitchenItemDao orderMenuKitchenItemDao){
-        Map<String,Object> updateZero = new HashMap<>();
-        String path = "order_kitchen/"+orderMenuKitchenItemDao.getOrderKitchenId()+"/status";
-        updateZero.put(path,"Ready to serve");
+    void setZero(OrderMenuKitchenItemDao orderMenuKitchenItemDao) {
+        Map<String, Object> updateZero = new HashMap<>();
+        String path = "order_kitchen/" + orderMenuKitchenItemDao.getOrderKitchenId() + "/status";
+        updateZero.put(path, "Ready to serve");
         DatabaseReference zeroDatabase = UtilDatabase.getDatabase();
         zeroDatabase.updateChildren(updateZero).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                if(!task.isSuccessful()){
+                if (!task.isSuccessful()) {
                     MyUtil.showText("can't set status");
                 }
             }

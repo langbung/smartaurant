@@ -130,7 +130,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
     void checkDialog(int table){
         TableItemDao tableItemDao = tableManager.getTableDao().getTableList().get(pos);
         String title = "Table "+tableItemDao.getTable();
-        String detail = tableItemDao.getTable()+" call waiter";
+        String detail = "Table "+tableItemDao.getTable()+" call waiter";
         YesNoDialog yesNoDialog = YesNoDialog.newInstance(title,detail);
         yesNoDialog.setTargetFragment(StaffCallWaiter.this,123);
         yesNoDialog.show(getFragmentManager(),"callWaiterFragment");

@@ -29,7 +29,6 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
     public void onBtCustomerClicked() {
         Intent intent = new Intent(MenuActivity.this,CustomerTableActivity.class);
         startActivity(intent);
-        finish();
     }
 
     @Override
@@ -48,8 +47,8 @@ public class MenuActivity extends AppCompatActivity implements MenuFragment.Frag
             Bundle bundle = new Bundle();
             bundle.putInt("table",numTable);
             intent.putExtra("bundle",bundle);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-            finish();
         }
     }
 }

@@ -26,6 +26,9 @@
         android:background="@android:color/white"
         android:orientation="vertical">
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:paddingLeft="24dp"
             android:id="@+id/btRevenue"
             android:text="Revenue"
@@ -34,6 +37,9 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"/>
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:id="@+id/btMenuSetting"
             android:paddingLeft="24dp"
             android:text="Menu setting"
@@ -42,6 +48,9 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"/>
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:paddingLeft="24dp"
             android:id="@+id/btStaffManagement"
             android:text="Staff management"
@@ -50,6 +59,9 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"/>
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:paddingLeft="24dp"
             android:id="@+id/btSetting"
             android:text="Setting"
@@ -58,6 +70,9 @@
             android:layout_height="wrap_content"
             android:gravity="left|center_vertical"/>
         <Button
+            android:textAllCaps="false"
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:textSize="@dimen/listview_text_size"
             android:paddingLeft="24dp"
             android:id="@+id/btLogOut"
             android:text="Logout"

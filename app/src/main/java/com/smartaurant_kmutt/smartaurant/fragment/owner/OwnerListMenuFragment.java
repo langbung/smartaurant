@@ -40,7 +40,7 @@ import java.util.Locale;
 import java.util.Map;
 
 @SuppressWarnings("unused")
-public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPopupLogoutClicked {
+public class OwnerListMenuFragment extends Fragment{
     FloatingActionButton btAddMenuFloat;
     GridView lvAllMenu;
     DatabaseReference database;
@@ -51,6 +51,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     String menuPriceCheck;
     int maxMenuId;
     Loading loading = Loading.newInstance();
+
     public OwnerListMenuFragment() {
         super();
     }
@@ -126,6 +127,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
         super.onSaveInstanceState(outState);
         // Save Instance State here
     }
+
     /*
      * Restore Instance State Here
      */
@@ -134,20 +136,12 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
         // Restore Instance State here
     }
 
-    void showText(String text){
-        Toast.makeText(Contextor.getInstance().getContext(),text,Toast.LENGTH_LONG).show();
+    void showText(String text) {
+        Toast.makeText(Contextor.getInstance().getContext(), text, Toast.LENGTH_LONG).show();
     }
 
-
-
-    @Override
-    public void onPopupLogoutClick(String email, String password) {
-        Intent intent = new Intent(getActivity(),MenuActivity.class);
-        startActivity(intent);
-    }
-
-    void setRealTime(){
-        loading.show(getFragmentManager(),"l");
+    void setRealTime() {
+        loading.show(getFragmentManager(), "l");
         DatabaseReference menuDatabase = database.child("menu");
         menuDatabase.addValueEventListener(new ValueEventListener() {
             @Override
@@ -157,7 +151,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
                 // whenever data at this location is updated.
                 ArrayList<MenuItemDao> menuList = new ArrayList<>();
                 MenuListDao menuListDao = new MenuListDao();
-                if(dataSnapshot.getChildrenCount()>0) {
+                if (dataSnapshot.getChildrenCount() > 0) {
                     for (DataSnapshot menuChild : dataSnapshot.getChildren()) {
                         MenuItemDao menuItemDao = menuChild.getValue(MenuItemDao.class);
                         menuList.add(menuItemDao);
@@ -167,8 +161,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
                     menuManager.setMenuDao(menuListDao);
                     menuAdapter.setMenuManager(menuManager);
                     menuAdapter.notifyDataSetChanged();
-                }
-                else{
+                } else {
                     menuListDao.setMenuList(menuList);
                     menuManager.setMenuDao(menuListDao);
                     menuAdapter.setMenuManager(menuManager);
@@ -186,23 +179,21 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     }
 
 
-
-
-    AdapterView.OnItemClickListener onItemClickListener= new AdapterView.OnItemClickListener() {
+    AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             OptionsOwnerMenuDialog optionsOwnerMenuDialog = OptionsOwnerMenuDialog.newInstance(menuManager.getMenuDao().getMenuList().get(position));
-            optionsOwnerMenuDialog.show(getFragmentManager(),"optionsOwnerMenuDialog");
+            optionsOwnerMenuDialog.show(getFragmentManager(), "optionsOwnerMenuDialog");
         }
     };
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(v==btAddMenuFloat){
+            if (v == btAddMenuFloat) {
                 OnOwnerListMenuFragmentListener onOwnerListMenuFragmentListener = (OnOwnerListMenuFragmentListener) getActivity();
-                Bundle bundle  = new Bundle();
-                bundle.putString("title","Add menu");
+                Bundle bundle = new Bundle();
+                bundle.putString("title", "Add menu");
                 onOwnerListMenuFragmentListener.onBtAddMenuFloatClick(bundle);
 //                menuName = etMenuName.getText().toString().trim();
 //                menuPriceText = etMenuPrice.getText().toString().trim();
@@ -215,10 +206,7 @@ public class OwnerListMenuFragment extends Fragment implements PopupLogout.OnPop
     };
 
 
-
-
-
-    public interface OnOwnerListMenuFragmentListener{
+    public interface OnOwnerListMenuFragmentListener {
         void onBtAddMenuFloatClick(Bundle bundle);
     }
 

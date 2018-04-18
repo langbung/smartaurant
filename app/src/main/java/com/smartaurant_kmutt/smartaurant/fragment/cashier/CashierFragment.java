@@ -487,6 +487,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
             String path = "table/" + tableId + "/";
             Map<String, Object> updateTable = new HashMap<>();
             updateTable.put(path + "availableTable", true);
+            updateTable.put(path + "availableToCallWaiter", true);
             updateTable.put(path + "availableCheckBill", true);
             updateTable.put(path + "orderId", "none");
             DatabaseReference tableDatabase = UtilDatabase.getDatabase();

@@ -1,9 +1,11 @@
 package com.smartaurant_kmutt.smartaurant.activity.customer;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -31,7 +33,8 @@ import java.util.Map;
 
 public class CustomerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
         , OrderDialogFragment.OnOrderDialogListener
-        ,CustomerCategoryFragment.CustomerCategoryFragmentListener {
+        , CustomerCategoryFragment.CustomerCategoryFragmentListener
+        , CustomerFragment.CustomerFragmentListener {
     int numTable;
     Button btLogOut;
     private OrderItemDao orderItemDao;
@@ -89,39 +92,11 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
 
 
     @Override
-    public void onPopupLogoutClick(String email, String password) {
-        writUserOut(false);
-        if (orderItemDao != null) {
-            increaseMaxOrderId();
-        } else {
+    public void onPopupLogoutClick(String staffRole) {
+        if (!staffRole.equals("none")) {
+            writUserOut(false);
             exitToMenuActivity();
         }
-    }
-
-    void increaseMaxOrderId() {
-        DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
-        maxOrderDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                int maxOrderId = dataSnapshot.getValue(Integer.class);
-                DatabaseReference maxOrderDatabase = UtilDatabase.getUtilDatabase().child("maxOrderId");
-                maxOrderDatabase.setValue(maxOrderId + 1).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()) {
-                            Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
-                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                            startActivity(intent);
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
     }
 
     void exitToMenuActivity() {
@@ -135,29 +110,36 @@ public class CustomerActivity extends AppCompatActivity implements PopupLogout.O
     }
 
     @Override
-    public void onOrderClick(Bundle bundle,int requestCode) {
+    public void onOrderClick(Bundle bundle, int requestCode) {
     }
 
     @Override
     public void onClickCategoryButtonCustomerCategoryFragment(Bundle bundle) {
-        Intent intent = new Intent(CustomerActivity.this,CustomerMenuActivity.class);
-        intent.putExtra("bundle",bundle);
-        startActivityForResult(intent,1);
+        Intent intent = new Intent(CustomerActivity.this, CustomerMenuActivity.class);
+        intent.putExtra("bundle", bundle);
+        startActivityForResult(intent, 1);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode==1){
-            if(resultCode==RESULT_OK){
+        if (requestCode == 1) {
+            if (resultCode == RESULT_OK) {
                 Bundle bundle = data.getBundleExtra("bundle");
-                OrderItemDao orderItemDao = bundle.getParcelable("orderItemDao");
+                orderItemDao = bundle.getParcelable("orderItemDao");
 //                Log.e("CustomerAct",orderItemDao.getDateTime().toString());
-                Map<String,String> date = orderItemDao.getDateTime();
+                Map<String, String> date = orderItemDao.getDateTime();
 //                Log.e("CustomerAct",date.toString());
-                CustomerFragment customerFragment= (CustomerFragment) getSupportFragmentManager().findFragmentById(R.id.contentContainer);
+                CustomerFragment customerFragment = (CustomerFragment) getSupportFragmentManager().findFragmentById(R.id.contentContainer);
                 customerFragment.setOrderItemDao(orderItemDao);
             }
         }
+    }
+
+    @Override
+    public void onPaidInCustomerFragment() {
+        Intent intent = new Intent(CustomerActivity.this, MenuActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
     }
 }

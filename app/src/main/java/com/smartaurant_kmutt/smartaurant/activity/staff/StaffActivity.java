@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.activity.staff;
 
+import android.content.Intent;
 import android.content.res.Configuration;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.DrawerLayout;
@@ -12,9 +13,12 @@ import android.view.View;
 import android.widget.Button;
 
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.MenuActivity;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.staff.StaffFragment;
 
-public class StaffActivity extends AppCompatActivity {
+public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnPopupLogoutClicked  {
     Button btCheckOrder;
     Button btMenuSetting;
     Button btLogOut;
@@ -49,6 +53,7 @@ public class StaffActivity extends AppCompatActivity {
         btLogOut.setOnClickListener(buttonOnClickListener);
         btCustomerCall = findViewById(R.id.btCustomerCall);
         btCustomerCall.setOnClickListener(buttonOnClickListener);
+
 
     }
 
@@ -99,6 +104,15 @@ public class StaffActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onPopupLogoutClick(String staffRole) {
+        if (!staffRole.equals("none")) {
+            Intent intent = new Intent(StaffActivity.this, MenuActivity.class);
+            startActivity(intent);
+            finish();
+        }
+    }
+
     View.OnClickListener buttonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -114,6 +128,15 @@ public class StaffActivity extends AppCompatActivity {
                 setCurrentPageInViewPager(1);
                 drawerLayout.closeDrawers();
             }
+            if (v == btLogOut) {
+                PopupLogout popupLogout = new PopupLogout();
+                popupLogout.show(getSupportFragmentManager(), "popup");
+            }
         }
     };
+
+    @Override
+    public void onBackPressed() {
+//        super.onBackPressed();
+    }
 }

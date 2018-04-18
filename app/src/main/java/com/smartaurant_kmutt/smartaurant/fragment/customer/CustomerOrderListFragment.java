@@ -44,7 +44,7 @@ import java.util.Map;
  * Created by nuuneoi on 11/16/2014.
  */
 @SuppressWarnings("unused")
-public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
+public class CustomerOrderListFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
     OrderItemDao orderItemDao;
     ListView lvOrder;
     TextView tvTotal;
@@ -64,6 +64,7 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
     Button btPay;
     final int DELETE_MENU_REQUEST_CODE = 1;
     final int CALL_PAY_REQUEST_CODE = 2;
+    int countChild;
 
     public CustomerOrderListFragment() {
         super();
@@ -141,10 +142,10 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
         initButton(rootView);
         initLoading();
         Voucher voucher = new Voucher();
-        String voucherCode=voucher.getVoucher(100,7);
-        MyUtil.print("voucherCode = "+voucherCode);
-        String sale = voucher.decryptVoucher(voucherCode)+"";
-        MyUtil.print("sale = "+sale);
+        String voucherCode = voucher.getVoucher(100, 7);
+        MyUtil.print("voucherCode = " + voucherCode);
+        String sale = voucher.decryptVoucher(voucherCode) + "";
+        MyUtil.print("sale = " + sale);
 
     }
 
@@ -195,7 +196,6 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
         });
     }
 
-
     void setOrderRealTime() {
 
         if (orderItemDao != null) {
@@ -205,8 +205,8 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
             valueEventListener = orderListQuery.addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    countQuery++;
-                    Log.e("set order real time", "queried " + dataSnapshot.toString());
+//                    countQuery++;
+//                    Log.e("set order real time", "queried " + dataSnapshot.toString());
 
 //                    MyUtil.showText(dataSnapshot.toString());
 //                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
@@ -217,6 +217,7 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
                         countDatabase = 0;
                         total = 0;
                         orderKitchenList = new ArrayList<>();
+                        countChild = (int) dataSnapshot.getChildrenCount();
                         for (DataSnapshot test : dataSnapshot.getChildren()) {
                             OrderMenuKitchenItemDao orderMenuKitchenItemDao = new OrderMenuKitchenItemDao();
                             orderMenuKitchenItemDao.setNote(test.child("note").getValue(String.class));
@@ -247,34 +248,60 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
 //                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
                                     total += orderKitchenList.get(countDatabase).getPrice();
 //                                    double vat = dataSnapshot.getValue(Double.class);
-                                    double vat;
-                                    vat = total * (1 + 7.0 / 100.0);
-//                                    Log.e("test vat",vat+"");
-                                    String textTotal = String.format(Locale.ENGLISH, "%.2f", vat);
-                                    tvTotal.setText(textTotal);
-                                    orderItemDao.setTotal(total);
+
                                     countDatabase++;
-                                    orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
-                                    customerOrderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
-                                    customerOrderListAdapter.notifyDataSetChanged();
 
-                                    DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase().child("vat");
-                                    vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            double vat = dataSnapshot.getValue(double.class);
-                                            vat = total * (1 + vat / 100.0);
-                                            String textTotal = String.format(Locale.ENGLISH, "%.2f", vat);
-                                            tvTotal.setText(textTotal);
-                                            setTotalToDatabase(vat);
-                                        }
+                                    if (countDatabase == countChild) {
+                                        DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase();
+                                        vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                double vat = dataSnapshot.child("vat").getValue(double.class);
+                                                customerOrderListAdapter.setVat((float) vat);
+                                                float vatValue = (float) (total * vat / 100.0);
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            MyUtil.showText("can't get vat.");
-                                        }
-                                    });
+                                                String vatValueText = String.format(Locale.ENGLISH, "%.2f", vatValue);
+                                                customerOrderListAdapter.setVatValue(Float.parseFloat(vatValueText));
+                                                total = (float) (total * (1 + vat / 100.0));
+                                                Log.e("total", total + "");
 
+                                                DataSnapshot discounts = dataSnapshot.child("discount");
+                                                ArrayList<Float> keyDiscounts = new ArrayList<>();
+                                                ArrayList<Integer> valueDiscounts = new ArrayList<>();
+
+                                                for (DataSnapshot discount : discounts.getChildren()) {
+                                                    keyDiscounts.add(Float.parseFloat(discount.getKey()));
+                                                    valueDiscounts.add(discount.getValue(Integer.class));
+                                                }
+
+                                                String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                                tvTotal.setText(textTotal);
+
+                                                for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
+                                                    if (total > keyDiscounts.get(i)) {
+                                                        customerOrderListAdapter.setCheckDiscount(true);
+                                                        String discountVal = String.format(Locale.ENGLISH, "%.2f", (float) (total * valueDiscounts.get(i) / 100.0));
+                                                        String discountCon = String.format(Locale.ENGLISH, "%.0f", keyDiscounts.get(i));
+                                                        customerOrderListAdapter.setDiscountCondition(Integer.parseInt(discountCon));
+                                                        customerOrderListAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
+//                                                            Log.e("discountCon",discountCon);
+                                                        total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
+                                                        textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                                        tvTotal.setText(textTotal);
+                                                        break;
+                                                    }
+                                                }
+                                                orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);
+                                                customerOrderListAdapter.setOrderMenuKitchenManager(orderMenuKitchenManager);
+                                                customerOrderListAdapter.notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+                                                MyUtil.showText("can't get vat.");
+                                            }
+                                        });
+                                    }
 //                                    Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
                                 }
 
@@ -366,7 +393,7 @@ public class  CustomerOrderListFragment extends Fragment implements YesNoDialog.
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
                     if (task.isSuccessful()) {
-                        String btPayText = (payStatus)?"Cancel pay":"Pay";
+                        String btPayText = (payStatus) ? "Cancel pay" : "Pay";
                         btPay.setText(btPayText);
                         loading.dismiss();
                     }

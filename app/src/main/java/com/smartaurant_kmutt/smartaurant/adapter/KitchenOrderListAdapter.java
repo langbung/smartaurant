@@ -75,8 +75,6 @@ public class KitchenOrderListAdapter extends BaseAdapter {
         else
             item.setBackground();
 
-
-
         return item;
     }
 
