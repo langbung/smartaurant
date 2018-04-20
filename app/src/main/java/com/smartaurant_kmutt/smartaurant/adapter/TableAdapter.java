@@ -64,6 +64,10 @@ public class TableAdapter extends BaseAdapter {
                 item.setBackground("#55555555");
 
         } else if (mode == MODE_STAFF) {
+            if(tableItemDao.isAvailableToCallWaiter())
+                item.setCallWaiter(!tableItemDao.isAvailableToCallWaiter());
+            else
+                item.setCallWaiter(!tableItemDao.isAvailableToCallWaiter());
             if (tableItemDao.isAvailableTable())
                 item.setBackground("#55555555");
             else
@@ -80,6 +84,7 @@ public class TableAdapter extends BaseAdapter {
             }
 
         } else if (mode == MODE_STAFF_CALL_WAITER) {
+
             if (tableItemDao.isAvailableToCallWaiter())
                 item.setBackground("#55555555");
             else

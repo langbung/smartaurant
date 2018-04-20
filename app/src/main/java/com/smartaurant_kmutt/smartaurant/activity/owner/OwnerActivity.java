@@ -21,6 +21,7 @@ import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueListFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerVoucherFragment;
 
 public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked
         , OwnerListMenuFragment.OnOwnerListMenuFragmentListener
@@ -33,6 +34,7 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
     Button btStaffManagement;
     Button btLogout;
     Button btSetting;
+    Button btVoucher;
     android.support.v7.widget.Toolbar toolbar;
     ActionBarDrawerToggle actionBarDrawerToggle;
     FrameLayout loading;
@@ -77,12 +79,14 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
         btStaffManagement = findViewById(R.id.btStaffManagement);
         btLogout = findViewById(R.id.btLogOut);
         btSetting = findViewById(R.id.btSetting);
+        btVoucher = findViewById(R.id.btVoucher);
 
         btLogout.setOnClickListener(onClickListener);
         btRevenue.setOnClickListener(onClickListener);
         btMenuSetting.setOnClickListener(onClickListener);
         btStaffManagement.setOnClickListener(onClickListener);
         btSetting.setOnClickListener(onClickListener);
+        btVoucher.setOnClickListener(onClickListener);
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {
@@ -105,6 +109,10 @@ public class OwnerActivity extends AppCompatActivity implements PopupLogout.OnPo
                 getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerSettingFragment.newInstance()).commit();
                 drawerLayout.closeDrawers();
 
+            }
+            else if (v == btVoucher) {
+                getSupportFragmentManager().beginTransaction().replace(R.id.contentContainer, OwnerVoucherFragment.newInstance()).commit();
+                drawerLayout.closeDrawers();
             }
             if (v == btLogout) {
                 PopupLogout popupLogout = new PopupLogout();

@@ -14,5 +14,22 @@
         android:id="@+id/tvTableText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+    <LinearLayout
+        android:padding="15dp"
+        android:gravity="right|bottom"
+        android:weightSum="4"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <ImageView
+            android:id="@+id/ivCallWaiter"
+            android:visibility="invisible"
+            android:layout_weight="1"
+            android:adjustViewBounds="true"
+            android:src="@drawable/loud"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
 
 </RelativeLayout>

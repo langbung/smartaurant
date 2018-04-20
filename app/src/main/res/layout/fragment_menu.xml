@@ -11,6 +11,8 @@
         android:orientation="vertical" >
 
         <Button
+            android:textSize="@dimen/listview_text_size"
+            android:textAllCaps="false"
             android:id="@+id/btCustomer"
             android:textColor="@color/textColor"
             android:layout_width="200dp"
@@ -21,6 +23,8 @@
             android:background="@drawable/selector_button"/>
 
         <Button
+            android:textSize="@dimen/listview_text_size"
+            android:textAllCaps="false"
             android:id="@+id/btStaff"
             android:textColor="@color/textColor"
             android:layout_width="200dp"

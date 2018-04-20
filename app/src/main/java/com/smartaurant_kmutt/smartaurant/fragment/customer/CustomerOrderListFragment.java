@@ -141,12 +141,6 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
         initTextView(rootView);
         initButton(rootView);
         initLoading();
-        Voucher voucher = new Voucher();
-        String voucherCode = voucher.getVoucher(100, 7);
-        MyUtil.print("voucherCode = " + voucherCode);
-        String sale = voucher.decryptVoucher(voucherCode) + "";
-        MyUtil.print("sale = " + sale);
-
     }
 
     private void initLoading() {
@@ -186,11 +180,13 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 pos = position;
-                OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
-                if (orderMenuKitchenItemDao.getStatus().equals("in queue")) {
-                    YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName());
-                    yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, DELETE_MENU_REQUEST_CODE);
-                    yesNoDialog.show(getFragmentManager(), "cancelMenu");
+                if (position < orderMenuKitchenManager.getOrderMenuKitchenDao().size()) {
+                    OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
+                    if (orderMenuKitchenItemDao.getStatus().equals("in queue")) {
+                        YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName());
+                        yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, DELETE_MENU_REQUEST_CODE);
+                        yesNoDialog.show(getFragmentManager(), "cancelMenu");
+                    }
                 }
             }
         });
@@ -276,7 +272,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
 
                                                 String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
                                                 tvTotal.setText(textTotal);
-
+                                                setTotalToDatabase(Float.parseFloat(textTotal));
                                                 for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
                                                     if (total > keyDiscounts.get(i)) {
                                                         customerOrderListAdapter.setCheckDiscount(true);
@@ -288,6 +284,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                                         total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
                                                         textTotal = String.format(Locale.ENGLISH, "%.2f", total);
                                                         tvTotal.setText(textTotal);
+                                                        setTotalToDatabase(total);
                                                         break;
                                                     }
                                                 }

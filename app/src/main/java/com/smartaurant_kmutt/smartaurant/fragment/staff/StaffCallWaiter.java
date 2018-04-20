@@ -165,17 +165,7 @@ public class StaffCallWaiter extends Fragment implements YesNoDialog.OnYesNoDial
 
     @Override
     public void onYesButtonClickInYesNODialog(Bundle bundle,int requestCode) {
-        TableItemDao tableItemDao = tableManager.getTableDao().getTableList().get(pos);
-        String tableId= String.format(Locale.ENGLISH,"TB%03d",tableItemDao.getTable());
-        DatabaseReference table = UtilDatabase.getDatabase().child("table/"+tableId+"/availableToCallWaiter");
-        table.setValue(true).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if(!task.isSuccessful()){
-                    MyUtil.showText("can't set to normal");
-                }
-            }
-        });
+
     }
 
     @Override

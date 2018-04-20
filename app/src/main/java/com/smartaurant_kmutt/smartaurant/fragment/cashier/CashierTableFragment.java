@@ -36,6 +36,7 @@ public class CashierTableFragment extends Fragment {
     TableAdapter tableAdapter;
     TableManager tableManager;
     DatabaseReference tableDatabase;
+
     public CashierTableFragment() {
         super();
     }
@@ -88,9 +89,8 @@ public class CashierTableFragment extends Fragment {
     private void initToolbar(View rootView) {
         toolbar = rootView.findViewById(R.id.toolbar);
         toolbar.setTitle("Cashier");
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
     }
-
 
 
     @Override
@@ -120,13 +120,13 @@ public class CashierTableFragment extends Fragment {
         // Restore Instance State here
     }
 
-    private void setTableDatabaseRealTime(){
+    private void setTableDatabaseRealTime() {
         tableDatabase = UtilDatabase.getDatabase().child("table");
         tableDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot listTable) {
                 ArrayList<TableItemDao> tableListDao = new ArrayList<>();
-                for(DataSnapshot tableItemRetrieve:listTable.getChildren()){
+                for (DataSnapshot tableItemRetrieve : listTable.getChildren()) {
                     TableItemDao tableItemDao = tableItemRetrieve.getValue(TableItemDao.class);
                     tableListDao.add(tableItemDao);
                 }
@@ -148,16 +148,19 @@ public class CashierTableFragment extends Fragment {
     AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            CashierTableFragmentListener cashierTableFragmentListener = (CashierTableFragmentListener) getActivity();
-            int tableNum=position+1;
-            Bundle bundle = new Bundle();
-            bundle.putInt("table",position+1);
-            cashierTableFragmentListener.onTableItemClickInCashierTableFragment(bundle);
+            TableItemDao tableItemDao = tableManager.getTableDao().getTableList().get(position);
+            if (!tableItemDao.isAvailableTable()) {
+                CashierTableFragmentListener cashierTableFragmentListener = (CashierTableFragmentListener) getActivity();
+                int tableNum = position + 1;
+                Bundle bundle = new Bundle();
+                bundle.putInt("table", position + 1);
+                cashierTableFragmentListener.onTableItemClickInCashierTableFragment(bundle);
+            }
         }
     };
 
     public interface CashierTableFragmentListener {
-       void onTableItemClickInCashierTableFragment(Bundle bundle);
+        void onTableItemClickInCashierTableFragment(Bundle bundle);
     }
 
 }

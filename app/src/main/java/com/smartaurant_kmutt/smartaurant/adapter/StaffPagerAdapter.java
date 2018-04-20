@@ -18,22 +18,19 @@ public class StaffPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 2;
     }
 
     @Override
     public android.support.v4.app.Fragment getItem(int position) {
-        switch (position){
-            case 0:{
-                return StaffCallWaiter.newInstance();
-            }
-            case 1:{
-
+        switch (position) {
+            case 0: {
                 return StaffTableCheckOrderFragment.newInstance();
             }
-            case 2:{
+            case 1: {
                 return StaffMenuSettingFragment.newInstance();
             }
+
             default:
                 return null;
         }

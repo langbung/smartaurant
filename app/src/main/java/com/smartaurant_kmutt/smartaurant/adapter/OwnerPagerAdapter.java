@@ -7,6 +7,7 @@ import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerListMenuFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerRevenueListFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerSettingFragment;
 import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerStaffManagementFragment;
+import com.smartaurant_kmutt.smartaurant.fragment.owner.OwnerVoucherFragment;
 
 /**
  * Created by LB on 19/2/2561.
@@ -20,7 +21,7 @@ public class OwnerPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -38,6 +39,9 @@ public class OwnerPagerAdapter extends FragmentStatePagerAdapter {
             }
             case 3:{
                 return OwnerSettingFragment.newInstance();
+            }
+            case 4:{
+                return OwnerVoucherFragment.newInstance();
             }
 
             default:

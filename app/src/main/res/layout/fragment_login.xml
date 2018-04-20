@@ -22,7 +22,7 @@
         android:visibility="invisible" />
 
     <EditText
-        android:textSize="@dimen/listview_text_size"
+        android:textSize="30sp"
         android:focusable="false"
         android:id="@+id/etPassword"
         android:layout_width="240dp"
@@ -149,7 +149,7 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:backgroundTint="@color/colorPrimary"
-                android:text="back"
+                android:text="Back"
                 android:textAllCaps="false"
                 android:textSize="@dimen/button_cashier_text_size"
                 android:theme="@style/ThemeOverlay.AppCompat.Dark"

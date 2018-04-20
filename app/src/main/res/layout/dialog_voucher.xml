@@ -23,6 +23,7 @@
         android:padding="20dp">
 
         <EditText
+            android:textSize="@dimen/listview_text_size"
             android:id="@+id/etVoucher"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -30,6 +31,7 @@
             android:inputType="text" />
 
         <Button
+            android:textSize="@dimen/listview_text_size"
             android:textAllCaps="false"
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
             android:id="@+id/btSubmit"

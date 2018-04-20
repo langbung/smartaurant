@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.fragment.cashier;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -23,6 +24,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierActivity;
 import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
@@ -58,7 +60,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     OrderMenuKitchenItemDao orderMenuItem;
     ArrayList<OrderMenuKitchenItemDao> orderKitchenList;
     double vat;
-
+    CashierActivity cashierActivity;
     int sale;
     float total;
     long posNum;
@@ -163,6 +165,12 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
         btBack.setOnClickListener(onCashierButtonClick);
         btPay.setOnClickListener(onCashierButtonClick);
         btVoucher.setOnClickListener(onCashierButtonClick);
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        cashierActivity =(CashierActivity) getActivity();
     }
 
     private void initToolbar(View rootView) {
@@ -377,9 +385,9 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     }
 
     void startCashierActivity() {
-        Intent intent = new Intent(getActivity(), CashierTableActivity.class);
+        Intent intent = new Intent(cashierActivity, CashierTableActivity.class);
         startActivity(intent);
-        getActivity().finish();
+        cashierActivity.finish();
     }
 
     View.OnClickListener onCashierButtonClick = new View.OnClickListener() {
@@ -464,10 +472,10 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
                 String changeText = String.format(Locale.ENGLISH, "%.2f", change);
                 YesNoDialog yesNoDialog;
                 if (change < 0) {
-                    yesNoDialog = YesNoDialog.newInstance("Exchange", "Check total.");
+                    yesNoDialog = YesNoDialog.newInstance("Change", "Check total.","Check","Cancel");
                     yesNoDialog.setTargetFragment(CashierFragment.this, ERROR_REQUEST_CODE);
                 } else {
-                    yesNoDialog = YesNoDialog.newInstance("Exchange", "Change " + changeText + " bath.");
+                    yesNoDialog = YesNoDialog.newInstance("Change", "Change " + changeText + " bath." ,"OK and exit","Cancel");
                     yesNoDialog.setTargetFragment(CashierFragment.this, OK_REQUEST_CODE);
                 }
                 yesNoDialog.show(getFragmentManager(), "exchange");
@@ -537,7 +545,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     @Override
     public void onSubmitButtonClickInVoucherCashierDialog(int sale, int requestCode) {
         if (sale == DialogCashierVoucher.VOUCHER_USED) {
-            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Voucher", "Voucher is used");
+            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Voucher", "Voucher is already used");
             yesNoDialog.setTargetFragment(CashierFragment.this, VOUCHER_ERROR_REQUEST_CODE);
             yesNoDialog.show(getFragmentManager(), "voucherError");
         } else if (sale == DialogCashierVoucher.VOUCHER_ERROR) {

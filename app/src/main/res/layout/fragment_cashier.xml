@@ -180,6 +180,7 @@
                     grid:layout_gravity="fill_horizontal"
                     grid:layout_rowWeight="1" />
                 <Button
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
                     android:backgroundTint="@color/material_blue_500"
                     android:id="@+id/btVoucher"
                     android:layout_width="0dp"
@@ -196,7 +197,7 @@
                     android:layout_width="0dp"
                     android:layout_height="0dp"
                     android:backgroundTint="@color/colorPrimary"
-                    android:text="back"
+                    android:text="Back"
                     android:textAllCaps="false"
                     android:textSize="@dimen/button_cashier_text_size"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark"

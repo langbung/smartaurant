@@ -25,6 +25,7 @@ public class StaffFragment extends Fragment {
     android.support.v7.widget.Toolbar toolbar;
     ViewPager viewPager;
     StaffPagerAdapter staffPagerAdapter;
+
     public StaffFragment() {
         super();
     }
@@ -33,7 +34,7 @@ public class StaffFragment extends Fragment {
     public static StaffFragment newInstance(Bundle bundle) {
         StaffFragment fragment = new StaffFragment();
         Bundle args = new Bundle();
-        args.putBundle("bundle",bundle);
+        args.putBundle("bundle", bundle);
         fragment.setArguments(args);
         return fragment;
     }
@@ -41,8 +42,8 @@ public class StaffFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        currentPage = getArguments().getBundle("bundle").getInt("currentPage",-1);
-        title = getArguments().getBundle("bundle").getString("title","no title");
+        currentPage = getArguments().getBundle("bundle").getInt("currentPage", -1);
+        title = getArguments().getBundle("bundle").getString("title", "no title");
         init(savedInstanceState);
         if (savedInstanceState != null)
             onRestoreInstanceState(savedInstanceState);
@@ -64,12 +65,11 @@ public class StaffFragment extends Fragment {
     private void initInstances(View rootView, Bundle savedInstanceState) {
         // Init 'View' instance(s) with rootView.findViewById here
         initViewPager(rootView);
-        if(title.equals("no title"))
-            getActivity().setTitle("Customer call");
+        if (title.equals("no title"))
+            getActivity().setTitle("Customer detail");
         else
             getActivity().setTitle(title);
     }
-
 
 
     private void initViewPager(View rootView) {
@@ -84,11 +84,12 @@ public class StaffFragment extends Fragment {
 
             @Override
             public void onPageSelected(int position) {
-                if(position==0)
-                    getActivity().setTitle("Customer call");
-                else if(position==1)
-                    getActivity().setTitle("Check order");
-                else if(position==2)
+//                if(position==0)
+//                    getActivity().setTitle("Customer call");
+//                else
+                if (position == 0)
+                    getActivity().setTitle("Customer detail");
+                else if (position == 1)
                     getActivity().setTitle("Menu setting");
             }
 
@@ -97,7 +98,7 @@ public class StaffFragment extends Fragment {
 
             }
         });
-        if(currentPage!=-1)
+        if (currentPage != -1)
             viewPager.setCurrentItem(currentPage);
 //        MyUtil.showText(title);
     }

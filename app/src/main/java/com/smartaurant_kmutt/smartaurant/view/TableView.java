@@ -21,6 +21,7 @@ public class TableView extends BaseCustomViewGroup {
 
     TextView tvTableText;
     ImageView imageView;
+    ImageView ivCallWaiter;
 
     public TableView(Context context) {
         super(context);
@@ -56,8 +57,9 @@ public class TableView extends BaseCustomViewGroup {
 
     private void initInstances() {
         // findViewById here
-        tvTableText = (TextView)findViewById(R.id.tvTableText);
-        imageView = (ImageView) findViewById(R.id.imageView);
+        tvTableText = findViewById(R.id.tvTableText);
+        imageView =  findViewById(R.id.imageView);
+        ivCallWaiter = findViewById(R.id.ivCallWaiter);
     }
 
     private void initWithAttrs(AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -118,6 +120,12 @@ public class TableView extends BaseCustomViewGroup {
 
     public void setBackground(String color){
         imageView.setBackgroundColor(Color.parseColor(color));
+    }
+    public void setCallWaiter(boolean isCallWaiter){
+        if(isCallWaiter)
+            ivCallWaiter.setVisibility(VISIBLE);
+        else
+            ivCallWaiter.setVisibility(INVISIBLE);
     }
 
 }

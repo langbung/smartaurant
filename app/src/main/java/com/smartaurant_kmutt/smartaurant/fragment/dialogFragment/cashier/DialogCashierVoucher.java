@@ -14,7 +14,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
+import com.smartaurant_kmutt.smartaurant.dao.VoucherItem;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
+import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 import com.smartaurant_kmutt.smartaurant.util.Voucher;
@@ -33,7 +35,7 @@ public class DialogCashierVoucher extends android.support.v4.app.DialogFragment 
     public static final int VOUCHER_USED = -10;
     public static final int VOUCHER_ERROR = -3;
     int sale = -3;
-    int check = -2;
+    Loading loading = Loading.newInstance();
 
     public static DialogCashierVoucher newInstance() {
         DialogCashierVoucher dialogCashierVoucher = new DialogCashierVoucher();
@@ -65,43 +67,41 @@ public class DialogCashierVoucher extends android.support.v4.app.DialogFragment 
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
+            loading.show(getFragmentManager(),"l");
             voucherCode = etVoucher.getText().toString();
             if (!voucherCode.equals("")) {
                 Voucher voucher = new Voucher();
-                check = voucher.decryptVoucher(voucherCode);
-                if (check > 0) {
-                    DatabaseReference voucherDatabase = UtilDatabase.getDatabase().child("voucher/" + voucherCode);
-                    voucherDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if (!dataSnapshot.exists()) {
-                                Map<String, Object> updateVoucher = new HashMap<>();
-                                updateVoucher.put(voucherCode, true);
-                                DatabaseReference voucherDatabase = UtilDatabase.getDatabase().child("voucher");
-                                voucherDatabase.updateChildren(updateVoucher);
-                                sale = check;
-                                VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
-                                voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
-                                dismiss();
-                            } else {
-                                sale=VOUCHER_USED;
-                                VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
-                                voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
-                                dismiss();
-                            }
-                        }
+//                check = voucherCode;
+                voucher.checkVoucherCode(voucherCode, new Voucher.VoucherListener() {
+                    @Override
+                    public void onGetVoucher(VoucherItem voucherItem) {
+                        loading.dismiss();
+                        if (!voucherItem.isAlreadyUsed()) {
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-
+                            sale = voucherItem.getDiscount();
+                            DatabaseReference databaseReference = UtilDatabase.getDatabase().child("voucher/" + voucherItem.getId() + "/alreadyUsed");
+                            databaseReference.setValue(true);
+                            VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
+                            voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
+                            dismiss();
+                        } else {
+                            sale = VOUCHER_USED;
+                            VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
+                            voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
+                            dismiss();
                         }
-                    });
-                } else {
-                    sale=VOUCHER_ERROR;
-                    VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
-                    voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
-                    dismiss();
-                }
+                    }
+
+                    @Override
+                    public void onNoVoucher() {
+                        loading.dismiss();
+                        sale = VOUCHER_ERROR;
+                        VoucherCashierDialogListener voucherCashierDialogListener = (VoucherCashierDialogListener) getTargetFragment();
+                        voucherCashierDialogListener.onSubmitButtonClickInVoucherCashierDialog(sale, getTargetRequestCode());
+                        dismiss();
+                    }
+                });
+
             }
         }
     };

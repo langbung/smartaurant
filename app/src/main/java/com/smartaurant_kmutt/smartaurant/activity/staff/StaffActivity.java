@@ -18,7 +18,7 @@ import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.PopupLogout;
 import com.smartaurant_kmutt.smartaurant.fragment.staff.StaffFragment;
 
-public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnPopupLogoutClicked  {
+public class StaffActivity extends AppCompatActivity implements PopupLogout.OnPopupLogoutClicked {
     Button btCheckOrder;
     Button btMenuSetting;
     Button btLogOut;
@@ -26,13 +26,14 @@ public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnP
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     ActionBarDrawerToggle actionBarDrawerToggle;
+
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_staff);
         initInstance();
-        if(savedInstanceState==null){
+        if (savedInstanceState == null) {
             Bundle bundle = new Bundle();
             getSupportFragmentManager().beginTransaction().add(R.id.contentContainer, StaffFragment.newInstance(bundle)).commit();
         }
@@ -65,23 +66,24 @@ public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnP
 
     private void initDrawerLayout() {
         drawerLayout = findViewById(R.id.drawerLayout);
-        actionBarDrawerToggle = new ActionBarDrawerToggle(StaffActivity.this,drawerLayout,R.string.open_drawer,R.string.close_drawer);
+        actionBarDrawerToggle = new ActionBarDrawerToggle(StaffActivity.this, drawerLayout, R.string.open_drawer, R.string.close_drawer);
         drawerLayout.addDrawerListener(actionBarDrawerToggle);
         getSupportActionBar().setHomeButtonEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
-    void setCurrentPageInViewPager(int currentPage){
+    void setCurrentPageInViewPager(int currentPage) {
         Bundle bundle = new Bundle();
-        bundle.putInt("currentPage",currentPage);
-        if(currentPage==0)
-            bundle.putString("title","Customer call");
-        else if(currentPage==1)
-            bundle.putString("title","Check order");
-        else if(currentPage==2)
-            bundle.putString("title","Menu setting");
+        bundle.putInt("currentPage", currentPage);
+//        if(currentPage==0)
+//            bundle.putString("title","Customer call");
+//        else
+        if (currentPage == 0)
+            bundle.putString("title", "Customer detail");
+        else if (currentPage == 1)
+            bundle.putString("title", "Menu setting");
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.contentContainer,StaffFragment.newInstance(bundle))
+                .replace(R.id.contentContainer, StaffFragment.newInstance(bundle))
                 .commit();
     }
 
@@ -99,7 +101,7 @@ public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnP
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        if(actionBarDrawerToggle.onOptionsItemSelected(item))
+        if (actionBarDrawerToggle.onOptionsItemSelected(item))
             return true;
         return super.onOptionsItemSelected(item);
     }
@@ -116,16 +118,16 @@ public class StaffActivity extends AppCompatActivity implements  PopupLogout.OnP
     View.OnClickListener buttonOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if(v== btCheckOrder){
-                setCurrentPageInViewPager(0);
-                drawerLayout.closeDrawers();
-            }
-            else if(v==btMenuSetting){
-                setCurrentPageInViewPager(2);
-                drawerLayout.closeDrawers();
-            }
-            else if(v==btCustomerCall){
+//            if(v== btCheckOrder){
+//                setCurrentPageInViewPager(0);
+//                drawerLayout.closeDrawers();
+//            }
+//            else
+            if (v == btMenuSetting) {
                 setCurrentPageInViewPager(1);
+                drawerLayout.closeDrawers();
+            } else if (v == btCustomerCall) {
+                setCurrentPageInViewPager(0);
                 drawerLayout.closeDrawers();
             }
             if (v == btLogOut) {

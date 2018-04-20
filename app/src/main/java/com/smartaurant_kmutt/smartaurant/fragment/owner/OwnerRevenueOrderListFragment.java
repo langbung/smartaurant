@@ -1,5 +1,6 @@
 package com.smartaurant_kmutt.smartaurant.fragment.owner;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -23,6 +24,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
+import com.smartaurant_kmutt.smartaurant.activity.owner.OwnerActivity;
+import com.smartaurant_kmutt.smartaurant.activity.owner.OwnerDetailOrderListActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
@@ -40,7 +43,7 @@ import java.util.Map;
 
 
 @SuppressWarnings("unused")
-public class OwnerRevenueOrderListFragment extends Fragment {
+public class OwnerRevenueOrderListFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener {
     TextView tvOrderId;
     TextView tvTime;
     TextView tvTable;
@@ -59,6 +62,7 @@ public class OwnerRevenueOrderListFragment extends Fragment {
     OrderMenuKitchenManager orderMenuManager;
     CustomerOrderListAdapter orderMenuAdapter;
     int countChild;
+    OwnerDetailOrderListActivity activity;
 
     public OwnerRevenueOrderListFragment() {
         super();
@@ -139,6 +143,11 @@ public class OwnerRevenueOrderListFragment extends Fragment {
 
     }
 
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        activity = (OwnerDetailOrderListActivity) getActivity();
+    }
 
     private void initToolbar(View rootView) {
         toolbar = rootView.findViewById(R.id.toolbar);
@@ -202,70 +211,78 @@ public class OwnerRevenueOrderListFragment extends Fragment {
                             @Override
                             public void onDataChange(DataSnapshot menuItemDatabase) {
                                 MenuItemDao menuItem = menuItemDatabase.getValue(MenuItemDao.class);
-                                String size = orderKitchenList.get(countDatabase).getSize();
-                                float price = getRealPrice(menuItem.getPrice(), size);
-                                price = price * (1 - menuItem.getPromotion() / 100);
-                                orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
+                                if (menuItem == null || menuItem.getName() == null) {
+                                    YesNoDialog yesNoDialog = YesNoDialog.newInstance("Sorry", "There are some menu were removed.");
+                                    yesNoDialog.setTargetFragment(OwnerRevenueOrderListFragment.this,555);
+                                    yesNoDialog.show(getActivity().getSupportFragmentManager(), "5");
+                                } else {
+                                    Log.e("menuItemDao", menuItem.getName() + " " + menuItem.getPrice());
+                                    String size = orderKitchenList.get(countDatabase).getSize();
+                                    float price = getRealPrice(menuItem.getPrice(), size);
+                                    price = price * (1 - menuItem.getPromotion() / 100);
+                                    orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
 
 //                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
-                                total += orderKitchenList.get(countDatabase).getPrice();
-                                String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                tvTotal.setText(textTotal);
-                                countDatabase++;
+                                    total += orderKitchenList.get(countDatabase).getPrice();
+                                    String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                    tvTotal.setText(textTotal);
+                                    countDatabase++;
 
 //                                Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
-                                if (countDatabase == countChild) {
-                                    DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase();
-                                    vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
-                                        @Override
-                                        public void onDataChange(DataSnapshot dataSnapshot) {
-                                            vat = dataSnapshot.child("vat").getValue(double.class);
-                                            orderMenuAdapter.setVat((float) vat);
-                                            float vatValue = (float) (total * vat / 100.0);
+                                    if (countDatabase == countChild) {
+                                        DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase();
+                                        vatDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                vat = dataSnapshot.child("vat").getValue(double.class);
+                                                orderMenuAdapter.setVat((float) vat);
+                                                float vatValue = (float) (total * vat / 100.0);
 
-                                            String vatValueText = String.format(Locale.ENGLISH, "%.2f", vatValue);
-                                            orderMenuAdapter.setVatValue(Float.parseFloat(vatValueText));
-                                            total = (float) (total * (1 + vat / 100.0));
-                                            Log.e("total", total + "");
+                                                String vatValueText = String.format(Locale.ENGLISH, "%.2f", vatValue);
+                                                orderMenuAdapter.setVatValue(Float.parseFloat(vatValueText));
+                                                total = (float) (total * (1 + vat / 100.0));
+                                                Log.e("total", total + "");
 
-                                            DataSnapshot discounts = dataSnapshot.child("discount");
-                                            ArrayList<Float> keyDiscounts = new ArrayList<>();
-                                            ArrayList<Integer> valueDiscounts = new ArrayList<>();
+                                                DataSnapshot discounts = dataSnapshot.child("discount");
+                                                ArrayList<Float> keyDiscounts = new ArrayList<>();
+                                                ArrayList<Integer> valueDiscounts = new ArrayList<>();
 
-                                            for (DataSnapshot discount : discounts.getChildren()) {
-                                                keyDiscounts.add(Float.parseFloat(discount.getKey()));
-                                                valueDiscounts.add(discount.getValue(Integer.class));
-                                            }
-
-                                            String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                            tvTotal.setText(textTotal);
-
-                                            for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
-                                                if (total > keyDiscounts.get(i)) {
-                                                    orderMenuAdapter.setCheckDiscount(true);
-                                                    String discountVal = String.format(Locale.ENGLISH, "%.2f", (float) (total * valueDiscounts.get(i) / 100.0));
-                                                    String discountCon = String.format(Locale.ENGLISH, "%.0f", keyDiscounts.get(i));
-                                                    orderMenuAdapter.setDiscountCondition(Integer.parseInt(discountCon));
-                                                    orderMenuAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
-//                                                            Log.e("discountCon",discountCon);
-                                                    total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
-                                                    textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                                    tvTotal.setText(textTotal);
-                                                    break;
+                                                for (DataSnapshot discount : discounts.getChildren()) {
+                                                    keyDiscounts.add(Float.parseFloat(discount.getKey()));
+                                                    valueDiscounts.add(discount.getValue(Integer.class));
                                                 }
-                                            }
-                                            orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
-                                            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
-                                            orderMenuAdapter.notifyDataSetChanged();
-                                        }
 
-                                        @Override
-                                        public void onCancelled(DatabaseError databaseError) {
-                                            MyUtil.showText("can't get vat.");
-                                        }
-                                    });
+                                                String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                                tvTotal.setText(textTotal);
+
+                                                for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
+                                                    if (total > keyDiscounts.get(i)) {
+                                                        orderMenuAdapter.setCheckDiscount(true);
+                                                        String discountVal = String.format(Locale.ENGLISH, "%.2f", (float) (total * valueDiscounts.get(i) / 100.0));
+                                                        String discountCon = String.format(Locale.ENGLISH, "%.0f", keyDiscounts.get(i));
+                                                        orderMenuAdapter.setDiscountCondition(Integer.parseInt(discountCon));
+                                                        orderMenuAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
+//                                                            Log.e("discountCon",discountCon);
+                                                        total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
+                                                        textTotal = String.format(Locale.ENGLISH, "%.2f", total);
+                                                        tvTotal.setText(textTotal);
+                                                        break;
+                                                    }
+                                                }
+                                                orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
+                                                orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+                                                orderMenuAdapter.notifyDataSetChanged();
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+                                                MyUtil.showText("can't get vat.");
+                                            }
+                                        });
+                                    }
+
                                 }
-                            }
+                            }//at this
 
                             @Override
                             public void onCancelled(DatabaseError databaseError) {
@@ -309,4 +326,13 @@ public class OwnerRevenueOrderListFragment extends Fragment {
     }
 
 
+    @Override
+    public void onYesButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        activity.finish();
+    }
+
+    @Override
+    public void onNoButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        activity.finish();
+    }
 }
