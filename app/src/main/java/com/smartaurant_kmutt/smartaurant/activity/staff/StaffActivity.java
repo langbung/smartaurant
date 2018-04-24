@@ -22,7 +22,7 @@ public class StaffActivity extends AppCompatActivity implements PopupLogout.OnPo
     Button btCheckOrder;
     Button btMenuSetting;
     Button btLogOut;
-    Button btCustomerCall;
+    Button btCustomerDetail;
     DrawerLayout drawerLayout;
     Toolbar toolbar;
     ActionBarDrawerToggle actionBarDrawerToggle;
@@ -46,16 +46,12 @@ public class StaffActivity extends AppCompatActivity implements PopupLogout.OnPo
     }
 
     private void initButton() {
-        btCheckOrder = findViewById(R.id.btCheckOrder);
+        btCustomerDetail = findViewById(R.id.btCustomerDetail);
         btMenuSetting = findViewById(R.id.btMenuSetting);
         btLogOut = findViewById(R.id.btLogOut);
-        btCheckOrder.setOnClickListener(buttonOnClickListener);
+        btCustomerDetail.setOnClickListener(buttonOnClickListener);
         btMenuSetting.setOnClickListener(buttonOnClickListener);
         btLogOut.setOnClickListener(buttonOnClickListener);
-        btCustomerCall = findViewById(R.id.btCustomerCall);
-        btCustomerCall.setOnClickListener(buttonOnClickListener);
-
-
     }
 
     private void initToolbar() {
@@ -126,7 +122,7 @@ public class StaffActivity extends AppCompatActivity implements PopupLogout.OnPo
             if (v == btMenuSetting) {
                 setCurrentPageInViewPager(1);
                 drawerLayout.closeDrawers();
-            } else if (v == btCustomerCall) {
+            } else if (v == btCustomerDetail) {
                 setCurrentPageInViewPager(0);
                 drawerLayout.closeDrawers();
             }
