@@ -13,6 +13,7 @@ import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.view.OrderAndCheckBillMenuViewCustomer;
 import com.smartaurant_kmutt.smartaurant.view.OrderMenuViewCustomer;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 /**
@@ -84,18 +85,22 @@ public class CustomerOrderListAdapter extends BaseAdapter {
         if (mode == MODE_ORDER_KITCHEN_CUSTOMER) {
             if (checkVoucher && checkDiscount) {
                 if (position == orderMenuList.size() + 1) {
-                    item.setName("discount when buy " + discountCondition);
+                    DecimalFormat df = new DecimalFormat("##,###.##");
+                    item.setName("Discount for " + df.format(discountCondition) +" baht up");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(discountValue);
                     return item;
                 } else if (position == orderMenuList.size() + 2) {
-                    item.setName("voucher");
+                    item.setName("Voucher");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(voucherValue);
                     return item;
                 } else if (position == orderMenuList.size()) {
-                    item.setName("vat " + vat + " %");
+                    item.setName("VAT. " + vat + " %");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(vatValue);
                     return item;
                 } else {
@@ -108,15 +113,18 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 }
             } else if (checkDiscount) {
                 if (position == orderMenuList.size() + 1) {
-                    item.setName("discount when buy " + discountCondition);
+                    DecimalFormat df = new DecimalFormat("##,###.##");
+                    item.setName("Discount for " + df.format(discountCondition) +" baht up");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(discountValue);
                     return item;
                 }
                 if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                    item.setName("vat " + vat + " %");
+                    item.setName("VAT. " + vat + " %");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(vatValue);
                     return item;
                 } else {
@@ -130,15 +138,17 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 }
             } else if (checkVoucher) {
                 if (position == orderMenuList.size() + 1) {
-                    item.setName("voucher");
+                    item.setName("Voucher");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(voucherValue);
                     return item;
                 } else if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                    item.setName("vat ");
+                    item.setName("VAT. ");
                     item.setQuantity(1);
                     item.setPrice(vatValue);
+                    item.setStatus("");
                     return item;
                 } else {
                     OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
@@ -152,8 +162,9 @@ public class CustomerOrderListAdapter extends BaseAdapter {
             } else {
                 if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                    item.setName("vat " + vat + " %");
+                    item.setName("VAT. " + vat + " %");
                     item.setQuantity(1);
+                    item.setStatus("");
                     item.setPrice(vatValue);
                     return item;
                 } else {
@@ -176,18 +187,22 @@ public class CustomerOrderListAdapter extends BaseAdapter {
         }
         if (checkVoucher && checkDiscount) {
             if (position == orderMenuList.size() + 1) {
-                item.setName("discount when buy " + discountCondition);
+                DecimalFormat df = new DecimalFormat("##,###.##");
+                item.setName("Discount for " + df.format(discountCondition) +" baht up");
                 item.setQuantity(1);
                 item.setPrice(discountValue);
+                item.setStatus("");
                 return item;
             } else if (position == orderMenuList.size() + 2) {
-                item.setName("voucher");
+                item.setName("Voucher");
                 item.setQuantity(1);
                 item.setPrice(voucherValue);
+                item.setStatus("");
                 return item;
             } else if (position == orderMenuList.size()) {
-                item.setName("vat " + vat + " %");
+                item.setName("VAT. " + vat + " %");
                 item.setQuantity(1);
+                item.setStatus("");
                 item.setPrice(vatValue);
                 return item;
             } else {
@@ -195,37 +210,44 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
                 item.setPrice(orderMenuKitchenItemDao.getPrice());
+                item.setStatus("");
                 return item;
             }
         } else if (checkDiscount) {
             if (position == orderMenuList.size() + 1) {
-                item.setName("discount when buy " + discountCondition);
+                DecimalFormat df = new DecimalFormat("##,###.##");
+                item.setName("Discount for " + df.format(discountCondition) +" baht up");
                 item.setQuantity(1);
                 item.setPrice(discountValue);
+                item.setStatus("");
                 return item;
             } else if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                item.setName("vat " + vat + " %");
+                item.setName("VAT. " + vat + " %");
                 item.setQuantity(1);
                 item.setPrice(vatValue);
+                item.setStatus("");
                 return item;
             } else {
                 OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
                 item.setPrice(orderMenuKitchenItemDao.getPrice());
+                item.setStatus("");
                 return item;
             }
         } else if (checkVoucher) {
             if (position == orderMenuList.size() + 1) {
-                item.setName("voucher ");
+                item.setName("Voucher ");
                 item.setQuantity(1);
                 item.setPrice(voucherValue);
+                item.setStatus("");
                 return item;
             } else if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                item.setName("vat " + vat + " %");
+                item.setName("VAT. " + vat + " %");
                 item.setQuantity(1);
+                item.setStatus("");
                 item.setPrice(vatValue);
                 return item;
             } else {
@@ -233,13 +255,15 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
                 item.setPrice(orderMenuKitchenItemDao.getPrice());
+                item.setStatus("");
                 return item;
             }
         }
         else{
             if (position == orderMenuList.size()) {
 //                Log.e("vat in adap", vat + "");
-                item.setName("vat " + vat + " %");
+                item.setName("VAT. " + vat + " %");
+                item.setStatus("");
                 item.setQuantity(1);
                 item.setPrice(vatValue);
                 return item;
@@ -247,6 +271,7 @@ public class CustomerOrderListAdapter extends BaseAdapter {
                 OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                 item.setName(orderMenuKitchenItemDao.getMenuName() + " " + orderMenuKitchenItemDao.getSize());
                 item.setQuantity(orderMenuKitchenItemDao.getQuantity());
+                item.setStatus("");
                 item.setPrice(orderMenuKitchenItemDao.getPrice());
                 return item;
             }

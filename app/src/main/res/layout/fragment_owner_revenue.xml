@@ -3,6 +3,43 @@
     android:orientation="vertical"
     xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
     android:layout_height="match_parent">
+    <LinearLayout
+        android:gravity="center"
+        android:background="@color/graySpinner"
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <com.weiwangcn.betterspinner.library.BetterSpinner
+            android:dropDownHeight="200dp"
+            android:gravity="center"
+            android:hint="date"
+            android:id="@+id/dateSpinner"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content" />
+        <com.weiwangcn.betterspinner.library.BetterSpinner
+            android:dropDownHeight="200dp"
+            android:gravity="center"
+            android:hint="month"
+            android:id="@+id/monthSpinner"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content" />
+        <com.weiwangcn.betterspinner.library.BetterSpinner
+            android:dropDownHeight="200dp"
+            android:gravity="center"
+            android:hint="year"
+            android:id="@+id/yearSpinner"
+            android:layout_width="80dp"
+            android:layout_height="wrap_content" />
+        <Space
+            android:layout_width="10dp"
+            android:layout_height="0dp"
+            />
+        <Button
+            android:id="@+id/btFilter"
+            android:background="@drawable/selector_filter_button"
+            android:layout_width="20dp"
+            android:layout_height="20dp" />
+    </LinearLayout>
     <ListView
         android:layout_weight="1"
         android:id="@+id/lvRevenue"

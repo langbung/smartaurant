@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
+    android:background="@drawable/selector__list_view_cover"
     android:paddingLeft="15dp"
     android:paddingRight="15dp"
     android:orientation="horizontal"

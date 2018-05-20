@@ -50,10 +50,24 @@
 
             <EditText
                 android:textSize="@dimen/listview_text_size"
-                android:id="@+id/etPrice"
+                android:id="@+id/etPriceS"
                 android:layout_width="300dp"
                 android:layout_height="wrap_content"
-                android:hint="price"
+                android:hint="price size S"
+                android:inputType="numberDecimal" />
+            <EditText
+                android:textSize="@dimen/listview_text_size"
+                android:id="@+id/etPriceM"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:hint="price size M"
+                android:inputType="numberDecimal" />
+            <EditText
+                android:textSize="@dimen/listview_text_size"
+                android:id="@+id/etPriceL"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:hint="price size L"
                 android:inputType="numberDecimal" />
 
             <EditText

@@ -3,7 +3,6 @@ package com.smartaurant_kmutt.smartaurant.fragment.cashier;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -29,17 +28,18 @@ import com.smartaurant_kmutt.smartaurant.activity.cashier.CashierTableActivity;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
+import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.OneAnswerDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.cashier.DialogCashierVoucher;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
-import com.smartaurant_kmutt.smartaurant.manager.OrderMenuOnlyManager;
 import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -48,7 +48,7 @@ import java.util.Map;
 
 @SuppressWarnings("unused")
 public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDialogListener
-        , DialogCashierVoucher.VoucherCashierDialogListener {
+        , DialogCashierVoucher.VoucherCashierDialogListener, OneAnswerDialog.OneAnswerDialogListener {
     int table;
     int countDatabase;
     long childCount;
@@ -170,7 +170,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
-        cashierActivity =(CashierActivity) getActivity();
+        cashierActivity = (CashierActivity) getActivity();
     }
 
     private void initToolbar(View rootView) {
@@ -207,7 +207,8 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
     }
 
     void showCashierDisplay(long num) {
-        tvCashierDisplay.setText(String.valueOf(num));
+        DecimalFormat df = new DecimalFormat("##,##0");
+        tvCashierDisplay.setText(df.format(num));
     }
 
     void setPosNum(String posText) {
@@ -266,8 +267,8 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
 
 //                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
                                         total += orderKitchenList.get(countDatabase).getPrice();
-                                        String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                        tvTotal.setText(textTotal);
+                                        DecimalFormat df = new DecimalFormat("##,##0.00");
+                                        tvTotal.setText(df.format(total));
                                         countDatabase++;
 
 //                                        orderMenuManager.setOrderMenuKitchenDao(orderKitchenList);
@@ -283,37 +284,35 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
                                                 @Override
                                                 public void onDataChange(DataSnapshot utilDatabase) {
                                                     vat = utilDatabase.child("vat").getValue(double.class);
-                                                    Log.e("vat",vat+"");
-                                                    String vatString = String.format(Locale.ENGLISH,"%.0f",(float)vat);
-                                                    String vatValue = String.format(Locale.ENGLISH,"%.2f",total*vat/100.0);
-                                                    Log.e("vatString",vatString);
+                                                    Log.e("vat", vat + "");
+                                                    String vatString = String.format(Locale.ENGLISH, "%.0f", (float) vat);
+                                                    String vatValue = String.format(Locale.ENGLISH, "%.2f", total * vat / 100.0);
+                                                    Log.e("vatString", vatString);
 
 
                                                     DataSnapshot discounts = utilDatabase.child("discount");
                                                     ArrayList<Float> keyDiscounts = new ArrayList<>();
                                                     ArrayList<Integer> valueDiscounts = new ArrayList<>();
 
-                                                    for(DataSnapshot discount:discounts.getChildren()){
+                                                    for (DataSnapshot discount : discounts.getChildren()) {
                                                         keyDiscounts.add(Float.parseFloat(discount.getKey()));
                                                         valueDiscounts.add(discount.getValue(Integer.class));
                                                     }
 //
-                                                    total = (float)(total * (1 + vat / 100.0));
-
-                                                    String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                                    tvTotal.setText(textTotal);
+                                                    total = (float) (total * (1 + vat / 100.0));
+                                                    DecimalFormat df = new DecimalFormat("##,##0.00");
+                                                    tvTotal.setText(df.format(total));
 //
-                                                    for(int i=keyDiscounts.size()-1;i>=0;i--){
-                                                        if(total>keyDiscounts.get(i)){
+                                                    for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
+                                                        if (total > keyDiscounts.get(i)) {
                                                             orderMenuAdapter.setCheckDiscount(true);
-                                                            String discountVal = String.format(Locale.ENGLISH,"%.2f",(float)(total*valueDiscounts.get(i)/100.0));
-                                                            String discountCon = String.format(Locale.ENGLISH,"%.0f",keyDiscounts.get(i));
+                                                            String discountVal = String.format(Locale.ENGLISH, "%.2f", (float) (total * valueDiscounts.get(i) / 100.0));
+                                                            String discountCon = String.format(Locale.ENGLISH, "%.0f", keyDiscounts.get(i));
                                                             orderMenuAdapter.setDiscountCondition(Integer.parseInt(discountCon));
-                                                            orderMenuAdapter.setDiscountValue(Float.parseFloat("-"+discountVal));
+                                                            orderMenuAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
 //                                                            Log.e("discountCon",discountCon);
-                                                            total = (float)(total*(1-valueDiscounts.get(i)/100.0));
-                                                            textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                                            tvTotal.setText(textTotal);
+                                                            total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
+                                                            tvTotal.setText(df.format(total));
 //                                                            orderMenuAdapter.notifyDataSetChanged();
                                                             break;
                                                         }
@@ -388,6 +387,98 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
         Intent intent = new Intent(cashierActivity, CashierTableActivity.class);
         startActivity(intent);
         cashierActivity.finish();
+    }
+
+
+    @Override
+    public void onYesButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        if (requestCode == OK_REQUEST_CODE) {
+            String tableId = String.format(Locale.ENGLISH, "TB%03d", table);
+            String path = "table/" + tableId + "/";
+            Map<String, Object> updateTable = new HashMap<>();
+            updateTable.put(path + "availableTable", true);
+            updateTable.put(path + "availableToCallWaiter", true);
+            updateTable.put(path + "availableCheckBill", true);
+            updateTable.put(path + "orderId", "none");
+            DatabaseReference tableDatabase = UtilDatabase.getDatabase();
+            tableDatabase.updateChildren(updateTable).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        startCashierActivity();
+                        getActivity().finish();
+                    }
+                }
+            });
+        } else if (requestCode == VOUCHER_OK_REQUEST_CODE) {
+            orderMenuAdapter.setCheckVoucher(true);
+            String voucherValue = String.format(Locale.ENGLISH, "%.2f", (float) (sale));
+            orderMenuAdapter.setVoucherValue(Float.parseFloat("-" + voucherValue));
+            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+            orderMenuAdapter.notifyDataSetChanged();
+            setTotalDiscount();
+        }
+    }
+
+    private void setTotalDiscount() {
+        Number num = 0;
+        try {
+            num = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(tvTotal.getText().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        float totalLocal = num.floatValue();
+        float saleLocal = Float.parseFloat(sale + "");
+        totalLocal = totalLocal - saleLocal;
+        if (totalLocal < 0) {
+            tvTotal.setText("0.00");
+        } else {
+            DecimalFormat df = new DecimalFormat("##,###.00");
+            tvTotal.setText(df.format(totalLocal));
+        }
+    }
+
+    @Override
+    public void onNoButtonClickInYesNODialog(Bundle bundle, int requestCode) {
+        if (requestCode == VOUCHER_OK_REQUEST_CODE) {
+            orderMenuAdapter.setCheckVoucher(true);
+            String voucherValue = String.format(Locale.ENGLISH, "%.2f", (float) (sale));
+            orderMenuAdapter.setVoucherValue(Float.parseFloat("-" + voucherValue));
+            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+            orderMenuAdapter.notifyDataSetChanged();
+            setTotalDiscount();
+        }
+    }
+
+    @Override
+    public void onSubmitButtonClickInVoucherCashierDialog(int sale, int requestCode) {
+        OneAnswerDialog oneAnswerDialog = OneAnswerDialog.newInstance("test", "test");
+        if (sale == DialogCashierVoucher.VOUCHER_USED) {
+            oneAnswerDialog = oneAnswerDialog.newInstance("Voucher", "Voucher is already used !", "Ok");
+            oneAnswerDialog.setTargetFragment(CashierFragment.this, VOUCHER_ERROR_REQUEST_CODE);
+            oneAnswerDialog.show(getFragmentManager(), "voucherError");
+        } else if (sale == DialogCashierVoucher.VOUCHER_ERROR) {
+            oneAnswerDialog = OneAnswerDialog.newInstance("Voucher", "Error voucher code !", "Ok");
+            oneAnswerDialog.setTargetFragment(CashierFragment.this, VOUCHER_ERROR_REQUEST_CODE);
+            oneAnswerDialog.show(getFragmentManager(), "voucherError");
+        } else {
+            this.sale = sale;
+            oneAnswerDialog = OneAnswerDialog.newInstance("Voucher", "discount " + sale + " baht", "Ok");
+            oneAnswerDialog.setTargetFragment(CashierFragment.this, VOUCHER_OK_REQUEST_CODE);
+            oneAnswerDialog.show(getFragmentManager(), "voucherError");
+        }
+    }
+
+    @Override
+    public void onYesButtonClickInOneAnswerDialog(Bundle bundle, int requestCode) {
+        if (requestCode == VOUCHER_OK_REQUEST_CODE) {
+            orderMenuAdapter.setCheckVoucher(true);
+            String voucherValue = String.format(Locale.ENGLISH, "%.2f", (float) (sale));
+            orderMenuAdapter.setVoucherValue(Float.parseFloat("-" + voucherValue));
+            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
+            orderMenuAdapter.notifyDataSetChanged();
+            setTotalDiscount();
+        }
     }
 
     View.OnClickListener onCashierButtonClick = new View.OnClickListener() {
@@ -467,18 +558,27 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
                 }
 //                MyUtil.showText(posTextLength+"");
             } else if (btPay == v) {
-                float totalLocal = Float.parseFloat(tvTotal.getText().toString());
-                double change = posNum - totalLocal;
-                String changeText = String.format(Locale.ENGLISH, "%.2f", change);
-                YesNoDialog yesNoDialog;
-                if (change < 0) {
-                    yesNoDialog = YesNoDialog.newInstance("Change", "Check total.","Check","Cancel");
-                    yesNoDialog.setTargetFragment(CashierFragment.this, ERROR_REQUEST_CODE);
-                } else {
-                    yesNoDialog = YesNoDialog.newInstance("Change", "Change " + changeText + " bath." ,"OK and exit","Cancel");
-                    yesNoDialog.setTargetFragment(CashierFragment.this, OK_REQUEST_CODE);
+                Number num = 0;
+                try {
+                    num = NumberFormat.getNumberInstance(Locale.ENGLISH).parse(tvTotal.getText().toString());
+                } catch (ParseException e) {
+                    e.printStackTrace();
                 }
-                yesNoDialog.show(getFragmentManager(), "exchange");
+                double change = posNum - num.floatValue();
+                DecimalFormat df = new DecimalFormat("###,##0.00");
+                String changeText = df.format(change);
+
+                if (change < 0) {
+                    OneAnswerDialog oneAnswerDialog = OneAnswerDialog.newInstance("Alert", "The amount paid is not enough!", "Go back");
+                    oneAnswerDialog.setTargetFragment(CashierFragment.this, ERROR_REQUEST_CODE);
+                    oneAnswerDialog.show(getFragmentManager(), "errorToPay");
+
+                } else {
+                    YesNoDialog yesNoDialog = YesNoDialog.newInstance("Change", "Change " + changeText + " bath.", "OK and exit", "Cancel");
+                    yesNoDialog.setTargetFragment(CashierFragment.this, OK_REQUEST_CODE);
+                    yesNoDialog.show(getFragmentManager(), "OkToPay");
+                }
+
             } else if (v == btVoucher) {
                 DialogCashierVoucher dialogCashierVoucher = DialogCashierVoucher.newInstance();
                 dialogCashierVoucher.setTargetFragment(CashierFragment.this, VOUCHER_REQUEST_CODE);
@@ -486,77 +586,4 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
             }
         }
     };
-
-
-    @Override
-    public void onYesButtonClickInYesNODialog(Bundle bundle, int requestCode) {
-        if (requestCode == OK_REQUEST_CODE) {
-            String tableId = String.format(Locale.ENGLISH, "TB%03d", table);
-            String path = "table/" + tableId + "/";
-            Map<String, Object> updateTable = new HashMap<>();
-            updateTable.put(path + "availableTable", true);
-            updateTable.put(path + "availableToCallWaiter", true);
-            updateTable.put(path + "availableCheckBill", true);
-            updateTable.put(path + "orderId", "none");
-            DatabaseReference tableDatabase = UtilDatabase.getDatabase();
-            tableDatabase.updateChildren(updateTable).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        startCashierActivity();
-                        getActivity().finish();
-                    }
-                }
-            });
-        } else if (requestCode == VOUCHER_OK_REQUEST_CODE) {
-            orderMenuAdapter.setCheckVoucher(true);
-            String voucherValue = String.format(Locale.ENGLISH,"%.2f",(float)(sale));
-            orderMenuAdapter.setVoucherValue(Float.parseFloat("-"+voucherValue));
-            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
-            orderMenuAdapter.notifyDataSetChanged();
-            setTotalDiscount();
-        }
-    }
-
-    private void setTotalDiscount() {
-        float totalLocal = Float.parseFloat(tvTotal.getText().toString());
-        float saleLocal = Float.parseFloat(sale + "");
-        totalLocal = totalLocal - saleLocal;
-        if (totalLocal < 0) {
-            tvTotal.setText("0.00");
-        } else {
-            String totalText = String.format(Locale.ENGLISH, "%.2f", totalLocal);
-            tvTotal.setText(totalText);
-        }
-    }
-
-    @Override
-    public void onNoButtonClickInYesNODialog(Bundle bundle, int requestCode) {
-        if (requestCode == VOUCHER_OK_REQUEST_CODE) {
-            orderMenuAdapter.setCheckVoucher(true);
-            String voucherValue = String.format(Locale.ENGLISH,"%.2f",(float)(sale));
-            orderMenuAdapter.setVoucherValue(Float.parseFloat("-"+voucherValue));
-            orderMenuAdapter.setOrderMenuKitchenManager(orderMenuManager);
-            orderMenuAdapter.notifyDataSetChanged();
-            setTotalDiscount();
-        }
-    }
-
-    @Override
-    public void onSubmitButtonClickInVoucherCashierDialog(int sale, int requestCode) {
-        if (sale == DialogCashierVoucher.VOUCHER_USED) {
-            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Voucher", "Voucher is already used");
-            yesNoDialog.setTargetFragment(CashierFragment.this, VOUCHER_ERROR_REQUEST_CODE);
-            yesNoDialog.show(getFragmentManager(), "voucherError");
-        } else if (sale == DialogCashierVoucher.VOUCHER_ERROR) {
-            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Voucher", "Error voucher code.");
-            yesNoDialog.setTargetFragment(CashierFragment.this, VOUCHER_ERROR_REQUEST_CODE);
-            yesNoDialog.show(getFragmentManager(), "voucherError");
-        } else {
-            this.sale = sale;
-            YesNoDialog yesNoDialog = YesNoDialog.newInstance("Voucher", "discount " + sale + " baht");
-            yesNoDialog.setTargetFragment(CashierFragment.this, VOUCHER_OK_REQUEST_CODE);
-            yesNoDialog.show(getFragmentManager(), "voucherError");
-        }
-    }
 }

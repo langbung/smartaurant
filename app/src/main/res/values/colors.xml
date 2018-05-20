@@ -7,4 +7,6 @@
     <color name="textColor">#ffffff</color>
     <color name="transparent">#00000000</color>
     <color name="coverPress">#aa000000</color>
+    <color name="tranWhite">#ddffffff</color>
+    <color name="graySpinner">#fff2f2f2</color>
 </resources>

@@ -14,6 +14,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.smartaurant_kmutt.smartaurant.dao.VoucherItem;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -22,6 +23,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
 
 public class Voucher {
     private String[] tableEncrypts = {"0123456789/:", "AsVEojuqPzWK"};
@@ -29,7 +31,7 @@ public class Voucher {
 //    private SimpleDateFormat stringTime = new SimpleDateFormat("SSS:ss:mm:HH", Locale.ENGLISH);
 //    private SimpleDateFormat stringDateTimeEnd = new SimpleDateFormat("SSS:ss:mm:HH dd/MM/yyyy", Locale.ENGLISH);
     private SimpleDateFormat stringDateTimeEnd = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss ", Locale.ENGLISH);
-    private SimpleDateFormat id = new SimpleDateFormat("SSmmss", Locale.ENGLISH);
+    private SimpleDateFormat id = new SimpleDateFormat("SssmmSSS", Locale.ENGLISH);
 
     public Voucher() {
     }
@@ -40,14 +42,16 @@ public class Voucher {
 //        Date dateNow = calendar.getTime();
         calendar.add(Calendar.DATE, endDateAmount);
         Date dateEnd = calendar.getTime();
-        String saleEncrypted = encrypt(String.valueOf(sale));
+//        String saleEncrypted = encrypt(String.valueOf(sale));
 //        String dateNowEncrypted = encrypt(stringDate.format(dateNow));
         VoucherItem voucherItem = new VoucherItem();
         voucherItem.setAlreadyUsed(false);
         voucherItem.setDateEnd(stringDateTimeEnd.format(dateEnd));
         voucherItem.setDiscount(sale);
-        String idText = id.format(dateEnd);
-        voucherItem.setId(encrypt(idText));
+        Random random = new Random();
+        int ran = random.nextInt(99999999) + 1;
+        DecimalFormat df = new DecimalFormat("00000000");
+        voucherItem.setId(df.format(ran));
         updateVoucher(voucherItem);
         return voucherItem.getId();
     }

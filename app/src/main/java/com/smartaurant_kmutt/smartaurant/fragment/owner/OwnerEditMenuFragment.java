@@ -5,12 +5,10 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,8 +44,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.internal.Util;
-
 
 @SuppressWarnings("unused")
 public class OwnerEditMenuFragment extends Fragment {
@@ -55,7 +51,9 @@ public class OwnerEditMenuFragment extends Fragment {
     String title;
     String type;
     String menuName;
-    String menuPriceText;
+    String menuPriceTextS;
+    String menuPriceTextM;
+    String menuPriceTextL;
     String menuPromotion;
     String menuType;
     String allergen;
@@ -64,7 +62,9 @@ public class OwnerEditMenuFragment extends Fragment {
     int maxMenuId;
     MenuItemDao menuItemDao;
     EditText etName;
-    EditText etPrice;
+    EditText etPriceS;
+    EditText etPriceM;
+    EditText etPriceL;
     EditText etPromotion;
     EditText etTest1, etTest2;
     CheckBox cbRecommended;
@@ -159,6 +159,8 @@ public class OwnerEditMenuFragment extends Fragment {
         String imageUri = menuItemDao.getImageUri();
         String name = menuItemDao.getName();
         String price = menuItemDao.getPrice() + "";
+        String priceM = menuItemDao.getPriceM() + "";
+        String priceL = menuItemDao.getPriceL() + "";
         String promotion = menuItemDao.getPromotion() + "";
         String type = menuItemDao.getType() + "";
         boolean recommended = menuItemDao.isRecommended();
@@ -168,7 +170,9 @@ public class OwnerEditMenuFragment extends Fragment {
         setImage(imageUri);
         etName.setText(name);
         etName.setEnabled(false);
-        etPrice.setText(price);
+        etPriceS.setText(price);
+        etPriceM.setText(priceM);
+        etPriceL.setText(priceL);
         etPromotion.setText(promotion);
         snType.setText(type);
         cbRecommended.setChecked(recommended);
@@ -209,7 +213,9 @@ public class OwnerEditMenuFragment extends Fragment {
         etTest1 = rootView.findViewById(R.id.etTest1);
         etTest2 = rootView.findViewById(R.id.etTest2);
         etName = rootView.findViewById(R.id.etName);
-        etPrice = rootView.findViewById(R.id.etPrice);
+        etPriceS = rootView.findViewById(R.id.etPriceS);
+        etPriceM = rootView.findViewById(R.id.etPriceM);
+        etPriceL = rootView.findViewById(R.id.etPriceL);
         etPromotion = rootView.findViewById(R.id.etPromotion);
     }
 
@@ -346,12 +352,18 @@ public class OwnerEditMenuFragment extends Fragment {
 
     private boolean checkRequireInput() {
         menuName = etName.getText().toString().trim();
-        menuPriceText = etPrice.getText().toString().trim();
+        menuPriceTextS = etPriceS.getText().toString().trim();
+        menuPriceTextM = etPriceM.getText().toString().trim();
+        menuPriceTextL = etPriceL.getText().toString().trim();
         menuPromotion = etPromotion.getText().toString().trim();
         menuType = snType.getText().toString().trim();
         if (menuName.equals(""))
             return false;
-        if (menuPriceText.equals(""))
+        if (menuPriceTextS.equals(""))
+            return false;
+        if (menuPriceTextM.equals(""))
+            return false;
+        if (menuPriceTextL.equals(""))
             return false;
         if (menuPromotion.equals(""))
             return false;
@@ -365,7 +377,9 @@ public class OwnerEditMenuFragment extends Fragment {
     @NonNull
     private MenuItemDao getMenuItemDaoFormInput(MenuItemDao menuItemDao) {
         menuName = etName.getText().toString().trim();
-        menuPriceText = etPrice.getText().toString().trim();
+        menuPriceTextS = etPriceS.getText().toString().trim();
+        menuPriceTextM = etPriceM.getText().toString().trim();
+        menuPriceTextL = etPriceL.getText().toString().trim();
         menuPromotion = etPromotion.getText().toString().trim();
         menuType = snType.getText().toString().trim();
         recommended = cbRecommended.isChecked();
@@ -380,7 +394,9 @@ public class OwnerEditMenuFragment extends Fragment {
             allergen += "seafood ";
 
         menuItemDao.setName(menuName);
-        menuItemDao.setPrice(Float.parseFloat(menuPriceText));
+        menuItemDao.setPrice(Float.parseFloat(menuPriceTextS));
+        menuItemDao.setPriceM(Float.parseFloat(menuPriceTextM));
+        menuItemDao.setPriceL(Float.parseFloat(menuPriceTextL));
         menuItemDao.setPromotion(Float.parseFloat(menuPromotion));
         menuItemDao.setType(menuType);
         menuItemDao.setRecommended(recommended);

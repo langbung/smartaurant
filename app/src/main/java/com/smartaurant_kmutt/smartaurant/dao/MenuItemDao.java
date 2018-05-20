@@ -13,6 +13,8 @@ public class MenuItemDao implements Parcelable {
     private String allergen;
     private String type;
     private float price;
+    private float priceM;
+    private float priceL;
     private float promotion;
     private boolean recommended;
     private boolean enable;
@@ -26,12 +28,15 @@ public class MenuItemDao implements Parcelable {
     public MenuItemDao() {
     }
 
+
     protected MenuItemDao(Parcel in) {
         name = in.readString();
         imageUri = in.readString();
         allergen = in.readString();
         type = in.readString();
         price = in.readFloat();
+        priceM = in.readFloat();
+        priceL = in.readFloat();
         promotion = in.readFloat();
         recommended = in.readByte() != 0;
         enable = in.readByte() != 0;
@@ -50,6 +55,8 @@ public class MenuItemDao implements Parcelable {
         dest.writeString(allergen);
         dest.writeString(type);
         dest.writeFloat(price);
+        dest.writeFloat(priceM);
+        dest.writeFloat(priceL);
         dest.writeFloat(promotion);
         dest.writeByte((byte) (recommended ? 1 : 0));
         dest.writeByte((byte) (enable ? 1 : 0));
@@ -102,6 +109,14 @@ public class MenuItemDao implements Parcelable {
         this.allergen = allergen;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
     public float getPrice() {
         return price;
     }
@@ -110,12 +125,36 @@ public class MenuItemDao implements Parcelable {
         this.price = price;
     }
 
+    public float getPriceM() {
+        return priceM;
+    }
+
+    public void setPriceM(float priceM) {
+        this.priceM = priceM;
+    }
+
+    public float getPriceL() {
+        return priceL;
+    }
+
+    public void setPriceL(float priceL) {
+        this.priceL = priceL;
+    }
+
     public float getPromotion() {
         return promotion;
     }
 
     public void setPromotion(float promotion) {
         this.promotion = promotion;
+    }
+
+    public boolean isRecommended() {
+        return recommended;
+    }
+
+    public void setRecommended(boolean recommended) {
+        this.recommended = recommended;
     }
 
     public boolean isEnable() {
@@ -172,21 +211,5 @@ public class MenuItemDao implements Parcelable {
 
     public void setEnableDrinks(boolean enableDrinks) {
         this.enableDrinks = enableDrinks;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public boolean isRecommended() {
-        return recommended;
-    }
-
-    public void setRecommended(boolean recommended) {
-        this.recommended = recommended;
     }
 }

@@ -1,22 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    android:orientation="vertical"
-    android:paddingLeft="15dp"
-    android:paddingRight="15dp"
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-
-    <GridView
-        android:paddingBottom="15dp"
-        android:paddingTop="15dp"
-        android:elevation="0dp"
-        android:id="@+id/gvMenuCustomer"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/background"/>
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="15dp"
+        android:paddingRight="15dp"
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:horizontalSpacing="15dp"
-        android:numColumns="3"
-        android:verticalSpacing="15dp">
-    </GridView>
+        android:layout_height="match_parent">
 
-</LinearLayout>
+        <GridView
+            android:paddingBottom="15dp"
+            android:paddingTop="15dp"
+            android:elevation="0dp"
+            android:id="@+id/gvMenuCustomer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:horizontalSpacing="15dp"
+            android:numColumns="3"
+            android:verticalSpacing="15dp">
+        </GridView>
+
+    </LinearLayout>
+</FrameLayout>

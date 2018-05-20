@@ -24,16 +24,14 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuListDao;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.util.Loading;
 import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
-import com.smartaurant_kmutt.smartaurant.util.Voucher;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -183,7 +181,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                 if (position < orderMenuKitchenManager.getOrderMenuKitchenDao().size()) {
                     OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                     if (orderMenuKitchenItemDao.getStatus().equals("in queue")) {
-                        YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName());
+                        YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName()+" ?");
                         yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, DELETE_MENU_REQUEST_CODE);
                         yesNoDialog.show(getFragmentManager(), "cancelMenu");
                     }
@@ -270,9 +268,9 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                                     valueDiscounts.add(discount.getValue(Integer.class));
                                                 }
 
-                                                String textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                                tvTotal.setText(textTotal);
-                                                setTotalToDatabase(Float.parseFloat(textTotal));
+                                                DecimalFormat df = new DecimalFormat("##,###.00");
+                                                tvTotal.setText(df.format(total));
+                                                setTotalToDatabase(Float.parseFloat(total+""));
                                                 for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
                                                     if (total > keyDiscounts.get(i)) {
                                                         customerOrderListAdapter.setCheckDiscount(true);
@@ -282,10 +280,11 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                                         customerOrderListAdapter.setDiscountValue(Float.parseFloat("-" + discountVal));
 //                                                            Log.e("discountCon",discountCon);
                                                         total = (float) (total * (1 - valueDiscounts.get(i) / 100.0));
-                                                        textTotal = String.format(Locale.ENGLISH, "%.2f", total);
-                                                        tvTotal.setText(textTotal);
+                                                        tvTotal.setText(df.format(total));
                                                         setTotalToDatabase(total);
                                                         break;
+                                                    }else{
+                                                        customerOrderListAdapter.setCheckDiscount(false);
                                                     }
                                                 }
                                                 orderMenuKitchenManager.setOrderMenuKitchenDao(orderKitchenList);

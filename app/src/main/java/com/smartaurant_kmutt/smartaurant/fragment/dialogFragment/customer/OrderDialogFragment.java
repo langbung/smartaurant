@@ -2,9 +2,7 @@ package com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.customer;
 
 import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
-import android.provider.ContactsContract;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -32,13 +30,12 @@ import com.smartaurant_kmutt.smartaurant.R;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderKitchenItemDao;
-import com.smartaurant_kmutt.smartaurant.dao.OrderMenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.TableItemDao;
 import com.smartaurant_kmutt.smartaurant.util.Loading;
-import com.smartaurant_kmutt.smartaurant.util.MyUtil;
 import com.smartaurant_kmutt.smartaurant.util.UtilDatabase;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -51,6 +48,8 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class OrderDialogFragment extends DialogFragment {
     TextView tvTitle;
+    TextView tvPrice;
+    String title;
     Button btPlus;
     Button btMinus;
     Button btOrder;
@@ -133,14 +132,21 @@ public class OrderDialogFragment extends DialogFragment {
         tvTitle = rootView.findViewById(R.id.tvTitle);
         activity = getActivity();
         initEditText(rootView);
+        initTvPrice(rootView);
         initCheckbox(rootView);
+
+    }
+
+    private void initTvPrice(View rootView) {
+        tvPrice = rootView.findViewById(R.id.tvPrice);
+        String price = String.format(Locale.ENGLISH,"%.2f",menu.getPrice());
+        tvPrice.setText(price);
     }
 
     private void initCheckbox(View rootView) {
         cbL = rootView.findViewById(R.id.cbL);
         cbS = rootView.findViewById(R.id.cbS);
         cbM = rootView.findViewById(R.id.cbM);
-
         cbL.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -149,6 +155,9 @@ public class OrderDialogFragment extends DialogFragment {
                     cbM.setChecked(false);
                     size="L";
 //                    MyUtil.showText(size);
+                    float price = quantity*(menu.getPriceL()-menu.getPriceL()*menu.getPromotion()/100);
+                    DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+                    tvPrice.setText(df.format(price));
                 }
             }
         });
@@ -159,6 +168,9 @@ public class OrderDialogFragment extends DialogFragment {
                     cbS.setChecked(false);
                     cbL.setChecked(false);
                     size="M";
+                    float price = quantity*(menu.getPriceM()-menu.getPriceM()*menu.getPromotion()/100);
+                    DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+                    tvPrice.setText(df.format(price));
 //                    MyUtil.showText(size);
                 }
             }
@@ -170,6 +182,9 @@ public class OrderDialogFragment extends DialogFragment {
                     cbM.setChecked(false);
                     cbL.setChecked(false);
                     size="S";
+                    float price = quantity*(menu.getPrice()- menu.getPrice()*menu.getPromotion()/100);
+                    DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+                    tvPrice.setText(df.format(price));
 //                    MyUtil.showText(size);
                 }
             }
@@ -187,7 +202,10 @@ public class OrderDialogFragment extends DialogFragment {
         btPlus.setOnClickListener(onClickListener);
         btMinus.setOnClickListener(onClickListener);
         btOrder.setOnClickListener(onClickListener);
-        tvTitle.setText(menu.getName());
+        DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+        tvPrice.setText(df.format(menu.getPrice()-menu.getPrice()*menu.getPromotion()/100));
+        title = menu.getName();
+        tvTitle.setText(title);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         setImage(menu.getImageUri());
 
@@ -249,11 +267,35 @@ public class OrderDialogFragment extends DialogFragment {
                 quantity++;
                 String textQuantity = String.valueOf(quantity);
                 etQuantity.setText(textQuantity);
+                float price=0;
+                if(cbS.isChecked()){
+                    price = quantity*(menu.getPrice()-menu.getPrice()*menu.getPromotion()/100);
+                }
+                else if(cbM.isChecked()){
+                    price = quantity*(menu.getPriceM()-menu.getPriceM()*menu.getPromotion()/100);
+                }
+                else if(cbL.isChecked()){
+                    price = quantity*(menu.getPriceL()-menu.getPriceL()*menu.getPromotion()/100);
+                }
+                DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+                tvPrice.setText(df.format(price));
             } else if (v == btMinus) {
                 if (quantity > 1) {
                     quantity--;
                     String textQuantity = String.valueOf(quantity);
                     etQuantity.setText(textQuantity);
+                    float price=0;
+                    if(cbS.isChecked()){
+                        price = quantity*(menu.getPrice()-menu.getPrice()*menu.getPromotion()/100);
+                    }
+                    else if(cbM.isChecked()){
+                        price = quantity*(menu.getPriceM()-menu.getPriceM()*menu.getPromotion()/100);
+                    }
+                    else if(cbL.isChecked()){
+                        price = quantity*(menu.getPriceL()-menu.getPriceL()*menu.getPromotion()/100);
+                    }
+                    DecimalFormat df = new DecimalFormat("##,##0.00 ฿");
+                    tvPrice.setText(df.format(price));
                 }
             } else if (v == btOrder) {
                 loading.show(getFragmentManager(),"l");
@@ -264,9 +306,7 @@ public class OrderDialogFragment extends DialogFragment {
                     maxOrderDatabase.addListenerForSingleValueEvent(maxOrderListener);
 
                 } else if (orderItemDao.getOrderList() != null) {
-
 //                    Log.e("orderDialog", orderItemDao.getDateTime().toString());
-
                     DatabaseReference maxOrderKitchen = UtilDatabase.getDatabase().child("util/maxOrderKitchen");
                     maxOrderKitchen.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override

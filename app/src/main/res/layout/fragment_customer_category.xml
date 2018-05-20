@@ -1,74 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="15dp">
-
-    <android.support.v7.widget.GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <include layout="@layout/background"/>
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:columnCount="3">
+        android:orientation="vertical"
+        android:padding="15dp">
 
-        <Button
-            android:elevation="5dp"
-            android:id="@+id/btRecommended"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="15dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/selector_menu_recommended"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+        <android.support.v7.widget.GridLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:columnCount="3">
 
-        <Button
-            android:elevation="5dp"
-            android:id="@+id/btPromotion"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="15dp"
-            android:background="@drawable/selector_menu_promotion"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+            <Button
+                android:elevation="5dp"
+                android:id="@+id/btRecommended"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/selector_menu_recommended"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
 
-        <Button
-            android:elevation="5dp"
-            android:id="@+id/btAppetizer"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginBottom="15dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/selector_menu_appetizer"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+            <Button
+                android:elevation="5dp"
+                android:id="@+id/btPromotion"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="15dp"
+                android:background="@drawable/selector_menu_promotion"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
 
-        <Button
-            android:elevation="5dp"
-            android:id="@+id/btMainDish"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginRight="15dp"
-            android:background="@drawable/selector_menu_main_dish"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+            <Button
+                android:elevation="5dp"
+                android:id="@+id/btAppetizer"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginBottom="15dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/selector_menu_appetizer"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
 
-        <Button
-            android:id="@+id/btDessert"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@drawable/selector_menu_dessert"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
+            <Button
+                android:elevation="5dp"
+                android:id="@+id/btMainDish"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/selector_menu_main_dish"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
 
-        <Button
-            android:id="@+id/btDrink"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginLeft="15dp"
-            android:background="@drawable/selector_menu_drinks"
-            app:layout_columnWeight="1"
-            app:layout_rowWeight="1" />
-    </android.support.v7.widget.GridLayout>
+            <Button
+                android:id="@+id/btDessert"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:background="@drawable/selector_menu_dessert"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
 
-</LinearLayout>
+            <Button
+                android:id="@+id/btDrink"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/selector_menu_drinks"
+                app:layout_columnWeight="1"
+                app:layout_rowWeight="1" />
+        </android.support.v7.widget.GridLayout>
+
+    </LinearLayout>
+</FrameLayout>

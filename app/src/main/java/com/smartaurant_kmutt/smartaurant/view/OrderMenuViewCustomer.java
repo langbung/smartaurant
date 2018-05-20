@@ -11,6 +11,7 @@ import com.inthecheesefactory.thecheeselibrary.view.BaseCustomViewGroup;
 import com.inthecheesefactory.thecheeselibrary.view.state.BundleSavedState;
 import com.smartaurant_kmutt.smartaurant.R;
 
+import java.text.DecimalFormat;
 import java.util.Locale;
 
 
@@ -107,12 +108,12 @@ public class OrderMenuViewCustomer extends BaseCustomViewGroup {
     }
 
     public void setPrice(float price){
-        String textPrice=String.format(Locale.ENGLISH,"%.2f",price);
-        tvPrice.setText(textPrice);
+        DecimalFormat df = new DecimalFormat("###,##0.00");
+        tvPrice.setText(df.format(price));
     }
     public void setTotal(float total){
-        String textPrice=String.format(Locale.ENGLISH,"%.2f",total);
-        tvPrice.setText(textPrice);
+        DecimalFormat df = new DecimalFormat("###,##0.00");
+        tvPrice.setText(df.format(total));
     }
 
     public void setTable(int table){
