@@ -122,7 +122,7 @@ public class CustomerMenuFragment extends Fragment  {
     private void menuRealTime() {
         loading.show(getFragmentManager(), "load");
         DatabaseReference menuDatabase = UtilDatabase.getMenu();
-        Log.e("customer", menuType);
+//        Log.e("customer", menuType);
         Query menuQuery = menuDatabase.orderByChild(menuType).equalTo(true);
         menuQuery.addValueEventListener(new ValueEventListener() {
             @Override

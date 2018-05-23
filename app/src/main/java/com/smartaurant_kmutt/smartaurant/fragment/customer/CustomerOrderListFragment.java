@@ -98,14 +98,14 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
     @Override
     public void onStart() {
         super.onStart();
-        Log.e("set order real time", "on start");
+//        Log.e("set order real time", "on start");
 //        setOrderRealTime();
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.e("set order real time", "on stop");
+//        Log.e("set order real time", "on stop");
 //        if(valueEventListener !=null)
 //            UtilDatabase.getDatabase().child("order_kitchen").orderByChild("orderId").equalTo(orderItemDao.getOrderId()).removeEventListener(valueEventListener);
 //        Log.e("set order real time","on stop removed listener");
@@ -181,7 +181,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                 if (position < orderMenuKitchenManager.getOrderMenuKitchenDao().size()) {
                     OrderMenuKitchenItemDao orderMenuKitchenItemDao = orderMenuKitchenManager.getOrderMenuKitchenDao().get(position);
                     if (orderMenuKitchenItemDao.getStatus().equals("in queue")) {
-                        YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName()+" ?");
+                        YesNoDialog yesNoDialog = YesNoDialog.newInstance("Cancel " + orderMenuKitchenItemDao.getMenuName(), "Do you want to cancel " + orderMenuKitchenItemDao.getMenuName() + " ?");
                         yesNoDialog.setTargetFragment(CustomerOrderListFragment.this, DELETE_MENU_REQUEST_CODE);
                         yesNoDialog.show(getFragmentManager(), "cancelMenu");
                     }
@@ -203,11 +203,12 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
 //                    Log.e("set order real time", "queried " + dataSnapshot.toString());
 
 //                    MyUtil.showText(dataSnapshot.toString());
-//                    Log.e("123","data = "+dataSnapshot.getChildrenCount()+"");
+//
 //                    if(dataSnapshot.exists()){
 
                     if (dataSnapshot.exists()) {
 //                        Log.e("OrderListFragment","data exist");
+                        Log.e("123", "data = " + dataSnapshot.getChildrenCount() + "");
                         countDatabase = 0;
                         total = 0;
                         orderKitchenList = new ArrayList<>();
@@ -230,20 +231,23 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                             priceMenuDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot menuItemDatabase) {
-                                    menuItem = menuItemDatabase.getValue(MenuItemDao.class);
+                                    if (countDatabase < countChild) {
+
 //                                    String show= "menu = " +menuItem.getName() +" price = "+menuItem.getPrice() + " promotion = "+menuItem.getPromotion();
 //                                    Log.e("customer order",show);
-                                    String size = orderKitchenList.get(countDatabase).getSize();
-                                    float price = getRealPrice(menuItem.getPrice(), size);
 //                                    Log.e("CustomerOrderListFrag","price = "+price);
-                                    price = price * (1 - menuItem.getPromotion() / 100);
 //                                    Log.e("set order real time", "countDatabase = "+countDatabase );
-                                    orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
 //                                Log.e("123", orderKitchenList.get(countDatabase).getMenuName() + " จำนวน " + orderKitchenList.get(countDatabase).getQuantity() + " ราคา " + orderKitchenList.get(countDatabase).getPrice());
-                                    total += orderKitchenList.get(countDatabase).getPrice();
 //                                    double vat = dataSnapshot.getValue(Double.class);
-
-                                    countDatabase++;
+                                        menuItem = menuItemDatabase.getValue(MenuItemDao.class);
+                                        Log.e("countDatabaseDataChange", countDatabase + "");
+                                        String size = orderKitchenList.get(countDatabase).getSize();
+                                        float price = getRealPrice(menuItem, size);
+                                        price = price * (1 - menuItem.getPromotion() / 100);
+                                        orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
+                                        total += orderKitchenList.get(countDatabase).getPrice();
+                                        countDatabase++;
+                                    }
 
                                     if (countDatabase == countChild) {
                                         DatabaseReference vatDatabase = UtilDatabase.getUtilDatabase();
@@ -257,7 +261,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                                 String vatValueText = String.format(Locale.ENGLISH, "%.2f", vatValue);
                                                 customerOrderListAdapter.setVatValue(Float.parseFloat(vatValueText));
                                                 total = (float) (total * (1 + vat / 100.0));
-                                                Log.e("total", total + "");
+//                                                Log.e("total", total + "");
 
                                                 DataSnapshot discounts = dataSnapshot.child("discount");
                                                 ArrayList<Float> keyDiscounts = new ArrayList<>();
@@ -270,7 +274,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
 
                                                 DecimalFormat df = new DecimalFormat("##,###.00");
                                                 tvTotal.setText(df.format(total));
-                                                setTotalToDatabase(Float.parseFloat(total+""));
+                                                setTotalToDatabase(Float.parseFloat(total + ""));
                                                 for (int i = keyDiscounts.size() - 1; i >= 0; i--) {
                                                     if (total > keyDiscounts.get(i)) {
                                                         customerOrderListAdapter.setCheckDiscount(true);
@@ -283,7 +287,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                                         tvTotal.setText(df.format(total));
                                                         setTotalToDatabase(total);
                                                         break;
-                                                    }else{
+                                                    } else {
                                                         customerOrderListAdapter.setCheckDiscount(false);
                                                     }
                                                 }
@@ -298,6 +302,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
                                             }
                                         });
                                     }
+
 //                                    Log.e("OrderListFragment", "orderKitchen list = " + orderKitchenList.size());
                                 }
 
@@ -340,19 +345,19 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
         });
     }
 
-    private float getRealPrice(float price, String size) {
+    private float getRealPrice(MenuItemDao menuItem, String size) {
         float test = 0;
         switch (size) {
             case "S": {
-                test = price;
+                test = menuItem.getPrice();
                 break;
             }
             case "M": {
-                test = price + 10;
+                test = menuItem.getPriceM();
                 break;
             }
             case "L": {
-                test = price + 15;
+                test = menuItem.getPriceL();
                 break;
             }
         }
@@ -362,7 +367,7 @@ public class CustomerOrderListFragment extends Fragment implements YesNoDialog.O
     @Override
     public void onPause() {
         super.onPause();
-        Log.e("set order real time", "on pause");
+//        Log.e("set order real time", "on pause");
 
     }
 

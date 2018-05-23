@@ -119,7 +119,8 @@ public class OwnerRevenueOrderListFragment extends Fragment implements YesNoDial
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 loading.show(getFragmentManager(), "l");
-                tvOrderId.setText(orderItemDao.getOrderId());
+                String orderId= "Order: "+orderItemDao.getOrderId();
+                tvOrderId.setText(orderId);
                 String tableText = "Table " + orderItemDao.getTable();
                 tvTable.setText(tableText);
                 Map<String, String> date = (Map) dataSnapshot.getValue();
