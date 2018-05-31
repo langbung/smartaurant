@@ -60,8 +60,9 @@ public class DialogCashierVoucher extends android.support.v4.app.DialogFragment 
         etVoucher = view.findViewById(R.id.etVoucher);
         btSubmit.setOnClickListener(onClickListener);
         Voucher voucher = new Voucher();
-        String voucherCode = voucher.getVoucher(200, 3);
-        MyUtil.print(voucherCode);
+        VoucherItem voucherCode = voucher.getVoucher(200, 3);
+        voucher.updateVoucher(voucherCode);
+        MyUtil.print(voucherCode.getId());
     }
 
     View.OnClickListener onClickListener = new View.OnClickListener() {

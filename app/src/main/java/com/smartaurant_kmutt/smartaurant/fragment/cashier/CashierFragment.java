@@ -261,7 +261,7 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
                                         MenuItemDao menuItem = menuItemDatabase.getValue(MenuItemDao.class);
 
                                         String size = orderKitchenList.get(countDatabase).getSize();
-                                        float price = getRealPrice(menuItem.getPrice(), size);
+                                        float price = getRealPrice(menuItem, size);
                                         price = price * (1 - menuItem.getPromotion() / 100);
                                         orderKitchenList.get(countDatabase).setPrice(orderKitchenList.get(countDatabase).getQuantity() * price);
 
@@ -364,19 +364,19 @@ public class CashierFragment extends Fragment implements YesNoDialog.OnYesNoDial
         });
     }
 
-    private float getRealPrice(float price, String size) {
+    private float getRealPrice(MenuItemDao menuItemDao, String size) {
         float test = 0;
         switch (size) {
             case "S": {
-                test = price;
+                test = menuItemDao.getPrice();
                 break;
             }
             case "M": {
-                test = price + 10;
+                test = menuItemDao.getPriceM();
                 break;
             }
             case "L": {
-                test = price + 15;
+                test =menuItemDao.getPriceL();
                 break;
             }
         }

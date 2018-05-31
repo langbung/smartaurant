@@ -37,7 +37,7 @@ public class Voucher {
     }
 
 
-    public String getVoucher(int sale, int endDateAmount) {
+    public VoucherItem getVoucher(int sale, int endDateAmount) {
         Calendar calendar = Calendar.getInstance();
 //        Date dateNow = calendar.getTime();
         calendar.add(Calendar.DATE, endDateAmount);
@@ -52,11 +52,10 @@ public class Voucher {
         int ran = random.nextInt(99999999) + 1;
         DecimalFormat df = new DecimalFormat("00000000");
         voucherItem.setId(df.format(ran));
-        updateVoucher(voucherItem);
-        return voucherItem.getId();
+        return voucherItem;
     }
 
-    private void updateVoucher(VoucherItem voucherItem) {
+    public void updateVoucher(VoucherItem voucherItem) {
         DatabaseReference databaseReference = UtilDatabase.getDatabase().child("voucher/"+voucherItem.getId());
         databaseReference.setValue(voucherItem);
     }

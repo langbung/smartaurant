@@ -36,6 +36,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class OwnerRevenueListFragment extends Fragment {
     Button btFilter;
+    Button btNotFilter;
     ArrayList<String> dateList;
     ArrayList<String> monthList;
     ArrayList<String> yearList;
@@ -56,6 +57,7 @@ public class OwnerRevenueListFragment extends Fragment {
     Loading loading = Loading.newInstance();
     OrderItemDao orderItemDao;
     View view;
+
     public OwnerRevenueListFragment() {
         super();
     }
@@ -103,18 +105,8 @@ public class OwnerRevenueListFragment extends Fragment {
     private void initButton(View rootView) {
         btFilter = rootView.findViewById(R.id.btFilter);
         btFilter.setOnClickListener(onClickListener);
-        btFilter.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View v) {
-                if(v == btFilter){
-                    dateSpinner.setText("");
-                    monthSpinner.setText("");
-                    yearSpinner.setText("");
-                    return true;
-                }
-                return false;
-            }
-        });
+        btNotFilter = rootView.findViewById(R.id.btNotFilter);
+        btNotFilter.setOnClickListener(onClickListener);
     }
 
     private void initListViewRevenue(View rootView) {
@@ -176,7 +168,7 @@ public class OwnerRevenueListFragment extends Fragment {
         int count;
         ArrayList<String> date = new ArrayList<>();
         for (count = 1; count <= 31; count++) {
-            date.add(String.format(Locale.ENGLISH,"%02d",count));
+            date.add(String.format(Locale.ENGLISH, "%02d", count));
         }
         return date;
     }
@@ -185,7 +177,7 @@ public class OwnerRevenueListFragment extends Fragment {
         int count;
         ArrayList<String> month = new ArrayList<>();
         for (count = 1; count <= 12; count++) {
-            month.add(String.format(Locale.ENGLISH,"%02d",count));
+            month.add(String.format(Locale.ENGLISH, "%02d", count));
         }
         return month;
     }
@@ -298,11 +290,10 @@ public class OwnerRevenueListFragment extends Fragment {
         } else if (!date.equals("") && !month.equals("")) {
             mode = 2;
             System.out.println("mode = 2");
-        } else if (!date.equals("") && !year.equals("") ){
+        } else if (!date.equals("") && !year.equals("")) {
             mode = 3;
             System.out.println("mode = 3");
-        }
-        else if (!month.equals("") && !year.equals("")) {
+        } else if (!month.equals("") && !year.equals("")) {
             mode = 4;
             System.out.println("mode = 4");
         } else if (!date.equals("")) {
@@ -323,27 +314,27 @@ public class OwnerRevenueListFragment extends Fragment {
         DecimalFormat df = new DecimalFormat("###,##0.00");
         switch (mode) {
             case 1: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mDay = orderItemDaoList.get(i).getDateTime().get("day");
                     String mMonth = orderItemDaoList.get(i).getDateTime().get("month");
                     String mYear = orderItemDaoList.get(i).getDateTime().get("year");
                     if (mDay.equals(date) && mMonth.equals(month) && mYear.equals(year)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
                 break;
             }
             case 2: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mDay = orderItemDaoList.get(i).getDateTime().get("day");
                     String mMonth = orderItemDaoList.get(i).getDateTime().get("month");
                     if (mDay.equals(date) && mMonth.equals(month)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
@@ -351,63 +342,63 @@ public class OwnerRevenueListFragment extends Fragment {
             }
 
             case 3: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mDay = orderItemDaoList.get(i).getDateTime().get("day");
                     String mYear = orderItemDaoList.get(i).getDateTime().get("year");
                     if (mDay.equals(date) && mYear.equals(year)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
                 break;
             }
             case 4: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mMonth = orderItemDaoList.get(i).getDateTime().get("month");
                     String mYear = orderItemDaoList.get(i).getDateTime().get("year");
                     if (mMonth.equals(month) && mYear.equals(year)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
                 break;
             }
             case 5: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mDay = orderItemDaoList.get(i).getDateTime().get("day");
                     if (mDay.equals(date)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
                 break;
             }
             case 6: {
-                filterTotal=0;
-                String mMonth="";
+                filterTotal = 0;
+                String mMonth = "";
                 for (int i = 0; i < count; i++) {
                     mMonth = orderItemDaoList.get(i).getDateTime().get("month");
                     if (mMonth.equals(month)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
                 break;
             }
             case 7: {
-                filterTotal=0;
+                filterTotal = 0;
                 for (int i = 0; i < count; i++) {
                     String mYear = orderItemDaoList.get(i).getDateTime().get("year");
                     if (mYear.equals(year)) {
                         filterOrderItemList.add(orderItemDaoList.get(i));
-                        filterTotal+=orderItemDaoList.get(i).getTotal();
+                        filterTotal += orderItemDaoList.get(i).getTotal();
                     }
                 }
                 tvTotal.setText(df.format(filterTotal));
@@ -434,16 +425,33 @@ public class OwnerRevenueListFragment extends Fragment {
     View.OnClickListener onClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            loading.show(getFragmentManager(), "l");
-            String date = dateSpinner.getText().toString();
-            String month = monthSpinner.getText().toString();
-            String year = yearSpinner.getText().toString();
-            ArrayList<OrderItemDao> filterList = filter(date, month, year, orderList);
-            orderListManager.setOrderList(filterList);
-            orderListAdapter.setOrderListManager(orderListManager);
-            orderListAdapter.notifyDataSetChanged();
-            loading.dismiss();
+            if (v == btNotFilter) {
+                dateSpinner.setText("");
+                monthSpinner.setText("");
+                yearSpinner.setText("");
+
+                dateSpinner.clearFocus();
+                monthSpinner.clearFocus();
+                yearSpinner.clearFocus();
+                ArrayList<OrderItemDao> filterList = filter("", "", "", orderList);
+                orderListManager.setOrderList(filterList);
+                orderListAdapter.setOrderListManager(orderListManager);
+                orderListAdapter.notifyDataSetChanged();
+
+            }
+            if (v == btFilter) {
+                loading.show(getFragmentManager(), "l");
+                String date = dateSpinner.getText().toString();
+                String month = monthSpinner.getText().toString();
+                String year = yearSpinner.getText().toString();
+                ArrayList<OrderItemDao> filterList = filter(date, month, year, orderList);
+                orderListManager.setOrderList(filterList);
+                orderListAdapter.setOrderListManager(orderListManager);
+                orderListAdapter.notifyDataSetChanged();
+                loading.dismiss();
+            }
         }
+
     };
 
 }

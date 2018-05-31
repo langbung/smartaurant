@@ -15,21 +15,21 @@
             android:hint="date"
             android:id="@+id/dateSpinner"
             android:layout_width="70dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="@dimen/height_listView_one_row" />
         <com.weiwangcn.betterspinner.library.BetterSpinner
             android:dropDownHeight="200dp"
             android:gravity="center"
             android:hint="month"
             android:id="@+id/monthSpinner"
             android:layout_width="80dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="@dimen/height_listView_one_row" />
         <com.weiwangcn.betterspinner.library.BetterSpinner
             android:dropDownHeight="200dp"
             android:gravity="center"
             android:hint="year"
             android:id="@+id/yearSpinner"
             android:layout_width="80dp"
-            android:layout_height="wrap_content" />
+            android:layout_height="@dimen/height_listView_one_row" />
         <Space
             android:layout_width="10dp"
             android:layout_height="0dp"
@@ -37,8 +37,13 @@
         <Button
             android:id="@+id/btFilter"
             android:background="@drawable/selector_filter_button"
-            android:layout_width="20dp"
-            android:layout_height="20dp" />
+            android:layout_width="@dimen/height_listView_one_row"
+            android:layout_height="@dimen/height_listView_one_row" />
+        <Button
+            android:id="@+id/btNotFilter"
+            android:background="@drawable/selector_unfilter_button"
+            android:layout_width="@dimen/height_listView_one_row"
+            android:layout_height="@dimen/height_listView_one_row" />
     </LinearLayout>
     <ListView
         android:layout_weight="1"

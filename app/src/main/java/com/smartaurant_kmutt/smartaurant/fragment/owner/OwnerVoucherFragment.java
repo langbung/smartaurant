@@ -27,6 +27,7 @@ import com.smartaurant_kmutt.smartaurant.adapter.CustomerOrderListAdapter;
 import com.smartaurant_kmutt.smartaurant.dao.MenuItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderItemDao;
 import com.smartaurant_kmutt.smartaurant.dao.OrderMenuKitchenItemDao;
+import com.smartaurant_kmutt.smartaurant.dao.VoucherItem;
 import com.smartaurant_kmutt.smartaurant.fragment.dialogFragment.YesNoDialog;
 import com.smartaurant_kmutt.smartaurant.manager.OrderMenuKitchenManager;
 import com.smartaurant_kmutt.smartaurant.util.Loading;
@@ -50,7 +51,7 @@ public class OwnerVoucherFragment extends Fragment {
     Button bt200;
     Button bt1000;
     Button bt500;
-
+    VoucherItem voucherItem;
     TextView tvVoucherCode;
 
     public OwnerVoucherFragment() {
@@ -158,7 +159,8 @@ public class OwnerVoucherFragment extends Fragment {
     }
     private void genVoucherCode(int discount){
         Voucher voucher = new Voucher();
-        tvVoucherCode.setText(voucher.getVoucher(discount,30));
+        voucherItem = voucher.getVoucher(discount,30);
+        tvVoucherCode.setText(voucherItem.getId());
         if(tvVoucherCode.getVisibility()!=View.VISIBLE){
             tvVoucherCode.setVisibility(View.VISIBLE);
             btCopy.setVisibility(View.VISIBLE);
@@ -185,6 +187,8 @@ public class OwnerVoucherFragment extends Fragment {
                 genVoucherCode(1000);
             }
             else if(v==btCopy){
+                Voucher voucher = new Voucher();
+                voucher.updateVoucher(voucherItem);
                 ClipboardManager clipboard = (ClipboardManager) activity.getSystemService(Context.CLIPBOARD_SERVICE);
                 ClipData clip = ClipData.newPlainText("voucherCode", tvVoucherCode.getText().toString());
                 clipboard.setPrimaryClip(clip);
